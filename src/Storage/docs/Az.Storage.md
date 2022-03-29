@@ -1,6 +1,6 @@
 ---
 Module Name: Az.Storage
-Module Guid: 453920b0-3f72-4fec-a420-fe623026be0a
+Module Guid: 68aa5c38-c369-41b5-ac9d-e34af6469770
 Download Help Link: https://docs.microsoft.com/powershell/module/az.storage
 Help Version: 1.0.0.0
 Locale: en-US
@@ -16,18 +16,15 @@ Clears legal hold tags.
 Clearing the same or non-existent tag results in an idempotent operation.
 ClearLegalHold clears out only the specified tags in the request.
 
-### [createContextForAccount](createContextForAccount.md)
-
-
 ### [Get-AzStorageAccount](Get-AzStorageAccount.md)
+
+
+### [Get-AzStorageAccountInternal](Get-AzStorageAccountInternal.md)
 Lists all the storage accounts available under the subscription.
 Note that storage keys are not returned; use the ListKeys operation for this.
 
 ### [Get-AzStorageAccountKey](Get-AzStorageAccountKey.md)
 Lists the access keys or Kerberos keys (if active directory enabled) for the specified storage account.
-
-### [Get-AzStorageAccountNew](Get-AzStorageAccountNew.md)
-Get-AzStorageAccount
 
 ### [Get-AzStorageAccountProperty](Get-AzStorageAccountProperty.md)
 Returns the properties for the specified storage account including but not limited to name, SKU name, location, and account status.
@@ -55,7 +52,7 @@ It returns a collection of one object named default.
 ### [Get-AzStorageBlobServiceProperty](Get-AzStorageBlobServiceProperty.md)
 Gets the properties of a storage account’s Blob service, including properties for Storage Analytics and CORS (Cross-Origin Resource Sharing) rules.
 
-### [Get-AzStorageDeletedAccount](Get-AzStorageDeletedAccount.md)
+### [Get-AzStorageDeletedAccountInternal](Get-AzStorageDeletedAccountInternal.md)
 Get properties of specified deleted account resource.
 
 ### [Get-AzStorageEncryptionScope](Get-AzStorageEncryptionScope.md)

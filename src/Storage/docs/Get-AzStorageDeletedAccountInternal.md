@@ -1,11 +1,11 @@
 ---
 external help file:
 Module Name: Az.Storage
-online version: https://docs.microsoft.com/powershell/module/az.storage/get-azstoragedeletedaccount
+online version: https://docs.microsoft.com/powershell/module/az.storage/get-azstoragedeletedaccountinternal
 schema: 2.0.0
 ---
 
-# Get-AzStorageDeletedAccount
+# Get-AzStorageDeletedAccountInternal
 
 ## SYNOPSIS
 Get properties of specified deleted account resource.
@@ -14,18 +14,20 @@ Get properties of specified deleted account resource.
 
 ### List (Default)
 ```
-Get-AzStorageDeletedAccount [-SubscriptionId <String[]>] [-DefaultProfile <PSObject>] [<CommonParameters>]
+Get-AzStorageDeletedAccountInternal [-SubscriptionId <String[]>] [-DefaultProfile <PSObject>]
+ [<CommonParameters>]
 ```
 
 ### Get
 ```
-Get-AzStorageDeletedAccount -Location <String> -Name <String> [-SubscriptionId <String[]>]
+Get-AzStorageDeletedAccountInternal -Location <String> -Name <String> [-SubscriptionId <String[]>]
  [-DefaultProfile <PSObject>] [<CommonParameters>]
 ```
 
 ### GetViaIdentity
 ```
-Get-AzStorageDeletedAccount -InputObject <IStorageIdentity> [-DefaultProfile <PSObject>] [<CommonParameters>]
+Get-AzStorageDeletedAccountInternal -InputObject <IStorageIdentity> [-DefaultProfile <PSObject>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION

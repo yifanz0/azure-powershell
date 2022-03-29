@@ -49,7 +49,13 @@ subject-prefix: $(service-name)
 # identity-correction-for-post: true
 resourcegroup-append: true
 
-#directive:
+directive:
+  - where:
+      verb: Get
+      subject: (Account$)
+    set:
+      subject: $1Internal
+#
 #  - where:
 #      subject: Snapshot
 #    set:

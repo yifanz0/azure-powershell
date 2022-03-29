@@ -1,11 +1,11 @@
-if(($null -eq $TestName) -or ($TestName -contains 'Get-AzStorageAccountMRR'))
+if(($null -eq $TestName) -or ($TestName -contains 'Get-AzStorageMRRProperty'))
 {
   $loadEnvPath = Join-Path $PSScriptRoot 'loadEnv.ps1'
   if (-Not (Test-Path -Path $loadEnvPath)) {
       $loadEnvPath = Join-Path $PSScriptRoot '..\loadEnv.ps1'
   }
   . ($loadEnvPath)
-  $TestRecordingFile = Join-Path $PSScriptRoot 'Get-AzStorageAccountMRR.Recording.json'
+  $TestRecordingFile = Join-Path $PSScriptRoot 'Get-AzStorageMRRProperty.Recording.json'
   $currentPath = $PSScriptRoot
   while(-not $mockingPath) {
       $mockingPath = Get-ChildItem -Path $currentPath -Recurse -Include 'HttpPipelineMocking.ps1' -File
@@ -14,8 +14,12 @@ if(($null -eq $TestName) -or ($TestName -contains 'Get-AzStorageAccountMRR'))
   . ($mockingPath | Select-Object -First 1).FullName
 }
 
-Describe 'Get-AzStorageAccountMRR' {
-    It '__AllParameterSets' -skip {
+Describe 'Get-AzStorageMRRProperty' {
+    It 'Get' -skip {
+        { throw [System.NotImplementedException] } | Should -Not -Throw
+    }
+
+    It 'GetViaIdentity' -skip {
         { throw [System.NotImplementedException] } | Should -Not -Throw
     }
 }

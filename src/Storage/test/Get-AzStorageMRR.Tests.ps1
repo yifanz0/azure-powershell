@@ -1,11 +1,11 @@
-if(($null -eq $TestName) -or ($TestName -contains 'Get-AzStorageAccountHelper'))
+if(($null -eq $TestName) -or ($TestName -contains 'Get-AzStorageMRR'))
 {
   $loadEnvPath = Join-Path $PSScriptRoot 'loadEnv.ps1'
   if (-Not (Test-Path -Path $loadEnvPath)) {
       $loadEnvPath = Join-Path $PSScriptRoot '..\loadEnv.ps1'
   }
   . ($loadEnvPath)
-  $TestRecordingFile = Join-Path $PSScriptRoot 'Get-AzStorageAccountHelper.Recording.json'
+  $TestRecordingFile = Join-Path $PSScriptRoot 'Get-AzStorageMRR.Recording.json'
   $currentPath = $PSScriptRoot
   while(-not $mockingPath) {
       $mockingPath = Get-ChildItem -Path $currentPath -Recurse -Include 'HttpPipelineMocking.ps1' -File
@@ -14,16 +14,12 @@ if(($null -eq $TestName) -or ($TestName -contains 'Get-AzStorageAccountHelper'))
   . ($mockingPath | Select-Object -First 1).FullName
 }
 
-Describe 'Get-AzStorageAccountHelper' {
-    It 'ResourceGroupParameterSet' -skip {
+Describe 'Get-AzStorageMRR' {
+    It 'Get' -skip {
         { throw [System.NotImplementedException] } | Should -Not -Throw
     }
 
-    It 'AccountNameParameterSet' -skip {
-        { throw [System.NotImplementedException] } | Should -Not -Throw
-    }
-
-    It 'BlobRestoreStatusParameterSet' -skip {
+    It 'GetViaIdentity' -skip {
         { throw [System.NotImplementedException] } | Should -Not -Throw
     }
 }

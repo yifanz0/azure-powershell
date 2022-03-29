@@ -8,25 +8,29 @@ schema: 2.0.0
 # Get-AzStorageAccount
 
 ## SYNOPSIS
-Lists all the storage accounts available under the subscription.
-Note that storage keys are not returned; use the ListKeys operation for this.
+
 
 ## SYNTAX
 
-### List (Default)
+### ResourceGroupParameterSet (Default)
 ```
-Get-AzStorageAccount [-SubscriptionId <String[]>] [-DefaultProfile <PSObject>] [<CommonParameters>]
+Get-AzStorageAccount [[-ResourceGroupName] <String>] [<CommonParameters>]
 ```
 
-### List1
+### AccountNameParameterSet
 ```
-Get-AzStorageAccount -ResourceGroupName <String> [-SubscriptionId <String[]>] [-DefaultProfile <PSObject>]
+Get-AzStorageAccount [-ResourceGroupName] <String> [-Name] <String> [-IncludeGeoReplicationStats]
+ [<CommonParameters>]
+```
+
+### BlobRestoreStatusParameterSet
+```
+Get-AzStorageAccount [-ResourceGroupName] <String> [-Name] <String> -IncludeBlobRestoreStatus
  [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Lists all the storage accounts available under the subscription.
-Note that storage keys are not returned; use the ListKeys operation for this.
+
 
 ## EXAMPLES
 
@@ -54,28 +58,12 @@ Note that storage keys are not returned; use the ListKeys operation for this.
 
 ## PARAMETERS
 
-### -DefaultProfile
-The credentials, account, tenant, and subscription used for communication with Azure.
+### -IncludeBlobRestoreStatus
+Get the GeoReplicationStats of the Storage account.
 
 ```yaml
-Type: System.Management.Automation.PSObject
-Parameter Sets: (All)
-Aliases: AzureRMContext, AzureCredential
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ResourceGroupName
-The name of the resource group within the user's subscription.
-The name is case insensitive.
-
-```yaml
-Type: System.String
-Parameter Sets: List1
+Type: System.Management.Automation.SwitchParameter
+Parameter Sets: BlobRestoreStatusParameterSet
 Aliases:
 
 Required: True
@@ -85,17 +73,47 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -SubscriptionId
-The ID of the target subscription.
+### -IncludeGeoReplicationStats
+Get the GeoReplicationStats of the Storage account.
 
 ```yaml
-Type: System.String[]
-Parameter Sets: (All)
+Type: System.Management.Automation.SwitchParameter
+Parameter Sets: AccountNameParameterSet
 Aliases:
 
 Required: False
 Position: Named
-Default value: (Get-AzContext).Subscription.Id
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Name
+Storage Account Name.
+
+```yaml
+Type: System.String
+Parameter Sets: AccountNameParameterSet, BlobRestoreStatusParameterSet
+Aliases:
+
+Required: True
+Position: 1
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ResourceGroupName
+Resource Group Name.
+
+```yaml
+Type: System.String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: 0
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -107,7 +125,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## OUTPUTS
 
-### Microsoft.Azure.PowerShell.Cmdlets.Storage.Models.Api20210801.IStorageAccount
+### Microsoft.Azure.PowerShell.Cmdlets.Storage.Models.Api20210801.StorageAccount
 
 ## NOTES
 

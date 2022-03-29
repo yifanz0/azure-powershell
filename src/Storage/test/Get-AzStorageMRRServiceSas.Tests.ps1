@@ -1,11 +1,11 @@
-if(($null -eq $TestName) -or ($TestName -contains 'createContextForAccount'))
+if(($null -eq $TestName) -or ($TestName -contains 'Get-AzStorageMRRServiceSas'))
 {
   $loadEnvPath = Join-Path $PSScriptRoot 'loadEnv.ps1'
   if (-Not (Test-Path -Path $loadEnvPath)) {
       $loadEnvPath = Join-Path $PSScriptRoot '..\loadEnv.ps1'
   }
   . ($loadEnvPath)
-  $TestRecordingFile = Join-Path $PSScriptRoot 'createContextForAccount.Recording.json'
+  $TestRecordingFile = Join-Path $PSScriptRoot 'Get-AzStorageMRRServiceSas.Recording.json'
   $currentPath = $PSScriptRoot
   while(-not $mockingPath) {
       $mockingPath = Get-ChildItem -Path $currentPath -Recurse -Include 'HttpPipelineMocking.ps1' -File
@@ -14,8 +14,12 @@ if(($null -eq $TestName) -or ($TestName -contains 'createContextForAccount'))
   . ($mockingPath | Select-Object -First 1).FullName
 }
 
-Describe 'createContextForAccount' {
-    It '__AllParameterSets' -skip {
+Describe 'Get-AzStorageMRRServiceSas' {
+    It 'ListExpanded' -skip {
+        { throw [System.NotImplementedException] } | Should -Not -Throw
+    }
+
+    It 'List' -skip {
         { throw [System.NotImplementedException] } | Should -Not -Throw
     }
 }

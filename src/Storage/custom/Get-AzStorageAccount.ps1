@@ -19,9 +19,35 @@ Get-AzStorageAccount
 .Description
 Get-AzStorageAccount
 #>
-function Get-AzStorageAccountNew {
+class PSSku {
+    [string]$Name
+    [string]$Tier
+}
+
+class PSPrimaryEndpoints {
+    [string]$Blob
+    [string]$Queue
+    [string]$Table
+    [string]$File
+    [string]$Web
+    [string]$Dfs
+    [string]$MicrosoftEndpoints
+    [string]$InternetEndpoints
+}
+
+class PSStorageAccount {
+    [string]$ResourceGroupName
+    [string]$StorageAccountName
+    [string]$Id
+    [string]$Location
+    [PSSku]$Sku
+    [PSPrimaryEndpoints]$PrimaryEndpoints
+}
+
+
+function Get-AzStorageAccount {
     [OutputType('Microsoft.Azure.PowerShell.Cmdlets.Storage.Models.Api20210801.StorageAccount')]
-    [CmdletBinding(DefaultParameterSetName='ResourceGroupParameterSet')]
+    #[CmdletBinding(DefaultParameterSetName='ResourceGroupParameterSet')]
     Param(
         [Parameter(Mandatory = $false,
             ParameterSetName = 'ResourceGroupParameterSet',
@@ -35,7 +61,7 @@ function Get-AzStorageAccountNew {
             ParameterSetName = 'BlobRestoreStatusParameterSet',
             HelpMessage = 'Resource Group Name.',
             Position = 0)]
-        [ValidateNotNullorEmpty()]
+ 
         [System.String]
         $ResourceGroupName,
 
@@ -64,84 +90,74 @@ function Get-AzStorageAccountNew {
             ParameterSetName = 'BlobRestoreStatusParameterSet',
             HelpMessage = 'Get the GeoReplicationStats of the Storage account.')]
         [System.Management.Automation.SwitchParameter]
-        $IncludeBlobRestoreStatus,
-
-        [Parameter(
-            Mandatory = $false,
-            HelpMessage = 'Get the GeoReplicationStats of the Storage account.')]
-        [System.Management.Automation.SwitchParameter]
-        $AsJob
+        $IncludeBlobRestoreStatus
     )
 
     process {
-        #$accounts = [Microsoft.Azure.PowerShell.Cmdlets.Storage.Models.Api20210801.StorageAccount]::New()
-#        $accounts = Az.Storage.internal\Get-AzStorageACcount
-        $demoarrayList = [System.Collections.ArrayList]::new()
-        if ($AsJob) {
-            Start-Job -ScriptBlock {
-                if ($ResourceGroupName) {
-                    $accounts = Get-AzStorageAccount -ResourceGroupName $ResourceGroupName
-                    if ($Name) {
-                        foreach ($account in $accounts) {
-                            if ($account.Name -eq $Name) {
-                                $res_account = [Microsoft.Azure.PowerShell.Cmdlets.Storage.Models.Api20210801.StorageAccount]::New()
-                                $account.PSObject.Properties | ForEach-Object {
-                                    $res_account.$_.Name = $_.Value
-                                    $c = createContextForAccount -Name $Name
-                                    $res_account.context = $c
-                                }
-                                return $res_account
-                            }
-                        }
-                    } else {
-                        return $accounts
-                    }
-                } else {
-                    return Get-AzStorageAccount
-                } 
+        $accounts = [System.Collections.ArrayList]::new()
+        if ($PSBoundParameters.ContainsKey('ResourceGroupName')) {
+            if ($PSBoundParameters.ContainsKey('Name')) {
+
+                $account = Get-AzStorageACcountProperty -ResourceGroupName $ResourceGroupName -AccountName $Name
+                return toPSStorageAccount -StorageAccount $account
+            } else {
+                $account_list = Get-AzStorageAccountInternal -ResourceGroupName $ResourceGroupName
+                foreach ($account in $account_list) {
+   
+                    $PSAccount = toPSStorageAccount -StorageAccount $account
+
+                    $accounts.add($PSAccount) 
+                }
+                return $accounts
+
             }
         } else {
-            if ($ResourceGroupName) {
-                $accounts = Get-AzStorageAccount -ResourceGroupName $ResourceGroupName
-                if ($Name) {
-                    foreach ($account in $accounts) {
-                        if ($account.Name -eq $Name) {
-                            $res_account = [Microsoft.Azure.PowerShell.Cmdlets.Storage.Models.Api20210801.StorageAccount]::New()
-                            foreach($object_properties in $account.PSObject.Properties) {
-                                $property_name = $object_properties.Name
-                                $property_val = $object_properties.Value
-                                $res_account.$property_name = $property_val
-                            }
-                            return $res_account
-                        }
-                    }
-                } else {
-                    return $accounts
-                }
-            } else {
-                return Get-AzStorageAccount
+            $account_list = Get-AzStorageAccountInternal
+            foreach ($account in $account_list) {
+                $PSAccount = toPSStorageAccount -StorageAccount $account
+
+                $accounts.add($PSAccount)
             }
+            return $accounts
         }
+
     }
 }
 
-function createContextForAccount {
+function toPSStorageAccount {
+    [OutputType('PSStorageAccount')]
+    [Microsoft.Azure.PowerShell.Cmdlets.Storage.DoNotExportAttribute()]
     Param(
         [Parameter(Mandatory = $true,
-            HelpMessage = 'Storage account name',
+            HelpMessage = 'Storage account',
             Position = 0)]
-        [System.String]
-        $Name
+        [Microsoft.Azure.PowerShell.Cmdlets.Storage.Models.Api20210801.StorageAccount]
+        $StorageAccount
     )
-    
 
-    $Context = [Microsoft.WindowsAzure.Commands.Common.Storage.AzureStorageContext]::New()
-    $Context.BlobEndPoint = 'https://example.blob.core.windows.net/'
-    # TODO: Fill in context information
-    return $Context
+    $PSAccount = [PSStorageAccount]::new()
+
+    $PSAccount.ResourceGroupName = $account.ResourceGroupName
+    $PSAccount.StorageAccountName = $account.Name
+    $PSAccount.Id = $account.Id
+    $PSAccount.Location = $account.Location
+
+    $Sku = [PSSku]::new()
+    $Sku.Name = $account.SkuName
+    $Sku.Tier = $account.SkuTier
+    $PSAccount.Sku = $Sku
+
+    $PrimaryEndpoints = [PSPrimaryEndpoints]::new()
+    $PrimaryEndpoints.Blob = $account.PrimaryEndpointBlob
+    $PrimaryEndpoints.Queue = $account.PrimaryEndpointQueue
+    $PrimaryEndpoints.Table = $account.PrimaryEndpointTable
+    $PrimaryEndpoints.File = $account.PrimaryEndpointFile
+    $PSAccount.PrimaryEndpoints = $PrimaryEndpoints
+
+    return $PSAccount
+
+
 }
 
-function createPrimaryEndpointsForAccount {
-    
-}
+
 
