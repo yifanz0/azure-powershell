@@ -15,6 +15,7 @@
 using Azure.Core;
 using Azure.ResourceManager;
 using Azure.ResourceManager.Resources;
+using Azure.ResourceManager.Storage;
 using Microsoft.Azure.Commands.Management.Storage.Models;
 using Microsoft.Azure.Commands.ResourceManager.Common;
 using Microsoft.Azure.Management.Storage;
@@ -24,6 +25,7 @@ using Microsoft.WindowsAzure.Commands.Utilities.Common;
 using System;
 using System.Collections.Generic;
 using StorageModels = Microsoft.Azure.Management.Storage.Models;
+using Azure.ResourceManager.Storage.Models;
 
 namespace Microsoft.Azure.Commands.Management.Storage
 {
@@ -157,43 +159,56 @@ namespace Microsoft.Azure.Commands.Management.Storage
             }
         }
 
-        protected static AccessTier ParseAccessTier(string accessTier)
+        protected static global::Azure.ResourceManager.Storage.Models.AccessTier ParseAccessTier(string accessTier)
         {
-            AccessTier returnAccessTier;
-            if (!Enum.TryParse<AccessTier>(accessTier, true, out returnAccessTier))
+            global::Azure.ResourceManager.Storage.Models.AccessTier returnAccessTier;
+            if (!Enum.TryParse<global::Azure.ResourceManager.Storage.Models.AccessTier>(accessTier, true, out returnAccessTier))
             {
                 throw new ArgumentOutOfRangeException("AccessTier");
             }
             return returnAccessTier;
         }
 
-        protected static Encryption ParseEncryption(bool storageEncryption = false, bool keyVaultEncryption = false, string keyName = null, string keyVersion = null, string keyVaultUri = null)
+
+
+
+        protected static global::Azure.ResourceManager.Storage.Models.Encryption ParseEncryption(bool storageEncryption = false, bool keyVaultEncryption = false, string keyName = null, string keyVersion = null, string keyVaultUri = null)
         {
-            Encryption accountEncryption = new Encryption();
+            global::Azure.ResourceManager.Storage.Models.Encryption accountEncryption = 
+                new global::Azure.ResourceManager.Storage.Models.Encryption(global::Azure.ResourceManager.Storage.Models.KeySource.MicrosoftKeyvault);
 
             if (storageEncryption)
             {
-                accountEncryption.KeySource = "Microsoft.Storage";
+                accountEncryption.KeySource = global::Azure.ResourceManager.Storage.Models.KeySource.MicrosoftStorage;
             }
             if (keyVaultEncryption)
             {
-                accountEncryption.KeySource = "Microsoft.Keyvault";
-                accountEncryption.KeyVaultProperties = new KeyVaultProperties(keyName, keyVersion, keyVaultUri);
+                accountEncryption.KeySource = global::Azure.ResourceManager.Storage.Models.KeySource.MicrosoftKeyvault;
+                accountEncryption.KeyVaultProperties = new global::Azure.ResourceManager.Storage.Models.KeyVaultProperties();
+                accountEncryption.KeyVaultProperties.KeyName = keyName;
+                accountEncryption.KeyVaultProperties.KeyVersion = keyVersion;
+                accountEncryption.KeyVaultProperties.KeyVaultUri = new Uri(keyVaultUri);
+                //accountEncryption.KeyVaultProperties = new global::Azure.ResourceManager.Models.KeyVaultProperties(keyName, keyVersion, keyVaultUri);
             }
             return accountEncryption;
         }
 
-        protected void WriteStorageAccount(StorageModels.StorageAccount storageAccount)
+        //protected void WriteStorageAccount(StorageModels.StorageAccount storageAccount)
+        //{
+        //    WriteObject(PSStorageAccount.Create(storageAccount, this.StorageClient));
+        //}
+
+        protected void WriteStorageAccount(StorageAccountResource storageAccountResource)
         {
-            WriteObject(PSStorageAccount.Create(storageAccount, this.StorageClient));
+            WriteObject(PSStorageAccount.Create(storageAccountResource, this.StorageClientTrack2));
         }
 
-        protected void WriteStorageAccountList(IEnumerable<StorageModels.StorageAccount> storageAccounts)
-        {
-            List<PSStorageAccount> output = new List<PSStorageAccount>();
-            storageAccounts.ForEach(storageAccount => output.Add(PSStorageAccount.Create(storageAccount, this.StorageClient)));
-            WriteObject(output, true);
-        }
+        //protected void WriteStorageAccountList(IEnumerable<StorageModels.StorageAccount> storageAccounts)
+        //{
+        //    List<PSStorageAccount> output = new List<PSStorageAccount>();
+        //    storageAccounts.ForEach(storageAccount => output.Add(PSStorageAccount.Create(storageAccount, this.StorageClient)));
+        //    WriteObject(output, true);
+        //}
 
         public static string GetIdentityTypeString(string inputIdentityType)
         {

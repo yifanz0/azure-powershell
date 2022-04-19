@@ -16,6 +16,7 @@ using Microsoft.Azure.Management.Storage.Models;
 using System;
 using System.Collections.Generic;
 using Microsoft.WindowsAzure.Commands.Common.Attributes;
+using Azure.ResourceManager.Storage.Models;
 
 namespace Microsoft.Azure.Commands.Management.Storage.Models
 {
@@ -82,14 +83,14 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
 
         //Parse NetworkRule property Action in SDK to wrapped property PSNetworkRuleActionEnum
-        public static PSNetworkRuleActionEnum? ParsePSNetworkRuleAction(Microsoft.Azure.Management.Storage.Models.Action? action)
+        public static PSNetworkRuleActionEnum? ParsePSNetworkRuleAction(string action)
         {
             if (action == null)
             {
                 return null;
             }
 
-            if (action.Value == Microsoft.Azure.Management.Storage.Models.Action.Allow)
+            if (string.Equals(action.ToUpper(), "ALLOW"))
             {
                 return PSNetworkRuleActionEnum.Allow;
             }
@@ -171,9 +172,9 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         }
 
         //Parse NetworkRule property DefaultAction in SDK to wrapped property PSNetworkRuleDefaultActionEnum
-        public static PSNetWorkRuleDefaultActionEnum ParsePSNetworkRuleDefaultAction(DefaultAction defaultAction)
+        public static PSNetWorkRuleDefaultActionEnum ParsePSNetworkRuleDefaultAction(global::Azure.ResourceManager.Storage.Models.DefaultAction defaultAction)
         {
-            if (defaultAction == Microsoft.Azure.Management.Storage.Models.DefaultAction.Allow)
+            if (defaultAction == global::Azure.ResourceManager.Storage.Models.DefaultAction.Allow)
             {
                 return PSNetWorkRuleDefaultActionEnum.Allow;
             }
@@ -184,38 +185,38 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         }
 
         //Parse wrapped property PSNetworkRuleDefaultActionEnum to NetworkRule property DefaultAction in SDK
-        public static DefaultAction ParseStorageNetworkRuleDefaultAction(PSNetWorkRuleDefaultActionEnum defaultAction)
+        public static global::Azure.ResourceManager.Storage.Models.DefaultAction ParseStorageNetworkRuleDefaultAction(PSNetWorkRuleDefaultActionEnum defaultAction)
         {
             if (defaultAction == PSNetWorkRuleDefaultActionEnum.Allow)
             {
-                return Microsoft.Azure.Management.Storage.Models.DefaultAction.Allow;
+                return global::Azure.ResourceManager.Storage.Models.DefaultAction.Allow;
             }
             else
             {
-                return Microsoft.Azure.Management.Storage.Models.DefaultAction.Deny;
+                return global::Azure.ResourceManager.Storage.Models.DefaultAction.Deny;
             }
         }
 
         //Parse single NetworkRule IpRule in SDK to wrapped property PSIpRule
-        public static PSIpRule ParsePSNetworkRuleIPRule(IPRule ipRule)
+        public static PSIpRule ParsePSNetworkRuleIPRule(global::Azure.ResourceManager.Storage.Models.IPRule ipRule)
         {
             PSIpRule returnRule = new PSIpRule();
-            returnRule.Action = ParsePSNetworkRuleAction(ipRule.Action);
+            returnRule.Action = ipRule.Action != null ? ParsePSNetworkRuleAction(ipRule.Action) : null;
+            //returnRule.Action = ParsePSNetworkRuleAction(ipRule.Action);
             returnRule.IPAddressOrRange = ipRule.IPAddressOrRange;
             return returnRule;
         }
 
         //Parse wrapped property PSIpRule to single NetworkRule IpRule in SDK
-        public static IPRule ParseStorageNetworkRuleIPRule(PSIpRule ipRule)
+        public static global::Azure.ResourceManager.Storage.Models.IPRule ParseStorageNetworkRuleIPRule(PSIpRule ipRule)
         {
-            IPRule returnRule = new IPRule();
-            returnRule.Action = ParseStorageNetworkRuleAction(ipRule.Action);
-            returnRule.IPAddressOrRange = ipRule.IPAddressOrRange;
+            global::Azure.ResourceManager.Storage.Models.IPRule returnRule = new global::Azure.ResourceManager.Storage.Models.IPRule(ipRule.IPAddressOrRange);
+            returnRule.Action = ParseStorageNetworkRuleAction(ipRule.Action).Value.ToString();
             return returnRule;
         }
 
         //Parse single NetworkRule PSResourceAccessRule in SDK to wrapped property PSPSResourceAccessRule
-        public static PSResourceAccessRule ParsePSResourceAccessRule(ResourceAccessRule rule)
+        public static PSResourceAccessRule ParsePSResourceAccessRule(global::Azure.ResourceManager.Storage.Models.ResourceAccessRule rule)
         {
             PSResourceAccessRule returnRule = new PSResourceAccessRule();
             returnRule.TenantId = rule.TenantId;
@@ -224,16 +225,17 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         }
 
         //Parse wrapped property PSPSResourceAccessRule to single NetworkRule PSResourceAccessRule in SDK
-        public static ResourceAccessRule ParseStorageResourceAccessRule(PSResourceAccessRule rule)
+        public static global::Azure.ResourceManager.Storage.Models.ResourceAccessRule ParseStorageResourceAccessRule(PSResourceAccessRule rule)
         {
-            ResourceAccessRule returnRule = new ResourceAccessRule();
+            global::Azure.ResourceManager.Storage.Models.ResourceAccessRule returnRule = 
+                new global::Azure.ResourceManager.Storage.Models.ResourceAccessRule();
             returnRule.TenantId = rule.TenantId;
             returnRule.ResourceId = rule.ResourceId;
             return returnRule;
         }
 
         //Parse single NetworkRule VirtualNetworkRule in SDK to wrapped property PSVirtualNetworkRule
-        public static PSVirtualNetworkRule ParsePSNetworkRuleVirtualNetworkRule(VirtualNetworkRule virtualNetworkRule)
+        public static PSVirtualNetworkRule ParsePSNetworkRuleVirtualNetworkRule(global::Azure.ResourceManager.Storage.Models.VirtualNetworkRule virtualNetworkRule)
         {
             PSVirtualNetworkRule returnRule = new PSVirtualNetworkRule();
             returnRule.Action = ParsePSNetworkRuleAction(virtualNetworkRule.Action);
@@ -244,30 +246,32 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         }
 
         //Parse wrapped property PSVirtualNetworkRule to single NetworkRule VirtualNetworkRule in SDK
-        public static VirtualNetworkRule ParseStorageNetworkRuleVirtualNetworkRule(PSVirtualNetworkRule virtualNetworkRule)
+        public static global::Azure.ResourceManager.Storage.Models.VirtualNetworkRule ParseStorageNetworkRuleVirtualNetworkRule(PSVirtualNetworkRule virtualNetworkRule)
         {
-            VirtualNetworkRule returnRule = new VirtualNetworkRule();
-            returnRule.Action = ParseStorageNetworkRuleAction(virtualNetworkRule.Action);
-            returnRule.VirtualNetworkResourceId = virtualNetworkRule.VirtualNetworkResourceId;
+            global::Azure.ResourceManager.Storage.Models.VirtualNetworkRule returnRule = 
+                new global::Azure.ResourceManager.Storage.Models.VirtualNetworkRule(virtualNetworkRule.VirtualNetworkResourceId);
+            var action = ParseStorageNetworkRuleAction(virtualNetworkRule.Action);
+            returnRule.Action = action != null ? action.Value.ToString() : null;
+            //returnRule.VirtualNetworkResourceId = virtualNetworkRule.VirtualNetworkResourceId;
 
             return returnRule;
         }
 
         //Parse Storage NetworkRule object in SDK to wrapped PSNetworkRuleSet
-        public static PSNetworkRuleSet ParsePSNetworkRule(NetworkRuleSet rules)
+        public static PSNetworkRuleSet ParsePSNetworkRule(global::Azure.ResourceManager.Storage.Models.NetworkRuleSet rules)
         {
             if (rules == null)
             {
                 return null;
             }
             PSNetworkRuleSet returnRules = new PSNetworkRuleSet();
-            returnRules.Bypass = ParsePSNetworkRuleBypass(rules.Bypass);
+            returnRules.Bypass = rules.Bypass != null ? ParsePSNetworkRuleBypass(rules.Bypass.ToString()) : null;
             returnRules.DefaultAction = ParsePSNetworkRuleDefaultAction(rules.DefaultAction);
 
             List<PSIpRule> ipRuleList = new List<PSIpRule>();
-            if (rules.IpRules != null)
+            if (rules.IPRules != null)
             {
-                foreach (var ipRule in rules.IpRules)
+                foreach (var ipRule in rules.IPRules)
                 {
                     ipRuleList.Add(ParsePSNetworkRuleIPRule(ipRule));
                 }
@@ -298,44 +302,49 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         }
 
         //Parse wrapped PSNetworkRuleSet to storage NetworkRule object in SDK
-        public static NetworkRuleSet ParseStorageNetworkRule(PSNetworkRuleSet rules)
+        public static global::Azure.ResourceManager.Storage.Models.NetworkRuleSet ParseStorageNetworkRule(PSNetworkRuleSet rules)
         {
             if (rules == null)
             {
                 return null;
             }
-            NetworkRuleSet returnRules = new NetworkRuleSet();
+            global::Azure.ResourceManager.Storage.Models.NetworkRuleSet returnRules = 
+                new global::Azure.ResourceManager.Storage.Models.NetworkRuleSet(ParseStorageNetworkRuleDefaultAction(rules.DefaultAction));
             returnRules.Bypass = ParseStorageNetworkRuleBypass(rules.Bypass);
-            returnRules.DefaultAction = ParseStorageNetworkRuleDefaultAction(rules.DefaultAction);
+            //returnRules.DefaultAction = ParseStorageNetworkRuleDefaultAction(rules.DefaultAction);
 
-            List<IPRule> ipRuleList = new List<IPRule>();
+            //List<global::Azure.ResourceManager.Storage.Models.IPRule> ipRuleList = new List<IPRule>();
             if (rules.IpRules != null)
             {
                 foreach (var ipRule in rules.IpRules)
                 {
-                    ipRuleList.Add(ParseStorageNetworkRuleIPRule(ipRule));
+                    returnRules.IPRules.Add(ParseStorageNetworkRuleIPRule(ipRule));
+                    //ipRuleList.Add(ParseStorageNetworkRuleIPRule(ipRule));
                 }
-                returnRules.IpRules = ipRuleList.ToArray();
+                //returnRules.IpRules = ipRuleList.ToArray();
             }
 
-            List<VirtualNetworkRule> virtualNetworkList = new List<VirtualNetworkRule>();
+            //List<global::Azure.ResourceManager.Storage.Models.VirtualNetworkRule> virtualNetworkList = 
+            //    new List<global::Azure.ResourceManager.Storage.Models.VirtualNetworkRule>();
             if (rules.VirtualNetworkRules != null)
             {
                 foreach (var virtualNetworkRule in rules.VirtualNetworkRules)
                 {
-                    virtualNetworkList.Add(ParseStorageNetworkRuleVirtualNetworkRule(virtualNetworkRule));
+                    returnRules.VirtualNetworkRules.Add(ParseStorageNetworkRuleVirtualNetworkRule(virtualNetworkRule));
+                    //virtualNetworkList.Add(ParseStorageNetworkRuleVirtualNetworkRule(virtualNetworkRule));
                 }
-                returnRules.VirtualNetworkRules = virtualNetworkList.ToArray();
+                //returnRules.VirtualNetworkRules = virtualNetworkList.ToArray();
             }
 
-            List<ResourceAccessRule> resourceAccessRuleList = new List<ResourceAccessRule>();
+            //List<ResourceAccessRule> resourceAccessRuleList = new List<ResourceAccessRule>();
             if (rules.ResourceAccessRules != null)
             {
                 foreach (var rule in rules.ResourceAccessRules)
                 {
-                    resourceAccessRuleList.Add(ParseStorageResourceAccessRule(rule));
+                    returnRules.ResourceAccessRules.Add(ParseStorageResourceAccessRule(rule));
+                    //resourceAccessRuleList.Add(ParseStorageResourceAccessRule(rule));
                 }
-                returnRules.ResourceAccessRules = resourceAccessRuleList.ToArray();
+                //returnRules.ResourceAccessRules = resourceAccessRuleList.ToArray();
             }
 
             return returnRules;

@@ -13,6 +13,7 @@
 // ----------------------------------------------------------------------------------
 
 using Microsoft.Azure.Management.Storage.Models;
+using Azure.ResourceManager.Storage.Models;
 using System;
 
 namespace Microsoft.Azure.Commands.Management.Storage.Models
@@ -20,7 +21,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
     public class PSRoutingPreference
     {
         //Parse RoutingPreference  in SDK to wrapped property PSRoutingPreference
-        public static PSRoutingPreference ParsePSRoutingPreference(RoutingPreference routingPreference)
+        public static PSRoutingPreference ParsePSRoutingPreference(global::Azure.ResourceManager.Storage.Models.RoutingPreference routingPreference)
         {
             if (routingPreference == null)
             {
@@ -29,7 +30,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
             PSRoutingPreference pSRoutingPreference = new PSRoutingPreference();
 
-            pSRoutingPreference.RoutingChoice = routingPreference.RoutingChoice;
+            pSRoutingPreference.RoutingChoice = routingPreference.RoutingChoice != null ? routingPreference.RoutingChoice.ToString() : null;
             pSRoutingPreference.PublishMicrosoftEndpoints = routingPreference.PublishMicrosoftEndpoints;
             pSRoutingPreference.PublishInternetEndpoints = routingPreference.PublishInternetEndpoints;
 

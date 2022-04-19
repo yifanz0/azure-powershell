@@ -14,6 +14,7 @@
 
 using Azure;
 using Azure.ResourceManager.Storage;
+using Azure.ResourceManager.Storage.Models;
 using Microsoft.Azure.Commands.Management.Storage.Models;
 using Microsoft.Azure.Commands.ResourceManager.Common.ArgumentCompleters;
 using Microsoft.Azure.Management.Storage;
@@ -100,10 +101,10 @@ namespace Microsoft.Azure.Commands.Management.Storage
                 //    WriteStorageAccountList(storageAccounts);
                 //}
 
-                Pageable<Track2.StorageAccount> accounts = this.StorageClientTrack2.ListStorageAccounts();
-                foreach (Track2.StorageAccount account in accounts)
+                Pageable<StorageAccountResource> accounts = this.StorageClientTrack2.ListStorageAccounts();
+                foreach (Track2.StorageAccountResource account in accounts)
                 {
-                    WriteObject(account.Data);
+                    WriteStorageAccount(account);
                 }
 
             }
@@ -118,16 +119,32 @@ namespace Microsoft.Azure.Commands.Management.Storage
                 //    WriteStorageAccountList(storageAccounts);
                 //}
 
-                Pageable<Track2.StorageAccount> accounts = this.StorageClientTrack2.ListStorageAccounts(this.ResourceGroupName);
-                foreach (Track2.StorageAccount account in accounts)
+                Pageable<Track2.StorageAccountResource> accounts = this.StorageClientTrack2.ListStorageAccounts(this.ResourceGroupName);
+                foreach (Track2.StorageAccountResource account in accounts)
                 {
-                    WriteObject(account.Data);
+                    WriteStorageAccount(account);
                 }
             }
             else
             {
-                Track2.StorageAccount account = this.StorageClientTrack2.GetStorageAccount(this.ResourceGroupName, this.Name);
-                WriteObject(account.Get().Value.Data);
+                Track2.Models.StorageAccountExpand? expandProperties = null;
+                if (this.IncludeGeoReplicationStats)
+                {
+                    expandProperties = Track2.Models.StorageAccountExpand.GeoReplicationStats;
+                }
+                if (this.IncludeBlobRestoreStatus)
+                {
+                    expandProperties = Track2.Models.StorageAccountExpand.BlobRestoreStatus;
+                }
+                Track2.StorageAccountResource account = this.StorageClientTrack2.GetStorageAccountWithExpand(
+                this.ResourceGroupName, this.Name, expandProperties);
+
+
+                WriteStorageAccount(account);
+
+                // Track2.StorageAccountResource account = this.StorageClientTrack2.GetStorageAccount(this.ResourceGroupName, this.Name);
+                //WriteObject(account.Get().Value.Data);
+                // WriteObject(account.Data);
                 //// ParameterSet ensure can only set one of the following 2 parameters
                 //StorageAccountExpand? expandproperties = null;
                 //if (this.IncludeGeoReplicationStats)

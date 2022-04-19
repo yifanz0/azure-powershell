@@ -22,6 +22,12 @@ using Microsoft.Azure.Commands.Management.Storage.Models;
 using Microsoft.Azure.Commands.ResourceManager.Common.ArgumentCompleters;
 using System;
 using System.Collections.Generic;
+using Azure.ResourceManager.Storage;
+using Azure.ResourceManager.Storage.Models;
+using Azure.ResourceManager.Models;
+using Azure.Core;
+using System.ComponentModel;
+using System.Management.Automation.Remoting;
 
 namespace Microsoft.Azure.Commands.Management.Storage
 {
@@ -543,77 +549,111 @@ namespace Microsoft.Azure.Commands.Management.Storage
         {
             base.ExecuteCmdlet();
 
-            CheckNameAvailabilityResult checkNameAvailabilityResult = this.StorageClient.StorageAccounts.CheckNameAvailability(this.Name);
+            //CheckNameAvailabilityResult checkNameAvailabilityResult = this.StorageClient.StorageAccounts.CheckNameAvailability(this.Name);
+
+            global::Azure.ResourceManager.Storage.Models.CheckNameAvailabilityResult checkNameAvailabilityResult =
+                this.StorageClientTrack2.GetSubscription(this.SubscriptionId).CheckStorageAccountNameAvailability(
+                    new StorageAccountCheckNameAvailabilityContent(this.Name));
+
             if (!checkNameAvailabilityResult.NameAvailable.Value)
             {
                 throw new System.ArgumentException(checkNameAvailabilityResult.Message, "Name");
             }
 
-            StorageAccountCreateParameters createParameters = new StorageAccountCreateParameters()
-            {
-                Location = this.Location,
-                Sku = new Sku(this.SkuName),
-                Tags = TagsConversionHelper.CreateTagDictionary(Tag, validate: true),
-            };
+
+            StorageSku sku = new StorageSku(this.Name);
+            StorageKind kind = string.IsNullOrEmpty(this.Kind) ? null : new StorageKind(this.Kind);
+
+            StorageAccountCreateOrUpdateContent createContent = 
+                new StorageAccountCreateOrUpdateContent(new StorageSku(this.SkuName), kind, this.Location);
+
+            //StorageAccountCreateParameters createParameters = new StorageAccountCreateParameters()
+            //{
+            //    Location = this.Location,
+            //    Sku = new Sku(this.SkuName),
+            //    Tags = TagsConversionHelper.CreateTagDictionary(Tag, validate: true),
+            //};
 
             if (this.CustomDomainName != null)
             {
-                createParameters.CustomDomain = new CustomDomain()
-                {
-                    Name = CustomDomainName,
-                    UseSubDomainName = UseSubDomain
-                };
+
+                createContent.CustomDomain = new global::Azure.ResourceManager.Storage.Models.CustomDomain(this.CustomDomainName);
+                createContent.CustomDomain.UseSubDomainName = this.UseSubDomain;
+
+
+                //createParameters.CustomDomain = new CustomDomain()
+                //{
+                //    Name = CustomDomainName,
+                //    UseSubDomainName = UseSubDomain
+                //};
             }
             else if (UseSubDomain != null)
             {
                 throw new System.ArgumentException(string.Format("UseSubDomain must be set together with CustomDomainName."));
             }
 
-            if (kind != null)
-            {
-                createParameters.Kind = kind;
-            }
+            //if (kind != null)
+            //{
+            //    createParameters.Kind = kind;
+            //}
 
             if (this.AccessTier != null)
             {
-                createParameters.AccessTier = ParseAccessTier(AccessTier);
+                createContent.AccessTier = ParseAccessTier(this.AccessTier);
+                //createParameters.AccessTier = ParseAccessTier(AccessTier);
             }
             if (enableHttpsTrafficOnly != null)
             {
-                createParameters.EnableHttpsTrafficOnly = enableHttpsTrafficOnly;
+                createContent.EnableHttpsTrafficOnly = enableHttpsTrafficOnly;
+                //createParameters.EnableHttpsTrafficOnly = enableHttpsTrafficOnly;
             }
 
             if (AssignIdentity.IsPresent || this.UserAssignedIdentityId != null || this.IdentityType != null)
             {
-                createParameters.Identity = new Identity() { Type = StorageModels.IdentityType.SystemAssigned };
+                createContent.Identity = 
+                    new global::Azure.ResourceManager.Models.ManagedServiceIdentity(ManagedServiceIdentityType.SystemAssigned);
+                //createParameters.Identity = new Identity() { Type = StorageModels.IdentityType.SystemAssigned };
                 if (this.IdentityType != null)
                 {
-                    createParameters.Identity.Type = GetIdentityTypeString(this.IdentityType);
+                    createContent.Identity.ManagedServiceIdentityType = new ManagedServiceIdentityType(this.IdentityType);
+                    //createParameters.Identity.Type = GetIdentityTypeString(this.IdentityType);
                 }
                 if (this.UserAssignedIdentityId != null)
                 {
-                    if (createParameters.Identity.Type != StorageModels.IdentityType.UserAssigned && createParameters.Identity.Type != StorageModels.IdentityType.SystemAssignedUserAssigned)
+                    if (createContent.Identity.ManagedServiceIdentityType != ManagedServiceIdentityType.UserAssigned && createContent.Identity.ManagedServiceIdentityType != ManagedServiceIdentityType.SystemAssignedUserAssigned)
                     {
                         throw new ArgumentException("UserAssignIdentityId should only be specified when AssignIdentityType is UserAssigned or SystemAssignedUserAssigned.", "UserAssignIdentityId");
                     }
-                    createParameters.Identity.UserAssignedIdentities = new Dictionary<string, UserAssignedIdentity>();
-                    createParameters.Identity.UserAssignedIdentities.Add(this.UserAssignedIdentityId, new UserAssignedIdentity());
+
+                    //if (createParameters.Identity.Type != StorageModels.IdentityType.UserAssigned && createParameters.Identity.Type != StorageModels.IdentityType.SystemAssignedUserAssigned)
+                    //{
+                    //    throw new ArgumentException("UserAssignIdentityId should only be specified when AssignIdentityType is UserAssigned or SystemAssignedUserAssigned.", "UserAssignIdentityId");
+                    //}
+
+                    createContent.Identity.UserAssignedIdentities.Add(new ResourceIdentifier(this.UserAssignedIdentityId), new global::Azure.ResourceManager.Models.UserAssignedIdentity());
+
+                    //createParameters.Identity.UserAssignedIdentities = new Dictionary<string, UserAssignedIdentity>();
+                    //createParameters.Identity.UserAssignedIdentities.Add(this.UserAssignedIdentityId, new UserAssignedIdentity());
                 }
             }
             if (NetworkRuleSet != null)
             {
-                createParameters.NetworkRuleSet = PSNetworkRuleSet.ParseStorageNetworkRule(NetworkRuleSet);
+                createContent.NetworkRuleSet = PSNetworkRuleSet.ParseStorageNetworkRule(NetworkRuleSet);
+                //createParameters.NetworkRuleSet = PSNetworkRuleSet.ParseStorageNetworkRule(NetworkRuleSet);
             }
             if (enableHierarchicalNamespace != null)
             {
-                createParameters.IsHnsEnabled = enableHierarchicalNamespace;
+                createContent.IsHnsEnabled = enableHierarchicalNamespace;
+                //createParameters.IsHnsEnabled = enableHierarchicalNamespace;
             }
-            if (enableAzureActiveDirectoryDomainServicesForFile !=null || enableActiveDirectoryDomainServicesForFile != null)
+            if (enableAzureActiveDirectoryDomainServicesForFile != null || enableActiveDirectoryDomainServicesForFile != null)
             {
-                createParameters.AzureFilesIdentityBasedAuthentication = new AzureFilesIdentityBasedAuthentication();
+                //createContent.AzureFilesIdentityBasedAuthentication = new global::Azure.ResourceManager.Storage.Models.AzureFilesIdentityBasedAuthentication();
+                //createParameters.AzureFilesIdentityBasedAuthentication = new AzureFilesIdentityBasedAuthentication();
                 if (enableAzureActiveDirectoryDomainServicesForFile != null && enableAzureActiveDirectoryDomainServicesForFile.Value)
                 {
-                    createParameters.AzureFilesIdentityBasedAuthentication.DirectoryServiceOptions = DirectoryServiceOptions.AADDS;
+                    createContent.AzureFilesIdentityBasedAuthentication = new global::Azure.ResourceManager.Storage.Models.AzureFilesIdentityBasedAuthentication(global::Azure.ResourceManager.Storage.Models.DirectoryServiceOptions.Aadds);
+                    //createParameters.AzureFilesIdentityBasedAuthentication.DirectoryServiceOptions = DirectoryServiceOptions.AADDS;
                 }
                 else if (enableActiveDirectoryDomainServicesForFile != null && enableActiveDirectoryDomainServicesForFile.Value)
                 {
@@ -628,22 +668,33 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         throw new System.ArgumentNullException("ActiveDirectoryDomainName, ActiveDirectoryNetBiosDomainName, ActiveDirectoryForestName, ActiveDirectoryDomainGuid, ActiveDirectoryDomainSid, ActiveDirectoryAzureStorageSid", 
                             "To enable ActiveDirectoryDomainServicesForFile, user must specify all of: ActiveDirectoryDomainName, ActiveDirectoryNetBiosDomainName, ActiveDirectoryForestName, ActiveDirectoryDomainGuid, ActiveDirectoryDomainSid, ActiveDirectoryAzureStorageSid.");
                     }
-                    createParameters.AzureFilesIdentityBasedAuthentication.DirectoryServiceOptions = DirectoryServiceOptions.AD;
-                    createParameters.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties = new ActiveDirectoryProperties()
-                    {
-                        DomainName = this.ActiveDirectoryDomainName,
-                        NetBiosDomainName = this.ActiveDirectoryNetBiosDomainName,
-                        ForestName = this.ActiveDirectoryForestName,
-                        DomainGuid = this.ActiveDirectoryDomainGuid,
-                        DomainSid = this.ActiveDirectoryDomainSid,
-                        AzureStorageSid = this.ActiveDirectoryAzureStorageSid,
-                        SamAccountName = this.ActiveDirectorySamAccountName,
-                        AccountType = this.ActiveDirectoryAccountType
-                    };
+
+                    createContent.AzureFilesIdentityBasedAuthentication =
+                        new global::Azure.ResourceManager.Storage.Models.AzureFilesIdentityBasedAuthentication(global::Azure.ResourceManager.Storage.Models.DirectoryServiceOptions.AD);
+                    createContent.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties = 
+                        new global::Azure.ResourceManager.Storage.Models.ActiveDirectoryProperties(this.ActiveDirectoryDomainName, this.ActiveDirectoryNetBiosDomainName,
+                        this.ActiveDirectoryForestName, this.ActiveDirectoryDomainGuid, this.ActiveDirectoryDomainSid, this.ActiveDirectoryAzureStorageSid);
+                    createContent.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties.SamAccountName = this.ActiveDirectorySamAccountName;
+                    createContent.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties.AccountType = this.ActiveDirectoryAccountType;
+                    
+                    //createParameters.AzureFilesIdentityBasedAuthentication.DirectoryServiceOptions = DirectoryServiceOptions.AD;
+                    //createParameters.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties = new ActiveDirectoryProperties()
+                    //{
+                    //    DomainName = this.ActiveDirectoryDomainName,
+                    //    NetBiosDomainName = this.ActiveDirectoryNetBiosDomainName,
+                    //    ForestName = this.ActiveDirectoryForestName,
+                    //    DomainGuid = this.ActiveDirectoryDomainGuid,
+                    //    DomainSid = this.ActiveDirectoryDomainSid,
+                    //    AzureStorageSid = this.ActiveDirectoryAzureStorageSid,
+                    //    SamAccountName = this.ActiveDirectorySamAccountName,
+                    //    AccountType = this.ActiveDirectoryAccountType
+                    //};
                 }
                 else
                 {
-                    createParameters.AzureFilesIdentityBasedAuthentication.DirectoryServiceOptions = DirectoryServiceOptions.None;
+                    createContent.AzureFilesIdentityBasedAuthentication = 
+                        new global::Azure.ResourceManager.Storage.Models.AzureFilesIdentityBasedAuthentication(global::Azure.ResourceManager.Storage.Models.DirectoryServiceOptions.None);
+                    //createParameters.AzureFilesIdentityBasedAuthentication.DirectoryServiceOptions = DirectoryServiceOptions.None;
                 }
             }
 
@@ -653,40 +704,70 @@ namespace Microsoft.Azure.Commands.Management.Storage
                 {
                     throw new ArgumentException("'-DefaultSharePermission' need be specify together with '-EnableAzureActiveDirectoryDomainServicesForFile' or '-EnableActiveDirectoryDomainServicesForFile'.");
                 }
-                if (createParameters.AzureFilesIdentityBasedAuthentication == null)
+                if (createContent.AzureFilesIdentityBasedAuthentication == null)
                 {
-                    createParameters.AzureFilesIdentityBasedAuthentication = new AzureFilesIdentityBasedAuthentication();
+                    createContent.AzureFilesIdentityBasedAuthentication =
+                        new global::Azure.ResourceManager.Storage.Models.AzureFilesIdentityBasedAuthentication(global::Azure.ResourceManager.Storage.Models.DirectoryServiceOptions.None);
                 }
-                createParameters.AzureFilesIdentityBasedAuthentication.DefaultSharePermission = this.DefaultSharePermission;
+                //if (createParameters.AzureFilesIdentityBasedAuthentication == null)
+                //{
+                //    createParameters.AzureFilesIdentityBasedAuthentication = new AzureFilesIdentityBasedAuthentication();
+                //}
+
+                createContent.AzureFilesIdentityBasedAuthentication.DefaultSharePermission = this.DefaultSharePermission;
+                //createParameters.AzureFilesIdentityBasedAuthentication.DefaultSharePermission = this.DefaultSharePermission;
             }
             if (this.EnableLargeFileShare.IsPresent)
             {
-                createParameters.LargeFileSharesState = LargeFileSharesState.Enabled;
+                createContent.LargeFileSharesState = global::Azure.ResourceManager.Storage.Models.LargeFileSharesState.Enabled;
+                //createParameters.LargeFileSharesState = LargeFileSharesState.Enabled;
             }
             if(this.EncryptionKeyTypeForQueue != null || this.EncryptionKeyTypeForTable != null || this.RequireInfrastructureEncryption.IsPresent)
             {
-                createParameters.Encryption = new Encryption();
-                createParameters.Encryption.KeySource = KeySource.MicrosoftStorage;
+
+                createContent.Encryption = new global::Azure.ResourceManager.Storage.Models.Encryption(global::Azure.ResourceManager.Storage.Models.KeySource.MicrosoftStorage);
+
+                //createParameters.Encryption = new Encryption();
+                //createParameters.Encryption.KeySource = KeySource.MicrosoftStorage;
                 if (this.EncryptionKeyTypeForQueue != null || this.EncryptionKeyTypeForTable != null)
                 {
-                    createParameters.Encryption.Services = new EncryptionServices();
+                    createContent.Encryption.Services = new global::Azure.ResourceManager.Storage.Models.EncryptionServices();
+
+                    //createParameters.Encryption.Services = new EncryptionServices();
                     if (this.EncryptionKeyTypeForQueue != null)
                     {
-                        createParameters.Encryption.Services.Queue = new EncryptionService(keyType: this.EncryptionKeyTypeForQueue);
+                        createContent.Encryption.Services.Queue = new global::Azure.ResourceManager.Storage.Models.EncryptionService
+                        {
+                            KeyType = this.EncryptionKeyTypeForQueue
+                        };
+                        //createContent.Encryption.Services.Queue.KeyType = this.EncryptionKeyTypeForQueue; 
+                        //createParameters.Encryption.Services.Queue = new EncryptionService(keyType: this.EncryptionKeyTypeForQueue);
                     }
                     if (this.EncryptionKeyTypeForTable != null)
                     {
-                        createParameters.Encryption.Services.Table = new EncryptionService(keyType: this.EncryptionKeyTypeForTable);
+                        createContent.Encryption.Services.Table = new global::Azure.ResourceManager.Storage.Models.EncryptionService
+                        {
+                            KeyType = this.EncryptionKeyTypeForTable
+                        };
+                        //createParameters.Encryption.Services.Table = new EncryptionService(keyType: this.EncryptionKeyTypeForTable);
                     }
                 }
                 if (this.RequireInfrastructureEncryption.IsPresent)
                 {
-                    createParameters.Encryption.RequireInfrastructureEncryption = true;
-                    if (createParameters.Encryption.Services is null)
+                    createContent.Encryption.RequireInfrastructureEncryption = true;
+                    //createParameters.Encryption.RequireInfrastructureEncryption = true;
+
+                    if (createContent.Encryption.Services == null)
                     {
-                        createParameters.Encryption.Services = new EncryptionServices();
-                        createParameters.Encryption.Services.Blob = new EncryptionService();
+                        createContent.Encryption.Services = new global::Azure.ResourceManager.Storage.Models.EncryptionServices();
+                        createContent.Encryption.Services.Blob = new global::Azure.ResourceManager.Storage.Models.EncryptionService();
                     }
+
+                    //if (createParameters.Encryption.Services is null)
+                    //{
+                    //    createParameters.Encryption.Services = new EncryptionServices();
+                    //    createParameters.Encryption.Services.Blob = new EncryptionService();
+                    //}
                 }
             }
             if (this.KeyVaultUri !=null || this.KeyName != null || this.KeyVersion != null || this.KeyVaultUserAssignedIdentityId != null)
@@ -706,73 +787,123 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     throw new ArgumentException("KeyVaultUserAssignedIdentityId can only be specified when specify KeyVaultUri and KeyName together.", "KeyVaultUserAssignedIdentityId");
                 }
 
-                if (createParameters.Encryption == null)
+
+                if (createContent.Encryption == null)
                 {
-                    createParameters.Encryption = new Encryption();
-                    createParameters.Encryption.KeySource = KeySource.MicrosoftStorage;
+                    createContent.Encryption = new global::Azure.ResourceManager.Storage.Models.Encryption(
+                        global::Azure.ResourceManager.Storage.Models.KeySource.MicrosoftStorage);
                 }
 
-                if (createParameters.Encryption.Services is null)
+
+                //if (createParameters.Encryption == null)
+                //{
+                //    createParameters.Encryption = new Encryption();
+                //    createParameters.Encryption.KeySource = KeySource.MicrosoftStorage;
+                //}
+
+                if (createContent.Encryption.Services == null)
                 {
-                    createParameters.Encryption.Services = new EncryptionServices();
-                    createParameters.Encryption.Services.Blob = new EncryptionService();
+                    createContent.Encryption.Services = new global::Azure.ResourceManager.Storage.Models.EncryptionServices
+                    {
+                        Blob = new global::Azure.ResourceManager.Storage.Models.EncryptionService()
+                    };
                 }
+
+                //if (createParameters.Encryption.Services is null)
+                //{
+                //    createParameters.Encryption.Services = new EncryptionServices();
+                //    createParameters.Encryption.Services.Blob = new EncryptionService();
+                //}
 
                 if (this.KeyVaultUri != null || this.KeyName != null || this.KeyVersion != null)
                 {
-                    createParameters.Encryption.KeySource = KeySource.MicrosoftKeyvault;
-                    createParameters.Encryption.KeyVaultProperties = new KeyVaultProperties(this.KeyName, this.KeyVersion, this.KeyVaultUri);
+                    
+                    createContent.Encryption.KeySource = global::Azure.ResourceManager.Storage.Models.KeySource.MicrosoftKeyvault;
+                    createContent.Encryption.KeyVaultProperties = new global::Azure.ResourceManager.Storage.Models.KeyVaultProperties
+                    {
+                        KeyName = this.KeyName,
+                        KeyVersion = this.KeyVersion,
+                        KeyVaultUri =  new Uri(this.KeyVaultUri)
+                    };
+                    //createParameters.Encryption.KeySource = KeySource.MicrosoftKeyvault;
+                    //createParameters.Encryption.KeyVaultProperties = new KeyVaultProperties(this.KeyName, this.KeyVersion, this.KeyVaultUri);
                 }
 
                 if (this.KeyVaultUserAssignedIdentityId != null)
                 {
-                    createParameters.Encryption.EncryptionIdentity = new EncryptionIdentity();
-                    createParameters.Encryption.EncryptionIdentity.EncryptionUserAssignedIdentity = this.KeyVaultUserAssignedIdentityId;
+                    createContent.Encryption.EncryptionIdentity = new global::Azure.ResourceManager.Storage.Models.EncryptionIdentity
+                    {
+                        EncryptionUserAssignedIdentity = this.KeyVaultUserAssignedIdentityId
+                    };
+
+                    //createParameters.Encryption.EncryptionIdentity = new EncryptionIdentity();
+                    //createParameters.Encryption.EncryptionIdentity.EncryptionUserAssignedIdentity = this.KeyVaultUserAssignedIdentityId;
                 }
             }
             if (this.minimumTlsVersion != null)
             {
-                createParameters.MinimumTlsVersion = this.minimumTlsVersion;
+                createContent.MinimumTlsVersion = this.minimumTlsVersion;
+                //createParameters.MinimumTlsVersion = this.minimumTlsVersion;
             }
             if (this.allowBlobPublicAccess != null)
             {
-                createParameters.AllowBlobPublicAccess = this.allowBlobPublicAccess;
+                createContent.AllowBlobPublicAccess = this.allowBlobPublicAccess;
+                //createParameters.AllowBlobPublicAccess = this.allowBlobPublicAccess;
             }
             if (this.RoutingChoice != null || this.publishMicrosoftEndpoint != null || this.publishInternetEndpoint != null)
             {
-                createParameters.RoutingPreference = new RoutingPreference(this.RoutingChoice, this.publishMicrosoftEndpoint, this.publishInternetEndpoint);
+                createContent.RoutingPreference = new global::Azure.ResourceManager.Storage.Models.RoutingPreference
+                {
+                    RoutingChoice = new global::Azure.ResourceManager.Storage.Models.RoutingChoice(this.RoutingChoice),
+                    PublishMicrosoftEndpoints = this.publishMicrosoftEndpoint,
+                    PublishInternetEndpoints = this.publishInternetEndpoint
+                };
+                //createParameters.RoutingPreference = new StorageModels.RoutingPreference(this.RoutingChoice, this.publishMicrosoftEndpoint, this.publishInternetEndpoint);
             }
             if (allowSharedKeyAccess != null)
             {
-                createParameters.AllowSharedKeyAccess = allowSharedKeyAccess;
+                createContent.AllowSharedKeyAccess = this.allowSharedKeyAccess;
+                //createParameters.AllowSharedKeyAccess = allowSharedKeyAccess;
             }
             if (enableNfsV3 != null)
             {
-                createParameters.EnableNfsV3 = enableNfsV3;
+                createContent.EnableNfsV3 = this.enableNfsV3;
+                //createParameters.EnableNfsV3 = enableNfsV3;
             }
             if (this.EdgeZone != null)
             {
-                createParameters.ExtendedLocation = new ExtendedLocation()
+                createContent.ExtendedLocation = new global::Azure.ResourceManager.Storage.Models.ExtendedLocation
                 {
-                    Type = ExtendedLocationTypes.EdgeZone,
-                    Name = this.EdgeZone
+                    Name = this.EdgeZone,
+                    ExtendedLocationType = global::Azure.ResourceManager.Storage.Models.ExtendedLocationTypes.EdgeZone,
                 };
+                //createParameters.ExtendedLocation = new ExtendedLocation()
+                //{
+                //    Type = ExtendedLocationTypes.EdgeZone,
+                //    Name = this.EdgeZone
+                //};
             }
             if (sasExpirationPeriod != null)
             {
-                createParameters.SasPolicy = new SasPolicy(sasExpirationPeriod.Value.ToString(@"d\.hh\:mm\:ss"));
+                createContent.SasPolicy = new global::Azure.ResourceManager.Storage.Models.SasPolicy(sasExpirationPeriod.Value.ToString(@"d\.hh\:mm\:ss"), null);
+
+                //createParameters.SasPolicy = new StorageModels.SasPolicy(sasExpirationPeriod.Value.ToString(@"d\.hh\:mm\:ss"));
             }
             if (keyExpirationPeriodInDay != null)
             {
-                createParameters.KeyPolicy = new KeyPolicy(keyExpirationPeriodInDay.Value);
+                createContent.KeyExpirationPeriodInDays = keyExpirationPeriodInDay.Value;
+
+                //createParameters.KeyPolicy = new KeyPolicy(keyExpirationPeriodInDay.Value);
             }
             if(allowCrossTenantReplication != null)
             {
-                createParameters.AllowCrossTenantReplication = allowCrossTenantReplication;
+                createContent.AllowCrossTenantReplication = this.allowCrossTenantReplication;
+                //createParameters.AllowCrossTenantReplication = allowCrossTenantReplication;
             }
             if (this.PublicNetworkAccess != null)
             {
-                createParameters.PublicNetworkAccess = this.PublicNetworkAccess;
+                createContent.PublicNetworkAccess = this.PublicNetworkAccess;
+                //createParameters.PublicNetworkAccess = this.PublicNetworkAccess;
             }
             if (EnableAccountLevelImmutability.IsPresent || this.immutabilityPeriod != null ||  this.ImmutabilityPolicyState != null)
             {
@@ -780,24 +911,45 @@ namespace Microsoft.Azure.Commands.Management.Storage
                 {
                     throw new ArgumentException("ImmutabilityPeriod, ImmutabilityPolicyState and AllowProtectedAppendWrite, can only be specified with -EnableAccountLevelImmutability.");
                 }
-                createParameters.ImmutableStorageWithVersioning = new ImmutableStorageAccount();
-                createParameters.ImmutableStorageWithVersioning.Enabled = this.EnableAccountLevelImmutability.IsPresent;
+
+                createContent.ImmutableStorageWithVersioning = new global::Azure.ResourceManager.Storage.Models.ImmutableStorageAccount
+                {
+                    Enabled = this.EnableAccountLevelImmutability.IsPresent
+                };
+ 
+
+                //createParameters.ImmutableStorageWithVersioning = new ImmutableStorageAccount();
+                //createParameters.ImmutableStorageWithVersioning.Enabled = this.EnableAccountLevelImmutability.IsPresent;
                 if (this.immutabilityPeriod != null || this.ImmutabilityPolicyState != null)
                 {
-                    createParameters.ImmutableStorageWithVersioning.ImmutabilityPolicy = new AccountImmutabilityPolicyProperties();
-                    createParameters.ImmutableStorageWithVersioning.ImmutabilityPolicy.ImmutabilityPeriodSinceCreationInDays = this.immutabilityPeriod;
-                    createParameters.ImmutableStorageWithVersioning.ImmutabilityPolicy.State = this.ImmutabilityPolicyState;
+                    createContent.ImmutableStorageWithVersioning.ImmutabilityPolicy = new global::Azure.ResourceManager.Storage.Models.AccountImmutabilityPolicyProperties
+                    {
+                        ImmutabilityPeriodSinceCreationInDays = this.ImmutabilityPeriod,
+                        State = this.ImmutabilityPolicyState,
+                    };
+
+                    //createParameters.ImmutableStorageWithVersioning.ImmutabilityPolicy = new AccountImmutabilityPolicyProperties();
+                    //createParameters.ImmutableStorageWithVersioning.ImmutabilityPolicy.ImmutabilityPeriodSinceCreationInDays = this.immutabilityPeriod;
+                    //createParameters.ImmutableStorageWithVersioning.ImmutabilityPolicy.State = this.ImmutabilityPolicyState;
                 }
             }
 
-            var createAccountResponse = this.StorageClient.StorageAccounts.Create(
-                this.ResourceGroupName,
-                this.Name,
-                createParameters);
 
-            var storageAccount = this.StorageClient.StorageAccounts.GetProperties(this.ResourceGroupName, this.Name);
 
-            this.WriteStorageAccount(storageAccount);
+            var createAccountResponse = this.StorageClientTrack2.CreateStorageAccount(this.ResourceGroupName, this.Name, createContent);
+
+            //var createAccountResponse = this.StorageClient.StorageAccounts.Create(
+            //    this.ResourceGroupName,
+            //    this.Name,
+            //    createParameters);
+            var storageAccount = this.StorageClientTrack2.GetSingleStorageAccount(this.ResourceGroupName, this.Name);
+
+            //WriteStorageAccount(storageAccount);
+
+            WriteStorageAccount(storageAccount);
+
+            //var storageAccount = this.StorageClient.StorageAccounts.GetProperties(this.ResourceGroupName, this.Name);
+
         }
     }
 }

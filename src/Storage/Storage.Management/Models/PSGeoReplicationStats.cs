@@ -13,6 +13,7 @@
 // ----------------------------------------------------------------------------------
 
 using Microsoft.Azure.Management.Storage.Models;
+using Azure.ResourceManager.Storage.Models;
 using System;
 
 namespace Microsoft.Azure.Commands.Management.Storage.Models
@@ -20,7 +21,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
     public class PSGeoReplicationStats
     {
         //Parse GeoReplicationStats  in SDK to wrapped property PSGeoReplicationStats
-        public static PSGeoReplicationStats ParsePSGeoReplicationStats(GeoReplicationStats geoReplicationStats)
+        public static PSGeoReplicationStats ParsePSGeoReplicationStats(global::Azure.ResourceManager.Storage.Models.GeoReplicationStats geoReplicationStats)
         {
             if (geoReplicationStats == null)
             {
@@ -29,15 +30,15 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
             PSGeoReplicationStats pSGeoReplicationStats = new PSGeoReplicationStats();
 
-            pSGeoReplicationStats.Status = geoReplicationStats.Status;
-            pSGeoReplicationStats.LastSyncTime = geoReplicationStats.LastSyncTime;
-            pSGeoReplicationStats.CanFailover = geoReplicationStats.CanFailover;
+            pSGeoReplicationStats.Status = geoReplicationStats.Status != null ? geoReplicationStats.Status.ToString() : null;
+            pSGeoReplicationStats.LastSyncTime = geoReplicationStats.LastSyncOn;
+            pSGeoReplicationStats.CanFailover = geoReplicationStats.CanFailover != null ? geoReplicationStats.CanFailover : null;
 
             return pSGeoReplicationStats;
         }
 
         public string Status { get; set; }
-        public DateTime? LastSyncTime { get; set; }
+        public DateTimeOffset? LastSyncTime { get; set; }
         public bool? CanFailover { get; set; }
     }
 }

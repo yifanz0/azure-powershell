@@ -13,7 +13,7 @@
 // ----------------------------------------------------------------------------------
 
 using Track2 = Azure.ResourceManager.Storage;
-//using Track2Model = Azure.ResourceManager.Storage.Models;
+using Track2Model = Azure.ResourceManager.Storage.Models;
 using Microsoft.Azure.Commands.Management.Storage.Models;
 using Microsoft.Azure.Commands.ResourceManager.Common.ArgumentCompleters;
 using Microsoft.Azure.Management.Internal.Resources.Utilities.Models;
@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Management.Automation;
 using System.Threading.Tasks;
+using Azure;
 
 namespace Microsoft.Azure.Commands.Management.Storage
 {
@@ -149,24 +150,35 @@ namespace Microsoft.Azure.Commands.Management.Storage
 
                     //    WriteObject(new PSBlobRestoreStatus(result.Body));
 
-                    Track2.StorageAccount account = this.StorageClientTrack2.GetStorageAccount(this.ResourceGroupName, this.StorageAccountName);
-                    var restoreLro = account.RestoreBlobRanges(
-                        new global::Azure.ResourceManager.Storage.Models.BlobRestoreParameters(
+                    Track2.StorageAccountResource account = this.StorageClientTrack2.GetSingleStorageAccount(this.ResourceGroupName, this.StorageAccountName);
+                    var restoreTask = account.RestoreBlobRangesAsync(
+                        WaitUntil.Started,
+                        new global::Azure.ResourceManager.Storage.Models.BlobRestoreContent(
                             this.TimeToRestore,
-                            ParseBlobRestoreRangesnew(this.BlobRestoreRange)),
-                        waitForCompletion: false);
-                    WriteWarning(string.Format("Restore blob ranges with Id '{0}' started. Restore blob ranges time to complete is dependent on the size of the restore.", restoreLro.Value is null ? "" : restoreLro.Value.RestoreId));
-                    
+                            ParseBlobRestoreRangesnew(this.BlobRestoreRange))
+                        );
+
+                    restoreTask.Wait();
+                    WriteWarning(string.Format("Restore blob ranges with Id '{0}' started. Restore blob ranges time to complete is dependent on the size of the restore.", restoreTask.Result.Value is null ? "" : restoreTask.Result.Value.RestoreId));
+
                     try
                     {
-                        restoreLro.WaitForCompletionAsync().AsTask().Wait();
+                        //restoreTask.WaitForCompletion();
+                        restoreTask.Wait();
+                        //restoreLro.WaitForCompletionAsync().AsTask().Wait();
                     }
                     catch (Exception ex) 
                     {
                         throw new InvalidJobStateException(string.Format("Blob ranges restore failed with information: '{0}'.", ex.ToString()));
                     }
 
-                    WriteObject(restoreLro.WaitForCompletionAsync().Result.Value);
+
+                    //var result = restoreTask.Result.Value;
+
+                    //var result = restoreLro.WaitForCompletionAsync().Result.Value;
+                    //WriteObject(restoreLro.WaitForCompletionAsync().Result.Value);
+
+                    //WriteObject(new PSBlobRestoreStatus(result));
 
 
                 }
@@ -186,12 +198,12 @@ namespace Microsoft.Azure.Commands.Management.Storage
 
 
 
-                    Track2.StorageAccount account = this.StorageClientTrack2.GetStorageAccount(this.ResourceGroupName, this.StorageAccountName);
+                    Track2.StorageAccountResource account = this.StorageClientTrack2.GetStorageAccount(this.ResourceGroupName, this.StorageAccountName);
                     var restoreLro = account.RestoreBlobRanges(
-                        new global::Azure.ResourceManager.Storage.Models.BlobRestoreParameters(
+                        WaitUntil.Completed,
+                        new global::Azure.ResourceManager.Storage.Models.BlobRestoreContent(
                             this.TimeToRestore.ToUniversalTime(),
-                            ParseBlobRestoreRangesnew(this.BlobRestoreRange)),
-                        waitForCompletion: false);
+                            ParseBlobRestoreRangesnew(this.BlobRestoreRange)));
                     WriteObject(restoreLro.Value);
                     if (restoreLro.Value != null && restoreLro.Value.Status != null && restoreLro.Value.Status == global::Azure.ResourceManager.Storage.Models.BlobRestoreProgressStatus.Failed)
                     {
