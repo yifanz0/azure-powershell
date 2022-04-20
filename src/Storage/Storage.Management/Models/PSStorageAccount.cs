@@ -115,7 +115,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             this.ExtendedLocation = storageAccountResource.Data.ExtendedLocation is null ? null : new PSExtendedLocation(storageAccountResource.Data.ExtendedLocation);
             this.AllowSharedKeyAccess = storageAccountResource.Data.AllowSharedKeyAccess;
             this.KeyCreationTime = storageAccountResource.Data.KeyCreationTime is null ? null : new PSKeyCreationTime(storageAccountResource.Data.KeyCreationTime);
-            // this.KeyPolicy = new PSKeyPolicy(storageAccountResource.Data.KeyExpirationPeriodInDays);
+            //this.KeyPolicy = new PSKeyPolicy(storageAccountResource.Data.KeyExpirationPeriodInDays);
             //this.KeyPolicy = storageAccountResource.Data.KeyExpirationPeriodInDays != null ? new PSKeyPolicy(storageAccountResource.Data.KeyExpirationPeriodInDays) : null;
 
             this.SasPolicy = storageAccountResource.Data.SasPolicy != null ? new PSSasPolicy(storageAccountResource.Data.SasPolicy.SasExpirationPeriod, storageAccountResource.Data.SasPolicy.ExpirationAction.ToString()) : null;

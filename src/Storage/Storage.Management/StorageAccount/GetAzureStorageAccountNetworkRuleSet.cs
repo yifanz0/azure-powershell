@@ -54,7 +54,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
                 this.Name);
             if (storageAccount.NetworkRuleSet != null)
             {
-                WriteObject(PSNetworkRuleSet.ParsePSNetworkRule(storageAccount.NetworkRuleSet));
+                //WriteObject(PSNetworkRuleSet.ParsePSNetworkRule(storageAccount.NetworkRuleSet));
             }
         }
     }

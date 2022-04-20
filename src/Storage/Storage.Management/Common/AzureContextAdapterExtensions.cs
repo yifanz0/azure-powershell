@@ -20,6 +20,7 @@ using Microsoft.WindowsAzure.Commands.Common.Storage;
 using System.Linq;
 using System;
 using System.Text;
+using Azure.ResourceManager.Storage;
 
 namespace Microsoft.WindowsAzure.Commands.Storage.Adapters
 {
@@ -104,6 +105,7 @@ namespace Microsoft.WindowsAzure.Commands.Storage.Adapters
 #endif
             return provider.GetStorageService(accountName, resourceGroupName).GetCloudStorageAccount();
         }
+
 
 
 

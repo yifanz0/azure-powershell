@@ -231,7 +231,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
                             }
                             if (!ruleExist)
                             {
-                                storageACL.VirtualNetworkRules.Add(PSNetworkRuleSet.ParseStorageNetworkRuleVirtualNetworkRule(rule));
+                                //storageACL.VirtualNetworkRules.Add(PSNetworkRuleSet.ParseStorageNetworkRuleVirtualNetworkRule(rule));
                                 ruleChanged = true;
                             }
                         }
@@ -257,7 +257,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
                             if (!ruleExist)
                             {
 
-                                storageACL.ResourceAccessRules.Add(PSNetworkRuleSet.ParseStorageResourceAccessRule(rule));
+                                //storageACL.ResourceAccessRules.Add(PSNetworkRuleSet.ParseStorageResourceAccessRule(rule));
                                 ruleChanged = true;
                             }
                         }
@@ -280,7 +280,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
                             if (!ruleExist)
                             {
 
-                                storageACL.IpRules.Add(PSNetworkRuleSet.ParseStorageNetworkRuleIPRule(rule));
+                                //storageACL.IpRules.Add(PSNetworkRuleSet.ParseStorageNetworkRuleIPRule(rule));
                                 ruleChanged = true;
                             }
                         }
@@ -304,15 +304,15 @@ namespace Microsoft.Azure.Commands.Management.Storage
                 {
                     case NetWorkRuleStringParameterSet:
                     case NetworkRuleObjectParameterSet:
-                        WriteObject(PSNetworkRuleSet.ParsePSNetworkRule(storageAccount.NetworkRuleSet).VirtualNetworkRules);
+                        //WriteObject(PSNetworkRuleSet.ParsePSNetworkRule(storageAccount.NetworkRuleSet).VirtualNetworkRules);
                         break;
                     case IpRuleStringParameterSet:
                     case IpRuleObjectParameterSet:
-                        WriteObject(PSNetworkRuleSet.ParsePSNetworkRule(storageAccount.NetworkRuleSet).IpRules);
+                        //WriteObject(PSNetworkRuleSet.ParsePSNetworkRule(storageAccount.NetworkRuleSet).IpRules);
                         break;
                     case ResourceAccessRuleStringParameterSet:
                     case ResourceAccessRuleObjectParameterSet:
-                        WriteObject(PSNetworkRuleSet.ParsePSNetworkRule(storageAccount.NetworkRuleSet).ResourceAccessRules);
+                        //WriteObject(PSNetworkRuleSet.ParsePSNetworkRule(storageAccount.NetworkRuleSet).ResourceAccessRules);
                         break;
                 }
             }

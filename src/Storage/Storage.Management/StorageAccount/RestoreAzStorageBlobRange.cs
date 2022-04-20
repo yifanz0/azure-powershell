@@ -150,7 +150,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
 
                     //    WriteObject(new PSBlobRestoreStatus(result.Body));
 
-                    Track2.StorageAccountResource account = this.StorageClientTrack2.GetSingleStorageAccount(this.ResourceGroupName, this.StorageAccountName);
+                    Track2.StorageAccountResource account = this.StorageClientTrack2.GetStorageAccount(this.ResourceGroupName, this.StorageAccountName);
                     var restoreTask = account.RestoreBlobRangesAsync(
                         WaitUntil.Started,
                         new global::Azure.ResourceManager.Storage.Models.BlobRestoreContent(
@@ -173,7 +173,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     }
 
 
-                    //var result = restoreTask.Result.Value;
+                    var result = restoreTask.Result.Value;
 
                     //var result = restoreLro.WaitForCompletionAsync().Result.Value;
                     //WriteObject(restoreLro.WaitForCompletionAsync().Result.Value);
