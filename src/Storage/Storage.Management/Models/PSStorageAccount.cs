@@ -26,6 +26,8 @@ using Azure.ResourceManager.Storage;
 using Azure.ResourceManager.Storage.Models;
 using Azure.ResourceManager.Models;
 using Microsoft.WindowsAzure.Commands.Utilities.Common;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Auth;
 
 namespace Microsoft.Azure.Commands.Management.Storage.Models
 {
@@ -228,10 +230,29 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
             result.Context = new LazyAzureStorageContext((s) =>
             {
-                return (new ARMStorageProvider(client)).GetCloudStorageAccount(s, result.ResourceGroupName);
+                return GetCloudStorageAccount(storageAccountResource, client);
+                //return (new ARMStorageProvider(client)).GetCloudStorageAccount(s, result.ResourceGroupName);
             }, result.StorageAccountName) as AzureStorageContext;
 
             return result;
+        }
+
+        public static CloudStorageAccount GetCloudStorageAccount(StorageAccountResource storageAccountResource, Track2StorageManagementClient client)
+        {
+            Uri blobEndpoint = new Uri(storageAccountResource.Data.PrimaryEndpoints.Blob);
+            Uri queueEndpoint = new Uri(storageAccountResource.Data.PrimaryEndpoints.Queue);
+            Uri tableEndpoint = new Uri(storageAccountResource.Data.PrimaryEndpoints.Table);
+            Uri fileEndpoint = new Uri(storageAccountResource.Data.PrimaryEndpoints.File);
+            string key = storageAccountResource.GetKeys().Value.Keys[0].Value;
+            StorageCredentials storageCredentials = new Azure.Storage.Auth.StorageCredentials(storageAccountResource.Data.Name, key);
+            CloudStorageAccount cloudStorageAccount = new CloudStorageAccount(
+                storageCredentials,
+                new StorageUri(blobEndpoint),
+                new StorageUri(queueEndpoint),
+                new StorageUri(tableEndpoint),
+                new StorageUri(fileEndpoint));
+
+            return cloudStorageAccount;
         }
 
         public IStorageContext Context { get; private set; }

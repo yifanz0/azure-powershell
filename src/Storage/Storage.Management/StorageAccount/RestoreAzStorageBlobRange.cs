@@ -151,36 +151,33 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     //    WriteObject(new PSBlobRestoreStatus(result.Body));
 
                     Track2.StorageAccountResource account = this.StorageClientTrack2.GetStorageAccount(this.ResourceGroupName, this.StorageAccountName);
-                    var restoreTask = account.RestoreBlobRangesAsync(
+                    var restoreLro = account.RestoreBlobRanges(
                         WaitUntil.Started,
                         new global::Azure.ResourceManager.Storage.Models.BlobRestoreContent(
                             this.TimeToRestore,
                             ParseBlobRestoreRangesnew(this.BlobRestoreRange))
                         );
+                    
+                    Dictionary<string, object> temp = (Dictionary<string, object>)restoreLro.GetRawResponse().Content.ToObjectFromJson();
+                    object restoreId;
 
-                    restoreTask.Wait();
-                    WriteWarning(string.Format("Restore blob ranges with Id '{0}' started. Restore blob ranges time to complete is dependent on the size of the restore.", restoreTask.Result.Value is null ? "" : restoreTask.Result.Value.RestoreId));
-
+                    if (temp.TryGetValue("restoreId", out restoreId))
+                    {
+                        WriteWarning(string.Format("Restore blob ranges with Id '{0}' started. Restore blob ranges time to complete is dependent on the size of the restore.", restoreId));
+                    } else
+                    {
+                        WriteWarning(string.Format("Restore blob ranges with Id  started. Restore blob ranges time to complete is dependent on the size of the restore."));
+                    }
+                   
                     try
                     {
-                        //restoreTask.WaitForCompletion();
-                        restoreTask.Wait();
-                        //restoreLro.WaitForCompletionAsync().AsTask().Wait();
+                        var result = restoreLro.WaitForCompletion().Value;
+                        WriteObject(new PSBlobRestoreStatus(result));
                     }
                     catch (Exception ex) 
                     {
                         throw new InvalidJobStateException(string.Format("Blob ranges restore failed with information: '{0}'.", ex.ToString()));
                     }
-
-
-                    var result = restoreTask.Result.Value;
-
-                    //var result = restoreLro.WaitForCompletionAsync().Result.Value;
-                    //WriteObject(restoreLro.WaitForCompletionAsync().Result.Value);
-
-                    //WriteObject(new PSBlobRestoreStatus(result));
-
-
                 }
                 else
                 {
@@ -204,12 +201,13 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         new global::Azure.ResourceManager.Storage.Models.BlobRestoreContent(
                             this.TimeToRestore.ToUniversalTime(),
                             ParseBlobRestoreRangesnew(this.BlobRestoreRange)));
-                    WriteObject(restoreLro.Value);
+                    //WriteObject(restoreLro.Value);
                     if (restoreLro.Value != null && restoreLro.Value.Status != null && restoreLro.Value.Status == global::Azure.ResourceManager.Storage.Models.BlobRestoreProgressStatus.Failed)
                     {
                         throw new InvalidJobStateException("Blob ranges restore failed.");
                     }
                     //restoreLro.WaitForCompletionAsync();
+                    WriteObject(new PSBlobRestoreStatus(restoreLro.Value));
                 }
             }
         }
