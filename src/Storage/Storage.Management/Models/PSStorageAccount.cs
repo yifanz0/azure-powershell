@@ -33,49 +33,6 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 {
     public class PSStorageAccount : IStorageContextProvider
     {
-        //public PSStorageAccount(StorageModels.StorageAccount storageAccount)
-        //{
-        //    this.ResourceGroupName = new ResourceIdentifier(storageAccount.Id).ResourceGroupName;
-        //    this.StorageAccountName = storageAccount.Name;
-        //    this.Id = storageAccount.Id;
-        //    this.Location = storageAccount.Location;
-        //    this.Sku = new PSSku(storageAccount.Sku);
-        //    this.Encryption = storageAccount.Encryption;
-        //    this.Kind = storageAccount.Kind;
-        //    this.AccessTier = storageAccount.AccessTier;
-        //    this.CreationTime = storageAccount.CreationTime;
-        //    this.CustomDomain = storageAccount.CustomDomain is null ? null : new PSCustomDomain(storageAccount.CustomDomain);
-        //    this.Identity = storageAccount.Identity;
-        //    this.LastGeoFailoverTime = storageAccount.LastGeoFailoverTime;
-        //    this.PrimaryEndpoints = storageAccount.PrimaryEndpoints;
-        //    this.PrimaryLocation = storageAccount.PrimaryLocation;
-        //    this.ProvisioningState = storageAccount.ProvisioningState;
-        //    this.SecondaryEndpoints = storageAccount.SecondaryEndpoints;
-        //    this.SecondaryLocation = storageAccount.SecondaryLocation;
-        //    this.StatusOfPrimary = storageAccount.StatusOfPrimary;
-        //    this.StatusOfSecondary = storageAccount.StatusOfSecondary;
-        //    this.Tags = storageAccount.Tags;
-        //    this.EnableHttpsTrafficOnly = storageAccount.EnableHttpsTrafficOnly;
-        //    this.NetworkRuleSet = PSNetworkRuleSet.ParsePSNetworkRule(storageAccount.NetworkRuleSet);
-        //    this.EnableHierarchicalNamespace = storageAccount.IsHnsEnabled;
-        //    this.FailoverInProgress = storageAccount.FailoverInProgress;
-        //    this.LargeFileSharesState = storageAccount.LargeFileSharesState;
-        //    this.AzureFilesIdentityBasedAuth = storageAccount.AzureFilesIdentityBasedAuthentication is null ? null : new PSAzureFilesIdentityBasedAuthentication(storageAccount.AzureFilesIdentityBasedAuthentication);
-        //    this.GeoReplicationStats = PSGeoReplicationStats.ParsePSGeoReplicationStats(storageAccount.GeoReplicationStats);
-        //    this.AllowBlobPublicAccess = storageAccount.AllowBlobPublicAccess;
-        //    this.MinimumTlsVersion = storageAccount.MinimumTlsVersion;
-        //    this.RoutingPreference = PSRoutingPreference.ParsePSRoutingPreference(storageAccount.RoutingPreference);
-        //    this.BlobRestoreStatus = storageAccount.BlobRestoreStatus is null ? null : new PSBlobRestoreStatus(storageAccount.BlobRestoreStatus);
-        //    this.EnableNfsV3 = storageAccount.EnableNfsV3;
-        //    this.ExtendedLocation = storageAccount.ExtendedLocation is null ? null : new PSExtendedLocation(storageAccount.ExtendedLocation);
-        //    this.AllowSharedKeyAccess = storageAccount.AllowSharedKeyAccess;
-        //    this.KeyCreationTime = storageAccount.KeyCreationTime is null? null : new PSKeyCreationTime(storageAccount.KeyCreationTime);
-        //    this.KeyPolicy = storageAccount.KeyPolicy;
-        //    this.SasPolicy = storageAccount.SasPolicy;
-        //    this.AllowCrossTenantReplication = storageAccount.AllowCrossTenantReplication;
-        //    this.PublicNetworkAccess = storageAccount.PublicNetworkAccess;
-        //    this.ImmutableStorageWithVersioning = storageAccount.ImmutableStorageWithVersioning is null ? null : new PSImmutableStorageAccount(storageAccount.ImmutableStorageWithVersioning);
-        //}
 
         public PSStorageAccount(StorageAccountResource storageAccountResource)
         {
@@ -213,31 +170,19 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
         public PSImmutableStorageAccount ImmutableStorageWithVersioning { get; set; }
 
-        //public static PSStorageAccount create(StorageModels.StorageAccount storageaccount, IStorageManagementClient client)
-        //{
-        //    var result = new PSStorageAccount(storageaccount);
-        //    result.Context = new LazyAzureStorageContext((s) =>
-        //    {
-        //        return (new ARMStorageProvider(client)).GetCloudStorageAccount(s, result.ResourceGroupName);
-        //    }, result.StorageAccountName) as AzureStorageContext;
-
-        //    return result;
-        //}
-
         public static PSStorageAccount Create(StorageAccountResource storageAccountResource, Track2StorageManagementClient client)
         {
             var result = new PSStorageAccount(storageAccountResource);
 
             result.Context = new LazyAzureStorageContext((s) =>
             {
-                return GetCloudStorageAccount(storageAccountResource, client);
-                //return (new ARMStorageProvider(client)).GetCloudStorageAccount(s, result.ResourceGroupName);
+                return GetCloudStorageAccount(storageAccountResource);
             }, result.StorageAccountName) as AzureStorageContext;
 
             return result;
         }
 
-        public static CloudStorageAccount GetCloudStorageAccount(StorageAccountResource storageAccountResource, Track2StorageManagementClient client)
+        public static CloudStorageAccount GetCloudStorageAccount(StorageAccountResource storageAccountResource)
         {
             Uri blobEndpoint = new Uri(storageAccountResource.Data.PrimaryEndpoints.Blob);
             Uri queueEndpoint = new Uri(storageAccountResource.Data.PrimaryEndpoints.Queue);
@@ -389,15 +334,6 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         public IList<string> Locations { get; set; }
         //public IList<SKUCapability> Capabilities { get; set; }
         //public IList<Restriction> Restrictions { get; set; }
-
-        //public PSSku(Sku sku)
-        //{
-        //    if (sku != null)
-        //    {
-        //        this.Name = sku.Name;
-        //        this.Tier = sku.Tier;
-        //    }
-        //}
 
         public PSSku(StorageSku sku)
         {

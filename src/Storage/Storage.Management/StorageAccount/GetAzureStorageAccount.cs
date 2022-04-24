@@ -92,15 +92,6 @@ namespace Microsoft.Azure.Commands.Management.Storage
 
             if (string.IsNullOrEmpty(this.ResourceGroupName))
             {
-                //IPage<Microsoft.Azure.Management.Storage.Models.StorageAccount> storageAccounts = this.StorageClient.StorageAccounts.List();
-                //WriteStorageAccountList(storageAccounts);
-
-                //while (storageAccounts.NextPageLink != null)
-                //{
-                //    storageAccounts = this.StorageClient.StorageAccounts.ListNext(storageAccounts.NextPageLink);
-                //    WriteStorageAccountList(storageAccounts);
-                //}
-
                 Pageable<StorageAccountResource> accounts = this.StorageClientTrack2.ListStorageAccounts();
                 foreach (Track2.StorageAccountResource account in accounts)
                 {
@@ -110,14 +101,6 @@ namespace Microsoft.Azure.Commands.Management.Storage
             }
             else if (string.IsNullOrEmpty(this.Name))
             {
-                //IPage<Microsoft.Azure.Management.Storage.Models.StorageAccount> storageAccounts = this.StorageClient.StorageAccounts.ListByResourceGroup(this.ResourceGroupName);
-                //WriteStorageAccountList(storageAccounts);
-
-                //while (storageAccounts.NextPageLink != null)
-                //{
-                //    storageAccounts = this.StorageClient.StorageAccounts.ListByResourceGroupNext(storageAccounts.NextPageLink);
-                //    WriteStorageAccountList(storageAccounts);
-                //}
 
                 Pageable<Track2.StorageAccountResource> accounts = this.StorageClientTrack2.ListStorageAccounts(this.ResourceGroupName);
                 foreach (Track2.StorageAccountResource account in accounts)
@@ -141,26 +124,6 @@ namespace Microsoft.Azure.Commands.Management.Storage
 
 
                 WriteStorageAccount(account);
-
-                // Track2.StorageAccountResource account = this.StorageClientTrack2.GetStorageAccount(this.ResourceGroupName, this.Name);
-                //WriteObject(account.Get().Value.Data);
-                // WriteObject(account.Data);
-                //// ParameterSet ensure can only set one of the following 2 parameters
-                //StorageAccountExpand? expandproperties = null;
-                //if (this.IncludeGeoReplicationStats)
-                //{
-                //    expandproperties = StorageAccountExpand.GeoReplicationStats;
-                //}
-                //if (this.IncludeBlobRestoreStatus)
-                //{
-                //    expandproperties = StorageAccountExpand.BlobRestoreStatus;
-                //}
-                //var storageAccount = this.StorageClient.StorageAccounts.GetProperties(
-                //    this.ResourceGroupName,
-                //    this.Name,
-                //    expandproperties);
-
-                //WriteStorageAccount(storageAccount);
             }
         }
     }

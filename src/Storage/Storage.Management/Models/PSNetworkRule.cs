@@ -252,7 +252,6 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
                 new global::Azure.ResourceManager.Storage.Models.VirtualNetworkRule(virtualNetworkRule.VirtualNetworkResourceId);
             var action = ParseStorageNetworkRuleAction(virtualNetworkRule.Action);
             returnRule.Action = action != null ? action.Value.ToString() : null;
-            //returnRule.VirtualNetworkResourceId = virtualNetworkRule.VirtualNetworkResourceId;
 
             return returnRule;
         }
@@ -311,40 +310,29 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             global::Azure.ResourceManager.Storage.Models.NetworkRuleSet returnRules = 
                 new global::Azure.ResourceManager.Storage.Models.NetworkRuleSet(ParseStorageNetworkRuleDefaultAction(rules.DefaultAction));
             returnRules.Bypass = ParseStorageNetworkRuleBypass(rules.Bypass);
-            //returnRules.DefaultAction = ParseStorageNetworkRuleDefaultAction(rules.DefaultAction);
 
-            //List<global::Azure.ResourceManager.Storage.Models.IPRule> ipRuleList = new List<IPRule>();
             if (rules.IpRules != null)
             {
                 foreach (var ipRule in rules.IpRules)
                 {
                     returnRules.IPRules.Add(ParseStorageNetworkRuleIPRule(ipRule));
-                    //ipRuleList.Add(ParseStorageNetworkRuleIPRule(ipRule));
                 }
-                //returnRules.IpRules = ipRuleList.ToArray();
             }
 
-            //List<global::Azure.ResourceManager.Storage.Models.VirtualNetworkRule> virtualNetworkList = 
-            //    new List<global::Azure.ResourceManager.Storage.Models.VirtualNetworkRule>();
             if (rules.VirtualNetworkRules != null)
             {
                 foreach (var virtualNetworkRule in rules.VirtualNetworkRules)
                 {
                     returnRules.VirtualNetworkRules.Add(ParseStorageNetworkRuleVirtualNetworkRule(virtualNetworkRule));
-                    //virtualNetworkList.Add(ParseStorageNetworkRuleVirtualNetworkRule(virtualNetworkRule));
                 }
-                //returnRules.VirtualNetworkRules = virtualNetworkList.ToArray();
             }
 
-            //List<ResourceAccessRule> resourceAccessRuleList = new List<ResourceAccessRule>();
             if (rules.ResourceAccessRules != null)
             {
                 foreach (var rule in rules.ResourceAccessRules)
                 {
                     returnRules.ResourceAccessRules.Add(ParseStorageResourceAccessRule(rule));
-                    //resourceAccessRuleList.Add(ParseStorageResourceAccessRule(rule));
                 }
-                //returnRules.ResourceAccessRules = resourceAccessRuleList.ToArray();
             }
 
             return returnRules;

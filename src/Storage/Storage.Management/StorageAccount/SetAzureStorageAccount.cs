@@ -515,19 +515,15 @@ namespace Microsoft.Azure.Commands.Management.Storage
 
                     StorageAccountPatch storageAccountPatch = new StorageAccountPatch();
 
-                    //StorageAccountUpdateParameters updateParameters = new StorageAccountUpdateParameters();
                     if (this.SkuName != null)
                     {
                         storageAccountPatch.Sku = new StorageSku(new StorageSkuName(this.SkuName));
-                        //updateParameters.Sku = new Sku(this.SkuName);
                     }
 
                     if (this.Tag != null)
                     {
                         Dictionary<string, string> tagDictionary = TagsConversionHelper.CreateTagDictionary(Tag, validate: true);
                         tagDictionary.ForEach(kv => storageAccountPatch.Tags.Add(kv.Key, kv.Value));
-
-                        //updateParameters.Tags = tagDictionary ?? new Dictionary<string, string>();
                     }
 
                     if (this.CustomDomainName != null)
@@ -535,11 +531,6 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         storageAccountPatch.CustomDomain = new global::Azure.ResourceManager.Storage.Models.CustomDomain(this.CustomDomainName);
                         storageAccountPatch.CustomDomain.UseSubDomainName = this.UseSubDomain;
 
-                        //updateParameters.CustomDomain = new CustomDomain()
-                        //{
-                        //    Name = CustomDomainName,
-                        //    UseSubDomainName = UseSubDomain
-                        //};
                     }
                     else if (UseSubDomain != null)
                     {
@@ -549,22 +540,18 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     if (this.AccessTier != null)
                     {
                         storageAccountPatch.AccessTier = ParseAccessTier(this.AccessTier);
-                        //updateParameters.AccessTier = ParseAccessTier(AccessTier);
                     }
                     if (enableHttpsTrafficOnly != null)
                     {
                         storageAccountPatch.EnableHttpsTrafficOnly = enableHttpsTrafficOnly;
-                        //updateParameters.EnableHttpsTrafficOnly = enableHttpsTrafficOnly;
                     }
 
                     if (AssignIdentity.IsPresent || this.UserAssignedIdentityId != null || this.IdentityType != null)
                     {
                         storageAccountPatch.Identity = new global::Azure.ResourceManager.Models.ManagedServiceIdentity(ManagedServiceIdentityType.SystemAssigned);
-                        //updateParameters.Identity = new Identity() { Type = StorageModels.IdentityType.SystemAssigned };
                         if (this.IdentityType != null)
                         {
                             storageAccountPatch.Identity.ManagedServiceIdentityType = new ManagedServiceIdentityType(this.IdentityType);
-                            //updateParameters.Identity.Type = GetIdentityTypeString(this.IdentityType);
                         }
                         if (this.UserAssignedIdentityId != null)
                         {
@@ -575,16 +562,8 @@ namespace Microsoft.Azure.Commands.Management.Storage
 
                             storageAccountPatch.Identity.UserAssignedIdentities.Add(new ResourceIdentifier(this.UserAssignedIdentityId), new global::Azure.ResourceManager.Models.UserAssignedIdentity());
 
-                            //if (updateParameters.Identity.Type != StorageModels.IdentityType.UserAssigned && updateParameters.Identity.Type != StorageModels.IdentityType.SystemAssignedUserAssigned)
-                            //{
-                            //    throw new ArgumentException("UserAssignIdentityId should only be specified when AssignIdentityType is UserAssigned or SystemAssignedUserAssigned.", "UserAssignIdentityId");
-                            //}
-                            //updateParameters.Identity.UserAssignedIdentities = new Dictionary<string, UserAssignedIdentity>();
-                            //updateParameters.Identity.UserAssignedIdentities.Add(this.UserAssignedIdentityId, new UserAssignedIdentity());
-
                             var accountProperties = this.StorageClientTrack2.GetStorageAccountProperties(this.ResourceGroupName, this.Name);
 
-                            //var accountProperties = this.StorageClient.StorageAccounts.GetProperties(this.ResourceGroupName, this.Name);
 
                             if (accountProperties.Data.Identity != null && accountProperties.Data.Identity.UserAssignedIdentities != null && accountProperties.Data.Identity.UserAssignedIdentities.Count > 0) {
                                 foreach (var uid in accountProperties.Data.Identity.UserAssignedIdentities)
@@ -596,17 +575,6 @@ namespace Microsoft.Azure.Commands.Management.Storage
                                 }
                             }
 
-                            //if (accountProperties.Identity != null && accountProperties.Identity.UserAssignedIdentities != null && accountProperties.Identity.UserAssignedIdentities.Count > 0)
-                            //{
-                            //    foreach (var uid in accountProperties.Identity.UserAssignedIdentities)
-                            //    {
-                            //        if (!uid.Key.Equals(this.UserAssignedIdentityId, StringComparison.OrdinalIgnoreCase))
-                            //        {
-                            //            updateParameters.Identity.UserAssignedIdentities.Add(uid.Key, null);
-   
-                            //        }
-                            //    }
-                            //}
                         }
                     }
 
@@ -619,28 +587,23 @@ namespace Microsoft.Azure.Commands.Management.Storage
 
                         storageAccountPatch.Encryption = ParseEncryption(StorageEncryption, keyvaultEncryption, KeyName, KeyVersion, KeyVaultUri);
 
-                        //updateParameters.Encryption = ParseEncryption(StorageEncryption, keyvaultEncryption, KeyName, KeyVersion, KeyVaultUri);
                         if (this.KeyVaultUserAssignedIdentityId != null)
                         {
                             storageAccountPatch.Encryption.EncryptionIdentity = new global::Azure.ResourceManager.Storage.Models.EncryptionIdentity
                             {
                                 EncryptionUserAssignedIdentity = this.KeyVaultUserAssignedIdentityId
                             };
-                            //updateParameters.Encryption.EncryptionIdentity = new EncryptionIdentity();
-                            //updateParameters.Encryption.EncryptionIdentity.EncryptionUserAssignedIdentity = this.KeyVaultUserAssignedIdentityId;
                         }
                     }
                       
                     if (NetworkRuleSet != null)
                     {
                         storageAccountPatch.NetworkRuleSet = PSNetworkRuleSet.ParseStorageNetworkRule(NetworkRuleSet);
-                        //updateParameters.NetworkRuleSet = PSNetworkRuleSet.ParseStorageNetworkRule(NetworkRuleSet);
                     }
 
                     if (UpgradeToStorageV2.IsPresent)
                     {
                         storageAccountPatch.Kind = StorageKind.StorageV2;
-                        //updateParameters.Kind = Kind.StorageV2;
                     }
                     if (enableAzureActiveDirectoryDomainServicesForFile != null)
                     {
@@ -650,7 +613,6 @@ namespace Microsoft.Azure.Commands.Management.Storage
 
                             var originStorageAccount = this.StorageClientTrack2.GetStorageAccountProperties(this.ResourceGroupName, this.Name);
 
-                            //var originStorageAccount = this.StorageClient.StorageAccounts.GetProperties(this.ResourceGroupName, this.Name);
                             if (originStorageAccount.Data.AzureFilesIdentityBasedAuthentication != null 
                                 && originStorageAccount.Data.AzureFilesIdentityBasedAuthentication.DirectoryServiceOptions == global::Azure.ResourceManager.Storage.Models.DirectoryServiceOptions.AD)
                             {
@@ -660,30 +622,23 @@ namespace Microsoft.Azure.Commands.Management.Storage
                             storageAccountPatch.AzureFilesIdentityBasedAuthentication = 
                                 new global::Azure.ResourceManager.Storage.Models.AzureFilesIdentityBasedAuthentication(global::Azure.ResourceManager.Storage.Models.DirectoryServiceOptions.Aadds);
 
-                            //updateParameters.AzureFilesIdentityBasedAuthentication = new AzureFilesIdentityBasedAuthentication();
-                            //updateParameters.AzureFilesIdentityBasedAuthentication.DirectoryServiceOptions = DirectoryServiceOptions.AADDS;
                         }
                         else //Disable AADDS
                         {
                             // Only disable AADDS; else keep unchanged
 
                             var originStorageAccount = this.StorageClientTrack2.GetStorageAccountProperties(this.ResourceGroupName, this.Name);
-                            //var originStorageAccount = this.StorageClient.StorageAccounts.GetProperties(this.ResourceGroupName, this.Name);
 
                             if (originStorageAccount.Data.AzureFilesIdentityBasedAuthentication == null
                                 || originStorageAccount.Data.AzureFilesIdentityBasedAuthentication.DirectoryServiceOptions == global::Azure.ResourceManager.Storage.Models.DirectoryServiceOptions.Aadds)
                             {
                                 storageAccountPatch.AzureFilesIdentityBasedAuthentication = 
                                     new global::Azure.ResourceManager.Storage.Models.AzureFilesIdentityBasedAuthentication(global::Azure.ResourceManager.Storage.Models.DirectoryServiceOptions.None);
-
-                                //updateParameters.AzureFilesIdentityBasedAuthentication = new AzureFilesIdentityBasedAuthentication();
-                                //updateParameters.AzureFilesIdentityBasedAuthentication.DirectoryServiceOptions = DirectoryServiceOptions.None;
                             }
                             else
                             {
                                 storageAccountPatch.AzureFilesIdentityBasedAuthentication = originStorageAccount.Data.AzureFilesIdentityBasedAuthentication;
 
-                                //updateParameters.AzureFilesIdentityBasedAuthentication = originStorageAccount.AzureFilesIdentityBasedAuthentication;
                             }
                         }
                     }
@@ -707,8 +662,6 @@ namespace Microsoft.Azure.Commands.Management.Storage
                             //if user want to enable AD, must first disable AADDS
 
                             var originStorageAccount = this.StorageClientTrack2.GetStorageAccountProperties(this.ResourceGroupName, this.Name);
-                            
-                            //var originStorageAccount = this.StorageClient.StorageAccounts.GetProperties(this.ResourceGroupName, this.Name);
 
 
 
@@ -722,26 +675,12 @@ namespace Microsoft.Azure.Commands.Management.Storage
                                 new global::Azure.ResourceManager.Storage.Models.AzureFilesIdentityBasedAuthentication(global::Azure.ResourceManager.Storage.Models.DirectoryServiceOptions.AD);
 
 
-                            //updateParameters.AzureFilesIdentityBasedAuthentication = new AzureFilesIdentityBasedAuthentication();
-                            //updateParameters.AzureFilesIdentityBasedAuthentication.DirectoryServiceOptions = DirectoryServiceOptions.AD;
-
                             storageAccountPatch.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties =
                                 new global::Azure.ResourceManager.Storage.Models.ActiveDirectoryProperties(this.ActiveDirectoryDomainName, this.ActiveDirectoryNetBiosDomainName,
                                 this.ActiveDirectoryForestName, this.ActiveDirectoryDomainGuid, this.ActiveDirectoryDomainSid, this.ActiveDirectoryAzureStorageSid);
                             storageAccountPatch.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties.SamAccountName = this.ActiveDirectorySamAccountName;
                             storageAccountPatch.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties.AccountType = this.ActiveDirectoryAccountType;
 
-                            //updateParameters.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties = new ActiveDirectoryProperties()
-                            //{
-                            //    DomainName = this.ActiveDirectoryDomainName,
-                            //    NetBiosDomainName = this.ActiveDirectoryNetBiosDomainName,
-                            //    ForestName = this.ActiveDirectoryForestName,
-                            //    DomainGuid = this.ActiveDirectoryDomainGuid,
-                            //    DomainSid = this.ActiveDirectoryDomainSid,
-                            //    AzureStorageSid = this.ActiveDirectoryAzureStorageSid,
-                            //    SamAccountName = this.ActiveDirectorySamAccountName,
-                            //    AccountType = this.ActiveDirectoryAccountType
-                            //};
                         }
                         else // Disable AD
                         {
@@ -761,21 +700,17 @@ namespace Microsoft.Azure.Commands.Management.Storage
                             // Only disable AD; else keep unchanged
                             var originStorageAccount = this.StorageClientTrack2.GetStorageAccountProperties(this.ResourceGroupName, this.Name);
 
-                            //var originStorageAccount = this.StorageClient.StorageAccounts.GetProperties(this.ResourceGroupName, this.Name);
                             if (originStorageAccount.Data.AzureFilesIdentityBasedAuthentication == null
                                 || originStorageAccount.Data.AzureFilesIdentityBasedAuthentication.DirectoryServiceOptions == global::Azure.ResourceManager.Storage.Models.DirectoryServiceOptions.AD)
                             {
                                 storageAccountPatch.AzureFilesIdentityBasedAuthentication = 
                                     new global::Azure.ResourceManager.Storage.Models.AzureFilesIdentityBasedAuthentication(global::Azure.ResourceManager.Storage.Models.DirectoryServiceOptions.AD);
 
-                                //updateParameters.AzureFilesIdentityBasedAuthentication = new AzureFilesIdentityBasedAuthentication();
-                                //updateParameters.AzureFilesIdentityBasedAuthentication.DirectoryServiceOptions = DirectoryServiceOptions.None;
                             }
                             else
                             {
                                 storageAccountPatch.AzureFilesIdentityBasedAuthentication = originStorageAccount.Data.AzureFilesIdentityBasedAuthentication;
 
-                                //updateParameters.AzureFilesIdentityBasedAuthentication = originStorageAccount.AzureFilesIdentityBasedAuthentication;
                             }
                         }
                     }
@@ -789,26 +724,18 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         }
 
                         storageAccountPatch.AzureFilesIdentityBasedAuthentication.DefaultSharePermission = this.DefaultSharePermission;
-                        //if (updateParameters.AzureFilesIdentityBasedAuthentication == null)
-                        //{
-                        //    updateParameters.AzureFilesIdentityBasedAuthentication = new AzureFilesIdentityBasedAuthentication();
-                        //}
-                        //updateParameters.AzureFilesIdentityBasedAuthentication.DefaultSharePermission = this.DefaultSharePermission;
                     }
                     if (this.EnableLargeFileShare.IsPresent)
                     {
                         storageAccountPatch.LargeFileSharesState = global::Azure.ResourceManager.Storage.Models.LargeFileSharesState.Enabled;
-                        //updateParameters.LargeFileSharesState = LargeFileSharesState.Enabled;
                     }
                     if (this.minimumTlsVersion != null)
                     {
                         storageAccountPatch.MinimumTlsVersion = this.minimumTlsVersion;
-                        //updateParameters.MinimumTlsVersion = this.minimumTlsVersion;
                     }
                     if (this.allowBlobPublicAccess != null)
                     {
                         storageAccountPatch.AllowBlobPublicAccess = this.allowBlobPublicAccess;
-                        //updateParameters.AllowBlobPublicAccess = this.allowBlobPublicAccess;
                     }
                     if (this.RoutingChoice != null || this.publishMicrosoftEndpoint != null || this.publishInternetEndpoint != null)
                     {
@@ -819,35 +746,30 @@ namespace Microsoft.Azure.Commands.Management.Storage
                             PublishMicrosoftEndpoints = this.publishMicrosoftEndpoint,
 
                         };
-                        //updateParameters.RoutingPreference = new RoutingPreference(this.RoutingChoice, this.publishMicrosoftEndpoint, this.publishInternetEndpoint);
                     }
                     if (allowSharedKeyAccess != null)
                     {
                         storageAccountPatch.AllowSharedKeyAccess = this.allowSharedKeyAccess;
-                        //updateParameters.AllowSharedKeyAccess = allowSharedKeyAccess;
                     }
                     if (sasExpirationPeriod != null)
                     {
                         storageAccountPatch.SasPolicy = new global::Azure.ResourceManager.Storage.Models.SasPolicy(
                             this.sasExpirationPeriod.Value.ToString(@"d\.hh\:mm\:ss"), null);
-                        //updateParameters.SasPolicy = new SasPolicy(sasExpirationPeriod.Value.ToString(@"d\.hh\:mm\:ss"));
                     }
                     if (keyExpirationPeriodInDay != null)
                     {
 
                         storageAccountPatch.KeyExpirationPeriodInDays = keyExpirationPeriodInDay.Value;
 
-                        //updateParameters.KeyPolicy = new KeyPolicy(keyExpirationPeriodInDay.Value);
+   
                     }
                     if (allowCrossTenantReplication != null)
                     {
                         storageAccountPatch.AllowCrossTenantReplication = this.allowCrossTenantReplication;
-                        //updateParameters.AllowCrossTenantReplication = allowCrossTenantReplication;
                     }
                     if (this.PublicNetworkAccess != null)
                     {
                         storageAccountPatch.PublicNetworkAccess = this.PublicNetworkAccess;
-                        //updateParameters.PublicNetworkAccess = this.PublicNetworkAccess;
                     }
                     if(this.immutabilityPeriod !=null ||  this.ImmutabilityPolicyState != null)
                     {
@@ -858,25 +780,15 @@ namespace Microsoft.Azure.Commands.Management.Storage
                             State = this.ImmutabilityPolicyState,
                         };
 
-
-                        //updateParameters.ImmutableStorageWithVersioning = new ImmutableStorageAccount();
-                        //updateParameters.ImmutableStorageWithVersioning.ImmutabilityPolicy = new AccountImmutabilityPolicyProperties();
-                        //updateParameters.ImmutableStorageWithVersioning.ImmutabilityPolicy.ImmutabilityPeriodSinceCreationInDays = this.immutabilityPeriod;
-                        //updateParameters.ImmutableStorageWithVersioning.ImmutabilityPolicy.State = this.ImmutabilityPolicyState;
                     }
 
 
                     var updatedAccountResponse = this.StorageClientTrack2.UpdateStorageAccount(this.ResourceGroupName, this.Name, storageAccountPatch);
 
-                    //var updatedAccountResponse = this.StorageClient.StorageAccounts.Update(
-                    //    this.ResourceGroupName,
-                    //    this.Name,
-                    //    updateParameters);
 
 
                     var storageAccount = this.StorageClientTrack2.GetSingleStorageAccount(this.ResourceGroupName, this.Name);
 
-                    //var storageAccount = this.StorageClient.StorageAccounts.GetProperties(this.ResourceGroupName, this.Name);
 
                     WriteStorageAccount(storageAccount);
                 }

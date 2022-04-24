@@ -600,23 +600,19 @@ namespace Microsoft.Azure.Commands.Management.Storage
             if (this.AccessTier != null)
             {
                 createContent.AccessTier = ParseAccessTier(this.AccessTier);
-                //createParameters.AccessTier = ParseAccessTier(AccessTier);
             }
             if (enableHttpsTrafficOnly != null)
             {
                 createContent.EnableHttpsTrafficOnly = enableHttpsTrafficOnly;
-                //createParameters.EnableHttpsTrafficOnly = enableHttpsTrafficOnly;
             }
 
             if (AssignIdentity.IsPresent || this.UserAssignedIdentityId != null || this.IdentityType != null)
             {
                 createContent.Identity = 
                     new global::Azure.ResourceManager.Models.ManagedServiceIdentity(ManagedServiceIdentityType.SystemAssigned);
-                //createParameters.Identity = new Identity() { Type = StorageModels.IdentityType.SystemAssigned };
                 if (this.IdentityType != null)
                 {
                     createContent.Identity.ManagedServiceIdentityType = new ManagedServiceIdentityType(this.IdentityType);
-                    //createParameters.Identity.Type = GetIdentityTypeString(this.IdentityType);
                 }
                 if (this.UserAssignedIdentityId != null)
                 {
@@ -625,35 +621,23 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         throw new ArgumentException("UserAssignIdentityId should only be specified when AssignIdentityType is UserAssigned or SystemAssignedUserAssigned.", "UserAssignIdentityId");
                     }
 
-                    //if (createParameters.Identity.Type != StorageModels.IdentityType.UserAssigned && createParameters.Identity.Type != StorageModels.IdentityType.SystemAssignedUserAssigned)
-                    //{
-                    //    throw new ArgumentException("UserAssignIdentityId should only be specified when AssignIdentityType is UserAssigned or SystemAssignedUserAssigned.", "UserAssignIdentityId");
-                    //}
-
                     createContent.Identity.UserAssignedIdentities.Add(new ResourceIdentifier(this.UserAssignedIdentityId), new global::Azure.ResourceManager.Models.UserAssignedIdentity());
 
-                    //createParameters.Identity.UserAssignedIdentities = new Dictionary<string, UserAssignedIdentity>();
-                    //createParameters.Identity.UserAssignedIdentities.Add(this.UserAssignedIdentityId, new UserAssignedIdentity());
                 }
             }
             if (NetworkRuleSet != null)
             {
                 createContent.NetworkRuleSet = PSNetworkRuleSet.ParseStorageNetworkRule(NetworkRuleSet);
-                //createParameters.NetworkRuleSet = PSNetworkRuleSet.ParseStorageNetworkRule(NetworkRuleSet);
             }
             if (enableHierarchicalNamespace != null)
             {
                 createContent.IsHnsEnabled = enableHierarchicalNamespace;
-                //createParameters.IsHnsEnabled = enableHierarchicalNamespace;
             }
             if (enableAzureActiveDirectoryDomainServicesForFile != null || enableActiveDirectoryDomainServicesForFile != null)
             {
-                //createContent.AzureFilesIdentityBasedAuthentication = new global::Azure.ResourceManager.Storage.Models.AzureFilesIdentityBasedAuthentication();
-                //createParameters.AzureFilesIdentityBasedAuthentication = new AzureFilesIdentityBasedAuthentication();
                 if (enableAzureActiveDirectoryDomainServicesForFile != null && enableAzureActiveDirectoryDomainServicesForFile.Value)
                 {
                     createContent.AzureFilesIdentityBasedAuthentication = new global::Azure.ResourceManager.Storage.Models.AzureFilesIdentityBasedAuthentication(global::Azure.ResourceManager.Storage.Models.DirectoryServiceOptions.Aadds);
-                    //createParameters.AzureFilesIdentityBasedAuthentication.DirectoryServiceOptions = DirectoryServiceOptions.AADDS;
                 }
                 else if (enableActiveDirectoryDomainServicesForFile != null && enableActiveDirectoryDomainServicesForFile.Value)
                 {
@@ -677,24 +661,11 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     createContent.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties.SamAccountName = this.ActiveDirectorySamAccountName;
                     createContent.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties.AccountType = this.ActiveDirectoryAccountType;
                     
-                    //createParameters.AzureFilesIdentityBasedAuthentication.DirectoryServiceOptions = DirectoryServiceOptions.AD;
-                    //createParameters.AzureFilesIdentityBasedAuthentication.ActiveDirectoryProperties = new ActiveDirectoryProperties()
-                    //{
-                    //    DomainName = this.ActiveDirectoryDomainName,
-                    //    NetBiosDomainName = this.ActiveDirectoryNetBiosDomainName,
-                    //    ForestName = this.ActiveDirectoryForestName,
-                    //    DomainGuid = this.ActiveDirectoryDomainGuid,
-                    //    DomainSid = this.ActiveDirectoryDomainSid,
-                    //    AzureStorageSid = this.ActiveDirectoryAzureStorageSid,
-                    //    SamAccountName = this.ActiveDirectorySamAccountName,
-                    //    AccountType = this.ActiveDirectoryAccountType
-                    //};
                 }
                 else
                 {
                     createContent.AzureFilesIdentityBasedAuthentication = 
                         new global::Azure.ResourceManager.Storage.Models.AzureFilesIdentityBasedAuthentication(global::Azure.ResourceManager.Storage.Models.DirectoryServiceOptions.None);
-                    //createParameters.AzureFilesIdentityBasedAuthentication.DirectoryServiceOptions = DirectoryServiceOptions.None;
                 }
             }
 
@@ -709,39 +680,28 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     createContent.AzureFilesIdentityBasedAuthentication =
                         new global::Azure.ResourceManager.Storage.Models.AzureFilesIdentityBasedAuthentication(global::Azure.ResourceManager.Storage.Models.DirectoryServiceOptions.None);
                 }
-                //if (createParameters.AzureFilesIdentityBasedAuthentication == null)
-                //{
-                //    createParameters.AzureFilesIdentityBasedAuthentication = new AzureFilesIdentityBasedAuthentication();
-                //}
 
                 createContent.AzureFilesIdentityBasedAuthentication.DefaultSharePermission = this.DefaultSharePermission;
-                //createParameters.AzureFilesIdentityBasedAuthentication.DefaultSharePermission = this.DefaultSharePermission;
             }
             if (this.EnableLargeFileShare.IsPresent)
             {
                 createContent.LargeFileSharesState = global::Azure.ResourceManager.Storage.Models.LargeFileSharesState.Enabled;
-                //createParameters.LargeFileSharesState = LargeFileSharesState.Enabled;
             }
             if(this.EncryptionKeyTypeForQueue != null || this.EncryptionKeyTypeForTable != null || this.RequireInfrastructureEncryption.IsPresent)
             {
 
                 createContent.Encryption = new global::Azure.ResourceManager.Storage.Models.Encryption(global::Azure.ResourceManager.Storage.Models.KeySource.MicrosoftStorage);
 
-                //createParameters.Encryption = new Encryption();
-                //createParameters.Encryption.KeySource = KeySource.MicrosoftStorage;
                 if (this.EncryptionKeyTypeForQueue != null || this.EncryptionKeyTypeForTable != null)
                 {
                     createContent.Encryption.Services = new global::Azure.ResourceManager.Storage.Models.EncryptionServices();
 
-                    //createParameters.Encryption.Services = new EncryptionServices();
                     if (this.EncryptionKeyTypeForQueue != null)
                     {
                         createContent.Encryption.Services.Queue = new global::Azure.ResourceManager.Storage.Models.EncryptionService
                         {
                             KeyType = this.EncryptionKeyTypeForQueue
                         };
-                        //createContent.Encryption.Services.Queue.KeyType = this.EncryptionKeyTypeForQueue; 
-                        //createParameters.Encryption.Services.Queue = new EncryptionService(keyType: this.EncryptionKeyTypeForQueue);
                     }
                     if (this.EncryptionKeyTypeForTable != null)
                     {
@@ -749,13 +709,11 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         {
                             KeyType = this.EncryptionKeyTypeForTable
                         };
-                        //createParameters.Encryption.Services.Table = new EncryptionService(keyType: this.EncryptionKeyTypeForTable);
                     }
                 }
                 if (this.RequireInfrastructureEncryption.IsPresent)
                 {
                     createContent.Encryption.RequireInfrastructureEncryption = true;
-                    //createParameters.Encryption.RequireInfrastructureEncryption = true;
 
                     if (createContent.Encryption.Services == null)
                     {
@@ -763,11 +721,6 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         createContent.Encryption.Services.Blob = new global::Azure.ResourceManager.Storage.Models.EncryptionService();
                     }
 
-                    //if (createParameters.Encryption.Services is null)
-                    //{
-                    //    createParameters.Encryption.Services = new EncryptionServices();
-                    //    createParameters.Encryption.Services.Blob = new EncryptionService();
-                    //}
                 }
             }
             if (this.KeyVaultUri !=null || this.KeyName != null || this.KeyVersion != null || this.KeyVaultUserAssignedIdentityId != null)
@@ -795,12 +748,6 @@ namespace Microsoft.Azure.Commands.Management.Storage
                 }
 
 
-                //if (createParameters.Encryption == null)
-                //{
-                //    createParameters.Encryption = new Encryption();
-                //    createParameters.Encryption.KeySource = KeySource.MicrosoftStorage;
-                //}
-
                 if (createContent.Encryption.Services == null)
                 {
                     createContent.Encryption.Services = new global::Azure.ResourceManager.Storage.Models.EncryptionServices
@@ -809,11 +756,6 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     };
                 }
 
-                //if (createParameters.Encryption.Services is null)
-                //{
-                //    createParameters.Encryption.Services = new EncryptionServices();
-                //    createParameters.Encryption.Services.Blob = new EncryptionService();
-                //}
 
                 if (this.KeyVaultUri != null || this.KeyName != null || this.KeyVersion != null)
                 {
@@ -825,8 +767,6 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         KeyVersion = this.KeyVersion,
                         KeyVaultUri =  new Uri(this.KeyVaultUri)
                     };
-                    //createParameters.Encryption.KeySource = KeySource.MicrosoftKeyvault;
-                    //createParameters.Encryption.KeyVaultProperties = new KeyVaultProperties(this.KeyName, this.KeyVersion, this.KeyVaultUri);
                 }
 
                 if (this.KeyVaultUserAssignedIdentityId != null)
@@ -836,19 +776,15 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         EncryptionUserAssignedIdentity = this.KeyVaultUserAssignedIdentityId
                     };
 
-                    //createParameters.Encryption.EncryptionIdentity = new EncryptionIdentity();
-                    //createParameters.Encryption.EncryptionIdentity.EncryptionUserAssignedIdentity = this.KeyVaultUserAssignedIdentityId;
                 }
             }
             if (this.minimumTlsVersion != null)
             {
                 createContent.MinimumTlsVersion = this.minimumTlsVersion;
-                //createParameters.MinimumTlsVersion = this.minimumTlsVersion;
             }
             if (this.allowBlobPublicAccess != null)
             {
                 createContent.AllowBlobPublicAccess = this.allowBlobPublicAccess;
-                //createParameters.AllowBlobPublicAccess = this.allowBlobPublicAccess;
             }
             if (this.RoutingChoice != null || this.publishMicrosoftEndpoint != null || this.publishInternetEndpoint != null)
             {
@@ -858,17 +794,14 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     PublishMicrosoftEndpoints = this.publishMicrosoftEndpoint,
                     PublishInternetEndpoints = this.publishInternetEndpoint
                 };
-                //createParameters.RoutingPreference = new StorageModels.RoutingPreference(this.RoutingChoice, this.publishMicrosoftEndpoint, this.publishInternetEndpoint);
             }
             if (allowSharedKeyAccess != null)
             {
                 createContent.AllowSharedKeyAccess = this.allowSharedKeyAccess;
-                //createParameters.AllowSharedKeyAccess = allowSharedKeyAccess;
             }
             if (enableNfsV3 != null)
             {
                 createContent.EnableNfsV3 = this.enableNfsV3;
-                //createParameters.EnableNfsV3 = enableNfsV3;
             }
             if (this.EdgeZone != null)
             {
@@ -877,33 +810,24 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     Name = this.EdgeZone,
                     ExtendedLocationType = global::Azure.ResourceManager.Storage.Models.ExtendedLocationTypes.EdgeZone,
                 };
-                //createParameters.ExtendedLocation = new ExtendedLocation()
-                //{
-                //    Type = ExtendedLocationTypes.EdgeZone,
-                //    Name = this.EdgeZone
-                //};
             }
             if (sasExpirationPeriod != null)
             {
                 createContent.SasPolicy = new global::Azure.ResourceManager.Storage.Models.SasPolicy(sasExpirationPeriod.Value.ToString(@"d\.hh\:mm\:ss"), null);
 
-                //createParameters.SasPolicy = new StorageModels.SasPolicy(sasExpirationPeriod.Value.ToString(@"d\.hh\:mm\:ss"));
             }
             if (keyExpirationPeriodInDay != null)
             {
                 createContent.KeyExpirationPeriodInDays = keyExpirationPeriodInDay.Value;
 
-                //createParameters.KeyPolicy = new KeyPolicy(keyExpirationPeriodInDay.Value);
             }
             if(allowCrossTenantReplication != null)
             {
                 createContent.AllowCrossTenantReplication = this.allowCrossTenantReplication;
-                //createParameters.AllowCrossTenantReplication = allowCrossTenantReplication;
             }
             if (this.PublicNetworkAccess != null)
             {
                 createContent.PublicNetworkAccess = this.PublicNetworkAccess;
-                //createParameters.PublicNetworkAccess = this.PublicNetworkAccess;
             }
             if (EnableAccountLevelImmutability.IsPresent || this.immutabilityPeriod != null ||  this.ImmutabilityPolicyState != null)
             {
@@ -918,8 +842,6 @@ namespace Microsoft.Azure.Commands.Management.Storage
                 };
  
 
-                //createParameters.ImmutableStorageWithVersioning = new ImmutableStorageAccount();
-                //createParameters.ImmutableStorageWithVersioning.Enabled = this.EnableAccountLevelImmutability.IsPresent;
                 if (this.immutabilityPeriod != null || this.ImmutabilityPolicyState != null)
                 {
                     createContent.ImmutableStorageWithVersioning.ImmutabilityPolicy = new global::Azure.ResourceManager.Storage.Models.AccountImmutabilityPolicyProperties
@@ -928,9 +850,6 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         State = this.ImmutabilityPolicyState,
                     };
 
-                    //createParameters.ImmutableStorageWithVersioning.ImmutabilityPolicy = new AccountImmutabilityPolicyProperties();
-                    //createParameters.ImmutableStorageWithVersioning.ImmutabilityPolicy.ImmutabilityPeriodSinceCreationInDays = this.immutabilityPeriod;
-                    //createParameters.ImmutableStorageWithVersioning.ImmutabilityPolicy.State = this.ImmutabilityPolicyState;
                 }
             }
 
@@ -938,17 +857,10 @@ namespace Microsoft.Azure.Commands.Management.Storage
 
             var createAccountResponse = this.StorageClientTrack2.CreateStorageAccount(this.ResourceGroupName, this.Name, createContent);
 
-            //var createAccountResponse = this.StorageClient.StorageAccounts.Create(
-            //    this.ResourceGroupName,
-            //    this.Name,
-            //    createParameters);
             var storageAccount = this.StorageClientTrack2.GetSingleStorageAccount(this.ResourceGroupName, this.Name);
 
-            //WriteStorageAccount(storageAccount);
 
             WriteStorageAccount(storageAccount);
-
-            //var storageAccount = this.StorageClient.StorageAccounts.GetProperties(this.ResourceGroupName, this.Name);
 
         }
     }
