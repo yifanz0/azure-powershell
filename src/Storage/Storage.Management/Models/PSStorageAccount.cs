@@ -184,10 +184,10 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
         public static CloudStorageAccount GetCloudStorageAccount(StorageAccountResource storageAccountResource)
         {
-            Uri blobEndpoint = new Uri(storageAccountResource.Data.PrimaryEndpoints.Blob);
-            Uri queueEndpoint = new Uri(storageAccountResource.Data.PrimaryEndpoints.Queue);
-            Uri tableEndpoint = new Uri(storageAccountResource.Data.PrimaryEndpoints.Table);
-            Uri fileEndpoint = new Uri(storageAccountResource.Data.PrimaryEndpoints.File);
+            Uri blobEndpoint = storageAccountResource.Data.PrimaryEndpoints.Blob != null ? new Uri(storageAccountResource.Data.PrimaryEndpoints.Blob) : null;
+            Uri queueEndpoint = storageAccountResource.Data.PrimaryEndpoints.Queue != null ? new Uri(storageAccountResource.Data.PrimaryEndpoints.Queue) : null;
+            Uri tableEndpoint = storageAccountResource.Data.PrimaryEndpoints.Table != null ? new Uri(storageAccountResource.Data.PrimaryEndpoints.Table) : null;
+            Uri fileEndpoint = storageAccountResource.Data.PrimaryEndpoints.File != null ? new Uri(storageAccountResource.Data.PrimaryEndpoints.File) : null;
             string key = storageAccountResource.GetKeys().Value.Keys[0].Value;
             StorageCredentials storageCredentials = new Azure.Storage.Auth.StorageCredentials(storageAccountResource.Data.Name, key);
             CloudStorageAccount cloudStorageAccount = new CloudStorageAccount(
