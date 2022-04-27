@@ -22,6 +22,8 @@ using System.Globalization;
 using System.Collections.Generic;
 using Microsoft.Azure.Management.Internal.Resources.Utilities.Models;
 using Microsoft.WindowsAzure.Commands.Common.CustomAttributes;
+using Track2 = Azure.ResourceManager.Storage;
+using Azure.ResourceManager.Storage;
 
 namespace Microsoft.Azure.Commands.Management.Storage
 {
@@ -168,35 +170,63 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     this.ResourceGroupName = accountResource.ResourceGroupName;
                     this.StorageAccountName = accountResource.ResourceName;
                 }
-                ManagementPolicy managementPolicy;
+                //ManagementPolicy managementPolicy;
+                ManagementPolicyResource managementPolicyResource;
+                Track2.ManagementPolicyData data;
 
                 switch (this.ParameterSetName)
                 {
                     case AccountObjectPolicyRuleParameterSet:
                     case AccountNamePolicyRuleParameterSet:
                     case AccountResourceIdPolicyRuleParameterSet:
-                        managementPolicy = this.StorageClient.ManagementPolicies.CreateOrUpdate(
-                            this.ResourceGroupName,
-                            this.StorageAccountName,
-                            new ManagementPolicySchema(
-                                //this.version,
-                                PSManagementPolicyRule.ParseManagementPolicyRules(this.Rule)));
+                        
+                        data = new Track2.ManagementPolicyData
+                        {
+                            Rules = PSManagementPolicyRule.ParseManagementPolicyRules(this.Rule)
+                        };
+
+                        managementPolicyResource = this.StorageClientTrack2
+                            .GetStorageAccount(this.ResourceGroupName, this.StorageAccountName)
+                            .GetManagementPolicy()
+                            .CreateOrUpdate(global::Azure.WaitUntil.Completed,data).Value;
+
+
+                        //managementPolicy = this.StorageClient.ManagementPolicies.CreateOrUpdate(
+                        //    this.ResourceGroupName,
+                        //    this.StorageAccountName,
+                        //    new ManagementPolicySchema(
+                        //        //this.version,
+                        //        PSManagementPolicyRule.ParseManagementPolicyRules(this.Rule)));
                         break;
                     case AccountObjectPolicyObjectParameterSet:
                     case AccountNamePolicyObjectParameterSet:
                     case AccountResourceIdPolicyObjectParameterSet:
-                        managementPolicy = this.StorageClient.ManagementPolicies.CreateOrUpdate(
-                            this.ResourceGroupName,
-                            this.StorageAccountName,
-                            new ManagementPolicySchema(
-                                //this.Policy.Version,
-                                PSManagementPolicyRule.ParseManagementPolicyRules(this.Policy.Rules)));
+
+                        data = new Track2.ManagementPolicyData()
+                        {
+                            Rules = PSManagementPolicyRule.ParseManagementPolicyRules(this.Policy.Rules)
+                        };
+
+                        managementPolicyResource = this.StorageClientTrack2
+                            .GetStorageAccount(this.ResourceGroupName, this.StorageAccountName)
+                            .GetManagementPolicy()
+                            .CreateOrUpdate(global::Azure.WaitUntil.Completed, data).Value;
+
+
+
+
+                        //managementPolicy = this.StorageClient.ManagementPolicies.CreateOrUpdate(
+                        //    this.ResourceGroupName,
+                        //    this.StorageAccountName,
+                        //    new ManagementPolicySchema(
+                        //        //this.Policy.Version,
+                        //        PSManagementPolicyRule.ParseManagementPolicyRules(this.Policy.Rules)));
                         break;
                     default:
                         throw new PSArgumentException(string.Format(CultureInfo.InvariantCulture, "Invalid ParameterSet: {0}", this.ParameterSetName));
                 }
 
-                WriteObject(new PSManagementPolicy(managementPolicy, this.ResourceGroupName, this.StorageAccountName), true);
+                WriteObject(new PSManagementPolicy(managementPolicyResource, this.ResourceGroupName, this.StorageAccountName), true);
             }
         }
     }

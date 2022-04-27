@@ -12,10 +12,13 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
+using Track2 = global::Azure.ResourceManager.Storage;
+using Azure.ResourceManager.Storage.Models;
 using Microsoft.Azure.Management.Storage.Models;
 using Microsoft.WindowsAzure.Commands.Common.Attributes;
 using System;
 using System.Collections.Generic;
+using Azure.ResourceManager.Storage;
 
 namespace Microsoft.Azure.Commands.Management.Storage.Models
 {
@@ -27,60 +30,70 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         public PSBlobInventoryPolicy()
         { }
 
-        public PSBlobInventoryPolicy(BlobInventoryPolicy policy, string ResourceGroupName, string StorageAccountName)
+        public PSBlobInventoryPolicy(BlobInventoryPolicyResource policy, string resourceGroupName, string storageAccountName)
         {
-            this.ResourceGroupName = ResourceGroupName;
-            this.StorageAccountName = StorageAccountName;
+            this.ResourceGroupName = resourceGroupName;
+            this.StorageAccountName = storageAccountName;
             this.Id = policy.Id;
-            this.Name = policy.Name;
-            this.Type = policy.Type;
-            this.LastModifiedTime = policy.LastModifiedTime;
-            this.SystemData = policy.SystemData is null ? null : new PSSystemData(policy.SystemData);
+            this.Name = policy.Data.Name;
+            this.Type = policy.Data.ResourceType;
+            this.LastModifiedTime = policy.Data.LastModifiedOn;
 
-            this.Enabled = policy.Policy.Enabled;
-            //this.Destination = policy.Policy.Destination;
+            this.SystemData = policy.Data.SystemData is null ? null : new PSSystemData(policy.Data.SystemData);
 
-            if (policy.Policy.Rules != null)
+            this.Enabled = policy.Data.Policy.Enabled;
+
+            if (policy.Data.Policy.Rules != null)
             {
                 List<PSBlobInventoryPolicyRule> psRules = new List<PSBlobInventoryPolicyRule>();
-                foreach (BlobInventoryPolicyRule rule in policy.Policy.Rules)
+                foreach (Track2.Models.BlobInventoryPolicyRule rule in policy.Data.Policy.Rules)
                 {
                     psRules.Add(new PSBlobInventoryPolicyRule(rule));
                 }
-                this.Rules = psRules.ToArray();
-            }
-            else
+                this.Rules= psRules.ToArray();
+            } else
             {
                 this.Rules = null;
             }
         }
 
-        public BlobInventoryPolicy ParseBlobInventoryPolicy()
-        {
-            List<BlobInventoryPolicyRule> invRules = ParseBlobInventoryPolicyRules(this.Rules);
 
-            BlobInventoryPolicySchema policySchema = new BlobInventoryPolicySchema()
-            {
-                Enabled = this.Enabled,
-                //Destination = this.Destination,
-                Rules = invRules
-            };
-            return new BlobInventoryPolicy(
-                policySchema,
-                this.Id,
-                this.Name,
-                this.Type,
-                this.LastModifiedTime,
-                this.SystemData is null ? null : this.SystemData.ParseSystemData()
-            );
-        }
 
-        public static List<BlobInventoryPolicyRule> ParseBlobInventoryPolicyRules(PSBlobInventoryPolicyRule[] rules)
+        //public BlobInventoryPolicy ParseBlobInventoryPolicy()
+        //{
+        //    List<Track2.Models.BlobInventoryPolicyRule> invRules = ParseBlobInventoryPolicyRules(this.Rules);
+
+        //    Track2.Models.BlobInventoryPolicySchema policySchema = new Track2.Models.BlobInventoryPolicySchema(
+        //        this.Enabled,
+        //        // Should Inventory be set here? 
+        //        Track2.Models.InventoryRuleType.Inventory,
+        //        invRules);
+
+
+        //    //BlobInventoryPolicySchema policySchema = new BlobInventoryPolicySchema()
+        //    //{
+        //    //    Enabled = this.Enabled,
+        //    //    //Destination = this.Destination,
+        //    //    Rules = invRules
+        //    //};
+
+
+        //    return new BlobInventoryPolicy(
+        //        policySchema,
+        //        this.Id,
+        //        this.Name,
+        //        this.Type,
+        //        this.LastModifiedTime,
+        //        this.SystemData is null ? null : this.SystemData.ParseSystemData()
+        //    );
+        //}
+
+        public static List<Track2.Models.BlobInventoryPolicyRule> ParseBlobInventoryPolicyRules(PSBlobInventoryPolicyRule[] rules)
         {
-            List<BlobInventoryPolicyRule> invRules = null;
+            List<Track2.Models.BlobInventoryPolicyRule> invRules = null;
             if (rules != null)
             {
-                invRules = new List<BlobInventoryPolicyRule>();
+                invRules = new List<Track2.Models.BlobInventoryPolicyRule>();
                 foreach (PSBlobInventoryPolicyRule rule in rules)
                 {
                     invRules.Add(rule.ParseBlobInventoryPolicyRule());
@@ -99,7 +112,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         [Ps1Xml(Label = "Type", Target = ViewControl.List, Position = 2)]
         public string Type { get; set; }
         [Ps1Xml(Label = "LastModifiedTime", Target = ViewControl.List, Position = 4)]
-        public DateTime? LastModifiedTime { get; set; }
+        public DateTimeOffset? LastModifiedTime { get; set; }
 
         //public PSBlobInventoryPolicySchema Policy { get; set; }
 
@@ -116,7 +129,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
     public class PSBlobInventoryPolicyRule
     {
         public PSBlobInventoryPolicyRule() { }
-        public PSBlobInventoryPolicyRule(BlobInventoryPolicyRule rule)
+        public PSBlobInventoryPolicyRule(Track2.Models.BlobInventoryPolicyRule rule)
         {
             this.Enabled = rule.Enabled;
             this.Name = rule.Name;
@@ -124,15 +137,25 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             this.Definition = rule.Definition is null ? null : new PSBlobInventoryPolicyDefinition(rule.Definition);
         }
 
-        public BlobInventoryPolicyRule ParseBlobInventoryPolicyRule()
+        public Track2.Models.BlobInventoryPolicyRule ParseBlobInventoryPolicyRule()
         {
-            return new BlobInventoryPolicyRule()
-            {
-                Enabled = this.Enabled,
-                Name = this.Name,
-                Destination = this.Destination,
-                Definition = this.Definition is null ? null : this.Definition.parseBlobInventoryPolicyDefinition()
-            };
+            Track2.Models.BlobInventoryPolicyDefinition policyDefinition = this.Definition is null ? null : this.Definition.parseBlobInventoryPolicyDefinition();
+
+            Track2.Models.BlobInventoryPolicyRule policyRule = new Track2.Models.BlobInventoryPolicyRule(
+                this.Enabled,
+                this.Name,
+                this.Destination,
+                policyDefinition);
+
+            return policyRule;
+
+            //return new BlobInventoryPolicyRule()
+            //{
+            //    Enabled = this.Enabled,
+            //    Name = this.Name,
+            //    Destination = this.Destination,
+            //    Definition = this.Definition is null ? null : this.Definition.parseBlobInventoryPolicyDefinition()
+            //};
         }
 
         public bool Enabled { get; set; }
@@ -151,20 +174,38 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
     {
         public PSBlobInventoryPolicyDefinition() { }
 
-        public PSBlobInventoryPolicyDefinition(BlobInventoryPolicyDefinition Definition)
+        public PSBlobInventoryPolicyDefinition(Track2.Models.BlobInventoryPolicyDefinition Definition)
         {
             this.Filters = Definition.Filters is null ? null : new PSBlobInventoryPolicyFilter(Definition.Filters);
-            this.Format = Definition.Format;
-            this.Schedule = Definition.Schedule;
-            this.ObjectType = Definition.ObjectType;
+            this.Format = Definition.Format.ToString();
+            this.Schedule = Definition.Schedule.ToString();
+            this.ObjectType = Definition.ObjectType.ToString();
             this.SchemaFields = Definition.SchemaFields is null ? null : ((List<string>)Definition.SchemaFields).ToArray();
         }
 
-        public BlobInventoryPolicyDefinition parseBlobInventoryPolicyDefinition()
+        public Track2.Models.BlobInventoryPolicyDefinition parseBlobInventoryPolicyDefinition()
         {
-            return new BlobInventoryPolicyDefinition(this.Format, this.Schedule, this.ObjectType, 
-                this.SchemaFields is null? null: new List<string>(this.SchemaFields),
-                this.Filters is null? null : this.Filters.ParseBlobInventoryPolicyFilter());
+            Track2.Models.BlobInventoryPolicyDefinition policyDefinition = new Track2.Models.BlobInventoryPolicyDefinition(
+                new Track2.Models.Format(this.Format),
+                new Track2.Models.Schedule(this.Schedule),
+                new Track2.Models.ObjectType(this.ObjectType),
+                this.SchemaFields is null ? null : new List<string>(this.SchemaFields)
+
+                
+                );
+
+            if (this.Filters != null)
+            {
+                policyDefinition.Filters = this.Filters.ParseBlobInventoryPolicyFilter();
+            }
+
+
+            return policyDefinition;
+
+
+            //return new BlobInventoryPolicyDefinition(this.Format, this.Schedule, this.ObjectType, 
+            //    this.SchemaFields is null? null: new List<string>(this.SchemaFields),
+            //    this.Filters is null? null : this.Filters.ParseBlobInventoryPolicyFilter());
         }
 
         public PSBlobInventoryPolicyFilter Filters { get; set; }
@@ -212,7 +253,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
     {
         public PSBlobInventoryPolicyFilter() { }
 
-        public PSBlobInventoryPolicyFilter(BlobInventoryPolicyFilter filters)
+        public PSBlobInventoryPolicyFilter(Track2.Models.BlobInventoryPolicyFilter filters)
         {
             this.PrefixMatch = PSManagementPolicyRuleFilter.StringListToArray(filters.PrefixMatch);
             this.BlobTypes = PSManagementPolicyRuleFilter.StringListToArray(filters.BlobTypes);
@@ -220,15 +261,33 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             this.IncludeSnapshots = filters.IncludeSnapshots;
         }
 
-        public BlobInventoryPolicyFilter ParseBlobInventoryPolicyFilter()
+        public Track2.Models.BlobInventoryPolicyFilter ParseBlobInventoryPolicyFilter()
         {
-            return new BlobInventoryPolicyFilter()
+            Track2.Models.BlobInventoryPolicyFilter policyFilter =  new Track2.Models.BlobInventoryPolicyFilter()
             {
-                PrefixMatch = PSManagementPolicyRuleFilter.StringArrayToList(this.PrefixMatch),
-                BlobTypes = PSManagementPolicyRuleFilter.StringArrayToList(this.BlobTypes),
+                //PrefixMatch = PSManagementPolicyRuleFilter.StringArrayToList(this.PrefixMatch),
+                //BlobTypes = PSManagementPolicyRuleFilter.StringArrayToList(this.BlobTypes),
                 IncludeSnapshots = this.IncludeSnapshots,
                 IncludeBlobVersions = this.IncludeBlobVersions
             };
+
+            if (this.PrefixMatch != null)
+            {
+                foreach (string prefixMatch in this.PrefixMatch)
+                {
+                    policyFilter.PrefixMatch.Add(prefixMatch);
+                }
+            }
+
+            if (this.BlobTypes != null)
+            {
+                foreach (string blobType in this.BlobTypes)
+                {
+                    policyFilter.BlobTypes.Add(blobType);
+                }
+            }
+            return policyFilter;
+
         }
 
         public string[] PrefixMatch { get; set; }
@@ -244,26 +303,33 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
     {
         public PSSystemData() { }
 
-        public PSSystemData(SystemData SystemData)
+        public PSSystemData(global::Azure.ResourceManager.Models.SystemData SystemData)
         {
             this.CreatedBy = SystemData.CreatedBy;
-            this.CreatedByType = SystemData.CreatedByType;
-            this.CreatedAt = SystemData.CreatedAt;
+            this.CreatedByType = SystemData.CreatedByType.ToString();
+            this.CreatedAt = SystemData.CreatedOn;
             this.LastModifiedBy = SystemData.LastModifiedBy;
-            this.LastModifiedByType = SystemData.LastModifiedByType;
-            this.LastModifiedAt = SystemData.LastModifiedAt;
+            this.LastModifiedByType = SystemData.LastModifiedByType.ToString();
+            this.LastModifiedAt = SystemData.LastModifiedOn;
         }
 
-        public SystemData ParseSystemData()
-        {
-            return new SystemData(this.CreatedBy, this.CreatedByType, this.CreatedAt, this.LastModifiedBy, this.LastModifiedByType, this.LastModifiedAt);
-        }
+        //public global::Azure.ResourceManager.Models.SystemData ParseSystemData()
+        //{
+        //    return new global::Azure.ResourceManager.Models.SystemData
+        //    {
+        //        // how to set property values? 
+        //    };
+            
+
+
+        //    //return new SystemData(this.CreatedBy, this.CreatedByType, this.CreatedAt, this.LastModifiedBy, this.LastModifiedByType, this.LastModifiedAt);
+        //}
 
         public string CreatedBy { get; set; }
         public string CreatedByType { get; set; }
-        public DateTime? CreatedAt { get; set; }
+        public DateTimeOffset? CreatedAt { get; set; }
         public string LastModifiedBy { get; set; }
         public string LastModifiedByType { get; set; }
-        public DateTime? LastModifiedAt { get; set; }
+        public DateTimeOffset? LastModifiedAt { get; set; }
     }
 }

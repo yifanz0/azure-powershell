@@ -95,9 +95,11 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     break;
             }
 
-            BlobInventoryPolicy policy = this.StorageClient.BlobInventoryPolicies.Get(
-                 this.ResourceGroupName,
-                 this.StorageAccountName);
+            //BlobInventoryPolicy policy = this.StorageClient.BlobInventoryPolicies.Get(
+            //     this.ResourceGroupName,
+            //     this.StorageAccountName);
+
+            global::Azure.ResourceManager.Storage.BlobInventoryPolicyResource policy = this.StorageClientTrack2.GetStorageAccount(this.ResourceGroupName, this.StorageAccountName).GetBlobInventoryPolicy("default").Value;
 
             WriteObject(new PSBlobInventoryPolicy(policy, this.ResourceGroupName, this.StorageAccountName), true);
         }

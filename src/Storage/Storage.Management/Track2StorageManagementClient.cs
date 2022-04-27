@@ -86,5 +86,9 @@ namespace Microsoft.Azure.Commands.Management.Storage
 
         public Track2.StorageAccountResource UpdateStorageAccount(string resourcegroup, string storageAccountName, StorageAccountPatch patch) =>
             _armClient.GetStorageAccountResource(Track2.StorageAccountResource.CreateResourceIdentifier(_subscription, resourcegroup, storageAccountName)).Update(patch);
+
+
+        //public Track2.ManagementPolicyResource GetManagementPolicy() => 
+
     }
 }
