@@ -22,68 +22,100 @@ using Microsoft.Azure.Storage;
 using System;
 using System.Collections.Generic;
 using StorageModels = Microsoft.Azure.Management.Storage.Models;
+using Track2 = Azure.ResourceManager.Storage;
 
 namespace Microsoft.Azure.Commands.Management.Storage.Models
 {
     public class PSContainer
     {
-        public PSContainer(StorageModels.ListContainerItem container)
+        //public PSContainer(StorageModels.ListContainerItem container)
+        //{
+        //    this.ResourceGroupName = ParseResourceGroupFromId(container.Id);
+        //    this.StorageAccountName = ParseStorageAccountNameFromId(container.Id);
+        //    this.Id = container.Id;
+        //    this.Name = container.Name;
+        //    this.Type = container.Type;
+        //    this.Metadata = container.Metadata;
+        //    this.Etag = container.Etag;
+        //    this.PublicAccess = (PSPublicAccess?)container.PublicAccess;
+        //    this.ImmutabilityPolicy = container.ImmutabilityPolicy == null ? null : new PSImmutabilityPolicyProperties(container.ImmutabilityPolicy);
+        //    this.LegalHold = container.LegalHold == null? null : new PSLegalHoldProperties(container.LegalHold);
+        //    this.LastModifiedTime = container.LastModifiedTime;
+        //    this.LeaseStatus = container.LeaseStatus;
+        //    this.LeaseState = container.LeaseState;
+        //    this.LeaseDuration = container.LeaseDuration;
+        //    this.HasLegalHold = container.HasLegalHold;
+        //    this.HasImmutabilityPolicy = container.HasImmutabilityPolicy;
+        //    this.DefaultEncryptionScope = container.DefaultEncryptionScope;
+        //    this.DenyEncryptionScopeOverride = container.DenyEncryptionScopeOverride;
+        //    this.Deleted = container.Deleted;
+        //    this.ImmutableStorageWithVersioning = container.ImmutableStorageWithVersioning is null ? null : new PSImmutableStorageWithVersioning(container.ImmutableStorageWithVersioning);
+        //    this.RemainingRetentionDays = container.RemainingRetentionDays;
+        //    this.DeletedTime = container.DeletedTime;
+        //    this.Version = container.Version;
+        //    this.EnableNfsV3AllSquash = container.EnableNfsV3AllSquash;
+        //    this.EnableNfsV3RootSquash = container.EnableNfsV3RootSquash;
+        //}
+
+        //public PSContainer(BlobContainer container)
+        //{
+        //    this.ResourceGroupName = ParseResourceGroupFromId(container.Id);
+        //    this.StorageAccountName = ParseStorageAccountNameFromId(container.Id);
+        //    this.Id = container.Id;
+        //    this.Name = container.Name;
+        //    this.Type = container.Type;
+        //    this.Metadata = container.Metadata;
+        //    this.Etag = container.Etag;
+        //    this.PublicAccess = (PSPublicAccess?)container.PublicAccess;
+        //    this.ImmutabilityPolicy = container.ImmutabilityPolicy == null ? null : new PSImmutabilityPolicyProperties(container.ImmutabilityPolicy);
+        //    this.LegalHold = container.LegalHold == null ? null : new PSLegalHoldProperties(container.LegalHold);
+        //    this.LastModifiedTime = container.LastModifiedTime;
+        //    this.LeaseStatus = container.LeaseStatus;
+        //    this.LeaseState = container.LeaseState;
+        //    this.LeaseDuration = container.LeaseDuration;
+        //    this.HasLegalHold = container.HasLegalHold;
+        //    this.HasImmutabilityPolicy = container.HasImmutabilityPolicy;
+        //    this.DefaultEncryptionScope = container.DefaultEncryptionScope;
+        //    this.DenyEncryptionScopeOverride = container.DenyEncryptionScopeOverride;
+        //    this.Deleted = container.Deleted;
+        //    this.ImmutableStorageWithVersioning = container.ImmutableStorageWithVersioning is null ? null : new PSImmutableStorageWithVersioning(container.ImmutableStorageWithVersioning);
+        //    this.RemainingRetentionDays = container.RemainingRetentionDays;
+        //    this.DeletedTime = container.DeletedTime;
+        //    this.Version = container.Version;
+        //    this.EnableNfsV3AllSquash = container.EnableNfsV3AllSquash;
+        //    this.EnableNfsV3RootSquash = container.EnableNfsV3RootSquash;
+        //}
+
+        public PSContainer(Track2.BlobContainerResource container)
         {
             this.ResourceGroupName = ParseResourceGroupFromId(container.Id);
             this.StorageAccountName = ParseStorageAccountNameFromId(container.Id);
             this.Id = container.Id;
-            this.Name = container.Name;
-            this.Type = container.Type;
-            this.Metadata = container.Metadata;
-            this.Etag = container.Etag;
-            this.PublicAccess = (PSPublicAccess?)container.PublicAccess;
-            this.ImmutabilityPolicy = container.ImmutabilityPolicy == null ? null : new PSImmutabilityPolicyProperties(container.ImmutabilityPolicy);
-            this.LegalHold = container.LegalHold == null? null : new PSLegalHoldProperties(container.LegalHold);
-            this.LastModifiedTime = container.LastModifiedTime;
-            this.LeaseStatus = container.LeaseStatus;
-            this.LeaseState = container.LeaseState;
-            this.LeaseDuration = container.LeaseDuration;
-            this.HasLegalHold = container.HasLegalHold;
-            this.HasImmutabilityPolicy = container.HasImmutabilityPolicy;
-            this.DefaultEncryptionScope = container.DefaultEncryptionScope;
-            this.DenyEncryptionScopeOverride = container.DenyEncryptionScopeOverride;
-            this.Deleted = container.Deleted;
-            this.ImmutableStorageWithVersioning = container.ImmutableStorageWithVersioning is null ? null : new PSImmutableStorageWithVersioning(container.ImmutableStorageWithVersioning);
-            this.RemainingRetentionDays = container.RemainingRetentionDays;
-            this.DeletedTime = container.DeletedTime;
-            this.Version = container.Version;
-            this.EnableNfsV3AllSquash = container.EnableNfsV3AllSquash;
-            this.EnableNfsV3RootSquash = container.EnableNfsV3RootSquash;
+            this.Name = container.Data.Name;
+            this.Type = container.Data.ResourceType;
+            this.Metadata = container.Data.Metadata;
+            this.Etag = container.Data.Etag;
+            this.PublicAccess = (PSPublicAccess?)container.Data.PublicAccess;
+            this.ImmutabilityPolicy = container.Data.ImmutabilityPolicy == null ? null : new PSImmutabilityPolicyProperties(container.Data.ImmutabilityPolicy);
+            this.LegalHold = container.Data.LegalHold == null ? null : new PSLegalHoldProperties(container.Data.LegalHold);
+            this.LastModifiedTime = container.Data.LastModifiedOn;
+            this.LeaseStatus = container.Data.LeaseStatus.ToString();
+            this.LeaseState = container.Data.LeaseState.ToString();
+            this.LeaseDuration = container.Data.LeaseDuration.ToString();
+            this.HasLegalHold = container.Data.HasLegalHold;
+            this.HasImmutabilityPolicy = container.Data.HasImmutabilityPolicy;
+            this.DefaultEncryptionScope = container.Data.DefaultEncryptionScope;
+            this.DenyEncryptionScopeOverride = container.Data.DenyEncryptionScopeOverride;
+            this.Deleted = container.Data.Deleted;
+            this.ImmutableStorageWithVersioning = container.Data.ImmutableStorageWithVersioning is null ? null : new PSImmutableStorageWithVersioning(container.Data.ImmutableStorageWithVersioning);
+            this.RemainingRetentionDays = container.Data.RemainingRetentionDays;
+            this.DeletedTime = container.Data.DeletedOn;
+            this.Version = container.Data.Version;
+            this.EnableNfsV3AllSquash = container.Data.EnableNfsV3AllSquash;
+            this.EnableNfsV3RootSquash = container.Data.EnableNfsV3RootSquash;
         }
 
-        public PSContainer(BlobContainer container)
-        {
-            this.ResourceGroupName = ParseResourceGroupFromId(container.Id);
-            this.StorageAccountName = ParseStorageAccountNameFromId(container.Id);
-            this.Id = container.Id;
-            this.Name = container.Name;
-            this.Type = container.Type;
-            this.Metadata = container.Metadata;
-            this.Etag = container.Etag;
-            this.PublicAccess = (PSPublicAccess?)container.PublicAccess;
-            this.ImmutabilityPolicy = container.ImmutabilityPolicy == null? null : new PSImmutabilityPolicyProperties(container.ImmutabilityPolicy);
-            this.LegalHold = container.LegalHold == null ? null : new PSLegalHoldProperties(container.LegalHold);
-            this.LastModifiedTime = container.LastModifiedTime;
-            this.LeaseStatus = container.LeaseStatus;
-            this.LeaseState = container.LeaseState;
-            this.LeaseDuration = container.LeaseDuration;
-            this.HasLegalHold = container.HasLegalHold;
-            this.HasImmutabilityPolicy = container.HasImmutabilityPolicy;
-            this.DefaultEncryptionScope = container.DefaultEncryptionScope;
-            this.DenyEncryptionScopeOverride = container.DenyEncryptionScopeOverride;
-            this.Deleted = container.Deleted;
-            this.ImmutableStorageWithVersioning = container.ImmutableStorageWithVersioning is null? null : new PSImmutableStorageWithVersioning(container.ImmutableStorageWithVersioning);
-            this.RemainingRetentionDays = container.RemainingRetentionDays;
-            this.DeletedTime = container.DeletedTime;
-            this.Version = container.Version;
-            this.EnableNfsV3AllSquash = container.EnableNfsV3AllSquash;
-            this.EnableNfsV3RootSquash = container.EnableNfsV3RootSquash;
-        }
+
 
         [Ps1Xml(Label = "ResourceGroupName", Target = ViewControl.List, Position = 0)]
         public string ResourceGroupName { get; set; }
@@ -110,7 +142,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         public PSLegalHoldProperties LegalHold { get; set; }
 
         [Ps1Xml(Label = "LastModifiedTime", Target = ViewControl.List, Position = 4)]
-        public DateTime? LastModifiedTime { get; set; }
+        public DateTimeOffset? LastModifiedTime { get; set; }
 
         public string LeaseStatus { get; set; }
 
@@ -130,7 +162,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
         public int? RemainingRetentionDays { get; }
 
-        public DateTime? DeletedTime { get; }
+        public DateTimeOffset? DeletedTime { get; }
 
         public bool? Deleted { get; }
 
@@ -212,7 +244,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
     public class PSLegalHoldProperties
     {
-        public PSLegalHoldProperties(StorageModels.LegalHoldProperties legalHoldProperty)
+        public PSLegalHoldProperties(Track2.Models.LegalHoldProperties legalHoldProperty)
         {
             this.HasLegalHold = legalHoldProperty.HasLegalHold;
             this.Tags = null;
@@ -220,7 +252,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             List<PSTagProperty> tagList = new List<PSTagProperty>();
             if (legalHoldProperty.Tags != null && legalHoldProperty.Tags.Count != 0)
             {
-                foreach (StorageModels.TagProperty tagProperty in legalHoldProperty.Tags)
+                foreach (Track2.Models.TagProperty tagProperty in legalHoldProperty.Tags)
                 {
                     tagList.Add(new PSTagProperty(tagProperty));
                 }
@@ -235,19 +267,19 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
     public class PSProtectedAppendWritesHistory
     {
-        public PSProtectedAppendWritesHistory(ProtectedAppendWritesHistory history)
+        public PSProtectedAppendWritesHistory(Track2.Models.ProtectedAppendWritesHistory history)
         {
             this.AllowProtectedAppendWritesAll = history.AllowProtectedAppendWritesAll;
             this.Timestamp = history.Timestamp;
         }
 
         public bool? AllowProtectedAppendWritesAll { get; set; }
-        public DateTime? Timestamp { get; }
+        public DateTimeOffset? Timestamp { get; }
     }
 
     public class PSTagProperty
     {
-        public PSTagProperty(StorageModels.TagProperty tagsProperty)
+        public PSTagProperty(Track2.Models.TagProperty tagsProperty)
         {
             this.Tag = tagsProperty.Tag;
             this.Timestamp = tagsProperty.Timestamp;
@@ -257,7 +289,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         }
         
         public string Tag { get; set; }
-        public DateTime? Timestamp { get; set; }
+        public DateTimeOffset? Timestamp { get; set; }
         public string ObjectIdentifier { get; set; }
         public string TenantId { get; set; }
         public string Upn { get; set; }
@@ -289,10 +321,10 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
     public class PSImmutabilityPolicyProperties
     {
-        public PSImmutabilityPolicyProperties(StorageModels.ImmutabilityPolicyProperties policy)
+        public PSImmutabilityPolicyProperties(Track2.Models.ImmutabilityPolicyProperties policy)
         {
             this.ImmutabilityPeriodSinceCreationInDays = policy.ImmutabilityPeriodSinceCreationInDays.Value;
-            this.State = policy.State;
+            this.State = policy.State.ToString();
             this.Etag = policy.Etag;
             this.AllowProtectedAppendWrites = policy.AllowProtectedAppendWrites;
             this.AllowProtectedAppendWritesAll = policy.AllowProtectedAppendWritesAll;
@@ -300,7 +332,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             List<PSUpdateHistoryProperty> updateHistoryList = new List<PSUpdateHistoryProperty>();
             if (policy.UpdateHistory != null && policy.UpdateHistory.Count != 0)
             {
-                foreach (UpdateHistoryProperty updateHistoryItem in policy.UpdateHistory)
+                foreach (Track2.Models.UpdateHistoryProperty updateHistoryItem in policy.UpdateHistory)
                 {
                     updateHistoryList.Add(new PSUpdateHistoryProperty(updateHistoryItem));
                 }
@@ -318,16 +350,16 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
     public enum PSPublicAccess
     {
-        Container = 0,
-        Blob = 1,
-        None = 2
+        None = 0,
+        Container = 1,
+        Blob = 2
     }
 
     public class PSUpdateHistoryProperty
     {
-        public PSUpdateHistoryProperty(UpdateHistoryProperty updateHistory)
+        public PSUpdateHistoryProperty(Track2.Models.UpdateHistoryProperty updateHistory)
         {
-            this.Update = updateHistory.Update;
+            this.Update = updateHistory.Update.ToString();
             this.ImmutabilityPeriodSinceCreationInDays = updateHistory.ImmutabilityPeriodSinceCreationInDays;
             this.Timestamp = updateHistory.Timestamp;
             this.ObjectIdentifier = updateHistory.ObjectIdentifier;
@@ -339,7 +371,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
         public string Update { get; set; }
         public int? ImmutabilityPeriodSinceCreationInDays { get; set; }
-        public DateTime? Timestamp { get; set; }
+        public DateTimeOffset? Timestamp { get; set; }
         public string ObjectIdentifier { get; set; }
         public string TenantId { get; set; }
         public string Upn { get; set; }
@@ -349,15 +381,15 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
     public class PSImmutableStorageWithVersioning
     {
-        public PSImmutableStorageWithVersioning(ImmutableStorageWithVersioning inputValue)
+        public PSImmutableStorageWithVersioning(Track2.Models.ImmutableStorageWithVersioning inputValue)
         {
             this.Enabled = inputValue.Enabled;
             this.TimeStamp = inputValue.TimeStamp;
-            this.MigrationState = inputValue.MigrationState;
+            this.MigrationState = inputValue.MigrationState.ToString();
         }
 
         public bool? Enabled { get; set; }
-        public DateTime? TimeStamp { get; }
+        public DateTimeOffset? TimeStamp { get; }
         public string MigrationState { get; }
     }
 }

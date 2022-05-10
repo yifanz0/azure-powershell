@@ -20,6 +20,10 @@ using System;
 using System.Collections.Generic;
 using System.Management.Automation;
 
+using Azure.ResourceManager.Storage;
+using Azure.ResourceManager.Storage.Models;
+using Azure;
+
 namespace Microsoft.Azure.Commands.Management.Storage
 {
     [Cmdlet("Get", ResourceManager.Common.AzureRMConstants.AzureRMStoragePrefix + StorageContainerNounStr, DefaultParameterSetName = AccountNameParameterSet), OutputType(typeof(PSContainer))]
@@ -92,24 +96,49 @@ namespace Microsoft.Azure.Commands.Management.Storage
                 {
                     WriteWarning("Can't get single deleted container, so -IncludeDeleted will be omit when get single container with -Name.");
                 }
-                var container = this.StorageClient.BlobContainers.Get(
-                           this.ResourceGroupName,
-                           this.StorageAccountName,
-                           this.Name);
+
+                BlobContainerResource container = this.StorageClientTrack2.GetBlobContainer(this.ResourceGroupName, this.StorageAccountName, this.Name);
+
                 WriteObject(new PSContainer(container));
+
+                //var container = this.StorageClient.BlobContainers.Get(
+                //           this.ResourceGroupName,
+                //           this.StorageAccountName,
+                //           this.Name);
+                //WriteObject(new PSContainer(container));
             }
             else
             {
-                IPage<ListContainerItem> containerlistResult = this.StorageClient.BlobContainers.List(
-                               this.ResourceGroupName,
-                               this.StorageAccountName, 
-                               include: IncludeDeleted.IsPresent ? ListContainersInclude.Deleted : null);
-                WriteContainerList(containerlistResult);
-                while (containerlistResult.NextPageLink != null)
+                Pageable<BlobContainerResource> containers;
+                if (this.IncludeDeleted.IsPresent)
                 {
-                    containerlistResult = this.StorageClient.BlobContainers.ListNext(containerlistResult.NextPageLink);
-                    WriteContainerList(containerlistResult);
+                    containers = this.StorageClientTrack2.GetBlobContainers(this.ResourceGroupName, this.StorageAccountName)
+                    .GetAll(include: global::Azure.ResourceManager.Storage.Models.ListContainersInclude.Deleted);
+                } else
+                {
+                    containers = this.StorageClientTrack2.GetBlobContainers(this.ResourceGroupName, this.StorageAccountName).GetAll();
                 }
+
+                
+
+                List<PSContainer> result = new List<PSContainer>();
+                foreach(BlobContainerResource container in containers)
+                {
+                    result.Add(new PSContainer(container));
+                } 
+
+                WriteObject(result);
+
+                //IPage<ListContainerItem> containerlistResult = this.StorageClient.BlobContainers.List(
+                //               this.ResourceGroupName,
+                //               this.StorageAccountName,
+                //               include: IncludeDeleted.IsPresent ? global::Azure.ResourceManager.Storage.Models.ListContainersInclude.Deleted : null);
+                //WriteContainerList(containerlistResult);
+                //while (containerlistResult.NextPageLink != null)
+                //{
+                //    containerlistResult = this.StorageClient.BlobContainers.ListNext(containerlistResult.NextPageLink);
+                //    WriteContainerList(containerlistResult);
+                //}
             }
         }
     }

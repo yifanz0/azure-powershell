@@ -62,6 +62,19 @@ namespace Microsoft.Azure.Commands.Management.Storage
             set { storageClientWrapper = new StorageManagementClientWrapper(value); }
         }
 
+        private Track2StorageManagementClient _track2StorageManagementClient;
+        public Track2StorageManagementClient StorageClientTrack2
+        {
+            get
+            {
+                return _track2StorageManagementClient ?? (_track2StorageManagementClient = new Track2StorageManagementClient(
+                    Microsoft.Azure.Commands.Common.Authentication.AzureSession.Instance.ClientFactory, 
+                    DefaultContext));
+            }
+
+            set { _track2StorageManagementClient = value; }
+        }
+
         public string SubscriptionId
         {
             get
@@ -70,20 +83,20 @@ namespace Microsoft.Azure.Commands.Management.Storage
             }
         }
 
-        protected void WriteContainer(ListContainerItem container)
-        {
-            WriteObject(new PSContainer(container));
-        }
+        //protected void WriteContainer(ListContainerItem container)
+        //{
+        //    WriteObject(new PSContainer(container));
+        //}
 
-        protected void WriteContainerList(IEnumerable<ListContainerItem> containers)
-        {
-            if (containers != null)
-            {
-                List<PSContainer> output = new List<PSContainer>();
-                containers.ForEach(container => output.Add(new PSContainer(container)));
-                WriteObject(output, true);
-            }
-        }
+        //protected void WriteContainerList(IEnumerable<ListContainerItem> containers)
+        //{
+        //    if (containers != null)
+        //    {
+        //        List<PSContainer> output = new List<PSContainer>();
+        //        containers.ForEach(container => output.Add(new PSContainer(container)));
+        //        WriteObject(output, true);
+        //    }
+        //}
 
         public static Dictionary<string, string> CreateMetadataDictionary(Hashtable Metadata, bool validate)
         {

@@ -14,7 +14,10 @@
     <RootNamespace>$(LegacyAssemblyPrefix)$(PsModuleName)</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Blob\InvokeAzureStorageContainerObjectLevelWormMigration.cs" />
+    <Compile Remove="Blob\NewAzureStorageContainer.cs" />
     <Compile Remove="StorageAccount\RemoveAzureStorageAccountNetworkRule.cs" />
+    <Compile Remove="StorageAccount\SetAzureStorageBlobInventoryPolicy.cs" />
     <Compile Remove="StorageAccount\UpdateAzureStorageAccountNetworkRuleSet.cs" />
   </ItemGroup>
   <ItemGroup>

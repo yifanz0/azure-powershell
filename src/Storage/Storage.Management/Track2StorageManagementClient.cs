@@ -87,6 +87,12 @@ namespace Microsoft.Azure.Commands.Management.Storage
         public Track2.StorageAccountResource UpdateStorageAccount(string resourcegroup, string storageAccountName, StorageAccountPatch patch) =>
             _armClient.GetStorageAccountResource(Track2.StorageAccountResource.CreateResourceIdentifier(_subscription, resourcegroup, storageAccountName)).Update(patch);
 
+        public Track2.BlobContainerCollection GetBlobContainers(string resourceGroupName, string storageAccountName) =>
+            _armClient.GetBlobServiceResource(Track2.BlobServiceResource.CreateResourceIdentifier(_subscription, resourceGroupName, storageAccountName)).GetBlobContainers();
+
+        public Track2.BlobContainerResource GetBlobContainer(string resourceGroupName, string storageAccountName, string containerName) =>
+            _armClient.GetBlobContainerResource(Track2.BlobContainerResource.CreateResourceIdentifier(_subscription, resourceGroupName, storageAccountName, containerName)).Get();
+
 
         //public Track2.ManagementPolicyResource GetManagementPolicy() => 
 

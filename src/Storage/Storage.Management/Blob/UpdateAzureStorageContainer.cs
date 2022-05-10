@@ -20,6 +20,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Management.Automation;
 
+using Track2 = Azure.ResourceManager.Storage;
+using Azure.ResourceManager.Storage.Models;
+
 namespace Microsoft.Azure.Commands.Management.Storage
 {
     [Cmdlet("Update", ResourceManager.Common.AzureRMConstants.AzureRMStoragePrefix + StorageContainerNounStr, DefaultParameterSetName = AccountNameParameterSet, SupportsShouldProcess = true), OutputType(typeof(PSContainer))]
@@ -113,11 +116,20 @@ namespace Microsoft.Azure.Commands.Management.Storage
 
         [Parameter(Mandatory = false,
         HelpMessage = "Sets reduction of the access rights for the remote superuser. Possible values include: 'NoRootSquash', 'RootSquash', 'AllSquash'")]
-        [ValidateSet(RootSquashType.NoRootSquash,
-            RootSquashType.RootSquash,
-            RootSquashType.AllSquash,
+        [ValidateSet("RootSqaush",
+            "NoRootSquash",
+            "AllSquash",
             IgnoreCase = true)]
         public string RootSquash { get; set; }
+
+
+        //[Parameter(Mandatory = false,
+        //HelpMessage = "Sets reduction of the access rights for the remote superuser. Possible values include: 'NoRootSquash', 'RootSquash', 'AllSquash'")]
+        //[ValidateSet(Track2.Models.RootSquashType.RootSquash.ToString(),
+        //    Track2.Models.RootSquashType.NoRootSquash.ToString(),
+        //    Track2.Models.RootSquashType.AllSquash.ToString(),
+        //    IgnoreCase = true)]
+        //public string RootSquash { get; set; }
 
         public override void ExecuteCmdlet()
         {
