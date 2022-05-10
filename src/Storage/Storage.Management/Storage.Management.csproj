@@ -16,6 +16,7 @@
   <ItemGroup>
     <Compile Remove="Blob\InvokeAzureStorageContainerObjectLevelWormMigration.cs" />
     <Compile Remove="Blob\NewAzureStorageContainer.cs" />
+    <Compile Remove="Blob\UpdateAzureStorageContainer.cs" />
     <Compile Remove="StorageAccount\RemoveAzureStorageAccountNetworkRule.cs" />
     <Compile Remove="StorageAccount\SetAzureStorageBlobInventoryPolicy.cs" />
     <Compile Remove="StorageAccount\UpdateAzureStorageAccountNetworkRuleSet.cs" />

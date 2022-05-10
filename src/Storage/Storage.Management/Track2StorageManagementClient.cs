@@ -93,6 +93,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
         public Track2.BlobContainerResource GetBlobContainer(string resourceGroupName, string storageAccountName, string containerName) =>
             _armClient.GetBlobContainerResource(Track2.BlobContainerResource.CreateResourceIdentifier(_subscription, resourceGroupName, storageAccountName, containerName)).Get();
 
+        
 
         //public Track2.ManagementPolicyResource GetManagementPolicy() => 
 
