@@ -22,6 +22,7 @@ using System.Management.Automation;
 
 using Track2 = Azure.ResourceManager.Storage;
 using Azure.ResourceManager.Storage.Models;
+using Azure.ResourceManager.Storage;
 
 namespace Microsoft.Azure.Commands.Management.Storage
 {
@@ -154,36 +155,56 @@ namespace Microsoft.Azure.Commands.Management.Storage
             {
                 Dictionary<string, string> MetadataDictionary = CreateMetadataDictionary(Metadata, validate: true);
 
+                BlobContainerData data = new BlobContainerData();
+
+                if (this.Metadata != null)
+                {
+                    foreach (KeyValuePair<string, string> keyValuePair in this.Metadata)
+                    {
+                        data.Metadata.Add(keyValuePair.Key, keyValuePair.Value);
+                    }
+                }
+                
+
                 bool? enableNfsV3RootSquash = null;
                 bool? enableNfsV3AllSquash = null;
                 if (this.RootSquash != null)
                 {
-                    if (this.RootSquash.ToLower() == RootSquashType.RootSquash.ToLower())
+                    if (this.RootSquash.ToLower() == Track2.Models.RootSquashType.RootSquash.ToString().ToLower())
                     {
                         enableNfsV3RootSquash = true;
                         enableNfsV3AllSquash = false;
                     }
-                    if (this.RootSquash.ToLower() == RootSquashType.AllSquash.ToLower())
+                    if (this.RootSquash.ToLower() == Track2.Models.RootSquashType.AllSquash.ToString().ToLower())
                     {
                         enableNfsV3RootSquash = false;
                         enableNfsV3AllSquash = true;
                     }
-                    if (this.RootSquash.ToLower() == RootSquashType.NoRootSquash.ToLower())
+                    if (this.RootSquash.ToLower() == Track2.Models.RootSquashType.NoRootSquash.ToString().ToLower())
                     {
                         enableNfsV3RootSquash = false;
                         enableNfsV3AllSquash = false;
                     }
                 }
 
-                var container = this.StorageClient.BlobContainers.Update(
-                                    this.ResourceGroupName,
-                                    this.StorageAccountName,
-                                    this.Name,
-                                    new BlobContainer(
-                                        publicAccess: (PublicAccess?)this.publicAccess,
-                                        metadata: MetadataDictionary,
-                                        enableNfsV3RootSquash: enableNfsV3RootSquash,
-                                        enableNfsV3AllSquash: enableNfsV3AllSquash));
+                data.EnableNfsV3RootSquash = enableNfsV3RootSquash;
+                data.EnableNfsV3AllSquash = enableNfsV3AllSquash;
+                data.PublicAccess = (Track2.Models.PublicAccess?)this.publicAccess;
+                var container = this.StorageClientTrack2.UpdateBlobContainer(
+                    this.ResourceGroupName,
+                    this.StorageAccountName,
+                    this.Name,
+                    data);
+
+                //var container = this.StorageClient.BlobContainers.Update(
+                //                    this.ResourceGroupName,
+                //                    this.StorageAccountName,
+                //                    this.Name,
+                //                    new BlobContainer(
+                //                        publicAccess: (PublicAccess?)this.publicAccess,
+                //                        metadata: MetadataDictionary,
+                //                        enableNfsV3RootSquash: enableNfsV3RootSquash,
+                //                        enableNfsV3AllSquash: enableNfsV3AllSquash));
 
                 WriteObject(new PSContainer(container));
             }

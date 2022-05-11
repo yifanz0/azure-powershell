@@ -12,6 +12,7 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
+using Azure.ResourceManager.Storage;
 using Microsoft.Azure.Commands.Management.Storage.Models;
 using Microsoft.Azure.Management.Storage;
 using Microsoft.Azure.Management.Storage.Models;
@@ -19,6 +20,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Management.Automation;
+using Track2 = Azure.ResourceManager.Storage;
 
 namespace Microsoft.Azure.Commands.Management.Storage
 {
@@ -111,12 +113,19 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     break;
             }
 
-            ImmutabilityPolicy policy= 
-            this.StorageClient.BlobContainers.GetImmutabilityPolicy(
-                        this.ResourceGroupName,
-                        this.StorageAccountName,
-                        this.ContainerName,
-                        Etag);
+            //ImmutabilityPolicy policy= 
+            //this.StorageClient.BlobContainers.GetImmutabilityPolicy(
+            //            this.ResourceGroupName,
+            //            this.StorageAccountName,
+            //            this.ContainerName,
+            //            Etag);
+
+
+            ImmutabilityPolicyResource policy = this.StorageClientTrack2.GetImmutabilityPolicy(
+                this.ResourceGroupName,
+                this.StorageAccountName,
+                this.ContainerName,
+                this.Etag); 
 
             WriteObject(new PSImmutabilityPolicy(policy));
         }

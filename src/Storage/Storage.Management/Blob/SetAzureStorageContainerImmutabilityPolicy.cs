@@ -12,6 +12,7 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
+using Azure.ResourceManager.Storage;
 using Microsoft.Azure.Commands.Management.Storage.Models;
 using Microsoft.Azure.Management.Storage;
 using Microsoft.Azure.Management.Storage.Models;
@@ -272,28 +273,49 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         break;
                 }
 
-                ImmutabilityPolicy policy;
+                //ImmutabilityPolicy policy;
+                ImmutabilityPolicyResource policy; 
                 if (!ExtendPolicy.IsPresent)
                 {
-                    policy = this.StorageClient.BlobContainers.CreateOrUpdateImmutabilityPolicy(
-                                this.ResourceGroupName,
-                                this.StorageAccountName,
-                                this.ContainerName,
-                                new ImmutabilityPolicy(
-                                    immutabilityPeriodSinceCreationInDays: immutabilityPeriod,
-                                    allowProtectedAppendWrites: this.allowProtectedAppendWrite,
-                                    allowProtectedAppendWritesAll: this.allowProtectedAppendWriteAll),
-                                this.Etag);
+                    ImmutabilityPolicyData data = new ImmutabilityPolicyData();
+                    data.ImmutabilityPeriodSinceCreationInDays = immutabilityPeriod;
+                    data.AllowProtectedAppendWrites = this.allowProtectedAppendWrite;
+                    data.AllowProtectedAppendWritesAll = this.allowProtectedAppendWriteAll;
+                    policy = this.StorageClientTrack2.CreateImmutabilityPolicy(
+                        this.ResourceGroupName,
+                        this.StorageAccountName,
+                        this.ContainerName,
+                        data,
+                        this.Etag);
+
+
+                    //policy = this.StorageClient.BlobContainers.CreateOrUpdateImmutabilityPolicy(
+                    //            this.ResourceGroupName,
+                    //            this.StorageAccountName,
+                    //            this.ContainerName,
+                    //            new ImmutabilityPolicy(
+                    //                immutabilityPeriodSinceCreationInDays: immutabilityPeriod,
+                    //                allowProtectedAppendWrites: this.allowProtectedAppendWrite,
+                    //                allowProtectedAppendWritesAll: this.allowProtectedAppendWriteAll),
+                    //            this.Etag);
                 }
                 else
                 {
-                    policy = this.StorageClient.BlobContainers.ExtendImmutabilityPolicy(
-                                this.ResourceGroupName,
-                                this.StorageAccountName,
-                                this.ContainerName,
-                                this.Etag,
-                                new ImmutabilityPolicy(
-                                    immutabilityPeriodSinceCreationInDays: immutabilityPeriod));
+                    ImmutabilityPolicyData data = new ImmutabilityPolicyData();
+                    data.ImmutabilityPeriodSinceCreationInDays = immutabilityPeriod;
+                    policy = this.StorageClientTrack2.ExtendImmutabilityPolicy(
+                        this.ResourceGroupName,
+                        this.StorageAccountName,
+                        this.ContainerName,
+                        data,
+                        this.Etag);
+                    //policy = this.StorageClient.BlobContainers.ExtendImmutabilityPolicy(
+                    //            this.ResourceGroupName,
+                    //            this.StorageAccountName,
+                    //            this.ContainerName,
+                    //            this.Etag,
+                    //            new ImmutabilityPolicy(
+                    //                immutabilityPeriodSinceCreationInDays: immutabilityPeriod));
                 }
                 WriteObject(new PSImmutabilityPolicy(policy));
             }

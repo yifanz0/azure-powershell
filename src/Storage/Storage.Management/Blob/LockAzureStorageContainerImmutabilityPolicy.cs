@@ -12,6 +12,7 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
+using Azure.ResourceManager.Storage;
 using Microsoft.Azure.Commands.Management.Storage.Models;
 using Microsoft.Azure.Management.Storage;
 using Microsoft.Azure.Management.Storage.Models;
@@ -148,11 +149,18 @@ namespace Microsoft.Azure.Commands.Management.Storage
 
                 if (Force || ShouldContinue(string.Format("Lock ImmutabilityPolicy in container '{0}' with Etag {1}", this.ContainerName, this.Etag), ""))
                 {
-                    ImmutabilityPolicy policy = this.StorageClient.BlobContainers.LockImmutabilityPolicy(
-                                                    this.ResourceGroupName,
-                                                    this.StorageAccountName,
-                                                    this.ContainerName,
-                                                    this.Etag);
+                    ImmutabilityPolicyResource policy = this.StorageClientTrack2.LockImmutabilityPolicy(
+                        this.ResourceGroupName,
+                        this.StorageAccountName,
+                        this.ContainerName,
+                        this.Etag);
+
+
+                    //ImmutabilityPolicy policy = this.StorageClient.BlobContainers.LockImmutabilityPolicy(
+                    //                                this.ResourceGroupName,
+                    //                                this.StorageAccountName,
+                    //                                this.ContainerName,
+                    //                                this.Etag);
 
                     WriteObject(new PSImmutabilityPolicy(policy));
                 }

@@ -12,12 +12,14 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
+using Track2 = Azure.ResourceManager.Storage;
 using Microsoft.Azure.Commands.Management.Storage.Models;
 using Microsoft.Azure.Management.Storage;
 using Microsoft.Azure.Management.Storage.Models;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Management.Automation;
 
 namespace Microsoft.Azure.Commands.Management.Storage
@@ -171,7 +173,18 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     this.StorageAccountName = StorageAccount.StorageAccountName;
                 }
 
-                Dictionary<string, string> MetadataDictionary = CreateMetadataDictionary(Metadata, validate: true);
+                Track2.BlobContainerData data = new Track2.BlobContainerData();
+                
+                if (this.Metadata != null)
+                {
+                    foreach(KeyValuePair<string, string> kvp in this.Metadata)
+                    {
+                        data.Metadata.Add(kvp.Key, kvp.Value);
+                    }
+                }
+
+
+                //Dictionary<string, string> MetadataDictionary = CreateMetadataDictionary(Metadata, validate: true);
 
                 bool? enableNfsV3RootSquash = null;
                 bool? enableNfsV3AllSquash = null;
@@ -194,25 +207,43 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     }
                 }
 
-                var container =
-                    this.StorageClient.BlobContainers.Create(
-                            this.ResourceGroupName,
-                            this.StorageAccountName,
-                            this.Name,
-                            new BlobContainer(
-                                defaultEncryptionScope: this.DefaultEncryptionScope,
-                                denyEncryptionScopeOverride: this.preventEncryptionScopeOverride,
-                                publicAccess: (PublicAccess?)this.publicAccess,
-                                metadata: MetadataDictionary,
-                                immutableStorageWithVersioning: this.EnableImmutableStorageWithVersioning.IsPresent ? new ImmutableStorageWithVersioning(true) : null,
-                                enableNfsV3RootSquash: enableNfsV3RootSquash,
-                                enableNfsV3AllSquash: enableNfsV3AllSquash));
+                data.EnableNfsV3RootSquash = enableNfsV3RootSquash;
+                data.EnableNfsV3AllSquash = enableNfsV3AllSquash;
+                data.DefaultEncryptionScope = this.DefaultEncryptionScope;
+                data.DenyEncryptionScopeOverride = this.preventEncryptionScopeOverride;
+                data.PublicAccess = (Track2.Models.PublicAccess?)this.publicAccess;
+                data.ImmutableStorageWithVersioning = this.EnableImmutableStorageWithVersioning.IsPresent ? new Track2.Models.ImmutableStorageWithVersioning { Enabled = true} : null;
 
-                container =
-                    this.StorageClient.BlobContainers.Get(
-                            this.ResourceGroupName,
-                            this.StorageAccountName,
-                            this.Name);
+                var container = this.StorageClientTrack2.CreateBlobContainer(
+                    this.ResourceGroupName,
+                    this.StorageAccountName,
+                    this.Name,
+                    data);
+
+                container = this.StorageClientTrack2.GetBlobContainer(
+                    this.ResourceGroupName,
+                    this.StorageAccountName,
+                    this.Name);
+
+                //var container =
+                //    this.StorageClient.BlobContainers.Create(
+                //            this.ResourceGroupName,
+                //            this.StorageAccountName,
+                //            this.Name,
+                //            new BlobContainer(
+                //                defaultEncryptionScope: this.DefaultEncryptionScope,
+                //                denyEncryptionScopeOverride: this.preventEncryptionScopeOverride,
+                //                publicAccess: (PublicAccess?)this.publicAccess,
+                //                metadata: MetadataDictionary,
+                //                immutableStorageWithVersioning: this.EnableImmutableStorageWithVersioning.IsPresent ? new ImmutableStorageWithVersioning(true) : null,
+                //                enableNfsV3RootSquash: enableNfsV3RootSquash,
+                //                enableNfsV3AllSquash: enableNfsV3AllSquash));
+
+                //container =
+                //    this.StorageClient.BlobContainers.Get(
+                //            this.ResourceGroupName,
+                //            this.StorageAccountName,
+                //            this.Name);
 
                 WriteObject(new PSContainer(container));
             }

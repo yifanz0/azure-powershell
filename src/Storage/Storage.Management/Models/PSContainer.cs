@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using StorageModels = Microsoft.Azure.Management.Storage.Models;
 using Track2 = Azure.ResourceManager.Storage;
+using Azure.ResourceManager.Storage;
 
 namespace Microsoft.Azure.Commands.Management.Storage.Models
 {
@@ -297,16 +298,16 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
     public class PSImmutabilityPolicy
     {
-        public PSImmutabilityPolicy(StorageModels.ImmutabilityPolicy policy)
+        public PSImmutabilityPolicy(ImmutabilityPolicyResource policy)
         {
-            this.ImmutabilityPeriodSinceCreationInDays = policy.ImmutabilityPeriodSinceCreationInDays.Value;
-            this.State = policy.State;
-            this.Etag = policy.Etag;
-            this.Name = policy.Name;
-            this.Type = policy.Type;
+            this.ImmutabilityPeriodSinceCreationInDays = policy.Data.ImmutabilityPeriodSinceCreationInDays.Value;
+            this.State = policy.Data.State.ToString();
+            this.Etag = policy.Data.Etag;
+            this.Name = policy.Data.Name;
+            this.Type = policy.Data.ResourceType;
             this.Id = policy.Id;
-            this.AllowProtectedAppendWrites = policy.AllowProtectedAppendWrites;
-            this.AllowProtectedAppendWritesAll = policy.AllowProtectedAppendWritesAll;
+            this.AllowProtectedAppendWrites = policy.Data.AllowProtectedAppendWrites;
+            this.AllowProtectedAppendWritesAll = policy.Data.AllowProtectedAppendWritesAll;
         }
 
         public int? ImmutabilityPeriodSinceCreationInDays { get; set; }

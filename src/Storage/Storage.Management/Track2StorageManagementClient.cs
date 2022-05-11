@@ -93,9 +93,31 @@ namespace Microsoft.Azure.Commands.Management.Storage
         public Track2.BlobContainerResource GetBlobContainer(string resourceGroupName, string storageAccountName, string containerName) =>
             _armClient.GetBlobContainerResource(Track2.BlobContainerResource.CreateResourceIdentifier(_subscription, resourceGroupName, storageAccountName, containerName)).Get();
 
-        
+        public Track2.BlobContainerResource UpdateBlobContainer(string resourceGroupName, string storageAccountName, string containerName, BlobContainerData data) =>
+            _armClient.GetBlobContainerResource(Track2.BlobContainerResource.CreateResourceIdentifier(_subscription, resourceGroupName, storageAccountName, containerName))
+            .Update(data);
 
-        //public Track2.ManagementPolicyResource GetManagementPolicy() => 
+        public Track2.BlobContainerResource CreateBlobContainer(string resourceGroupName, string storageAccountName, string containerName, BlobContainerData data) =>
+            GetBlobContainers(resourceGroupName, storageAccountName).CreateOrUpdate(WaitUntil.Completed, containerName, data).Value;
 
+        public Track2.ImmutabilityPolicyResource GetImmutabilityPolicy(string resourceGroupName, string storageAccountName, string containerName, string etag) =>
+            _armClient.GetBlobContainerResource(Track2.BlobContainerResource.CreateResourceIdentifier(_subscription, resourceGroupName, storageAccountName, containerName))
+            .GetImmutabilityPolicy().Get(etag);
+
+        public Track2.ImmutabilityPolicyResource LockImmutabilityPolicy(string resourceGroupName, string storageAccountName, string containerName, string etag) => 
+            _armClient.GetBlobContainerResource(Track2.BlobContainerResource.CreateResourceIdentifier(_subscription, resourceGroupName, storageAccountName, containerName))
+            .GetImmutabilityPolicy().LockImmutabilityPolicy(etag);
+
+        public Track2.ImmutabilityPolicyResource CreateImmutabilityPolicy(string resourceGroupName, string storageAccountName, string containerName, ImmutabilityPolicyData data, string etag) =>
+            _armClient.GetBlobContainerResource(Track2.BlobContainerResource.CreateResourceIdentifier(_subscription, resourceGroupName, storageAccountName, containerName))
+            .GetImmutabilityPolicy().CreateOrUpdate(WaitUntil.Completed, data, etag).Value;
+
+        public Track2.ImmutabilityPolicyResource ExtendImmutabilityPolicy(string resourceGroupName, string storageAccountName, string containerName, ImmutabilityPolicyData data, string etag) =>
+            _armClient.GetBlobContainerResource(Track2.BlobContainerResource.CreateResourceIdentifier(_subscription, resourceGroupName, storageAccountName, containerName))
+            .GetImmutabilityPolicy().ExtendImmutabilityPolicy(etag, data);
+
+        public Track2.ImmutabilityPolicyResource DeleteImmutabilityPolicy(string resourceGroupName, string storageAccountName, string containerName, string etag) =>
+            _armClient.GetBlobContainerResource(Track2.BlobContainerResource.CreateResourceIdentifier(_subscription, resourceGroupName, storageAccountName, containerName))
+            .GetImmutabilityPolicy().Delete(WaitUntil.Completed, etag).Value;
     }
 }
