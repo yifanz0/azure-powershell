@@ -189,7 +189,6 @@ namespace Microsoft.Azure.Commands.Management.Storage
                 }
 
                 Track2.EncryptionScopeData data = new Track2.EncryptionScopeData();
-
                 if (this.KeyvaultEncryption.IsPresent)
                 {
                     data.Source = Track2Models.EncryptionScopeSource.MicrosoftKeyVault;

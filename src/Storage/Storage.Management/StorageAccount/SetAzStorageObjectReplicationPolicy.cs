@@ -142,7 +142,6 @@ namespace Microsoft.Azure.Commands.Management.Storage
             if (ShouldProcess(this.StorageAccountName, "Set Storage Account Object Replication Policy"))
             {
                 Track2.ObjectReplicationPolicyData data = new Track2.ObjectReplicationPolicyData();
-
                 switch (ParameterSetName)
                 {
                     case AccountObjectParameterSet:
@@ -152,7 +151,6 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     case PolicyObjectParameterSet:
                         this.PolicyId = InputObject.PolicyId;
                         data = InputObject.ParseObjectReplicationPolicy();
-
                         break;
                     default:
                         // For AccountNameParameterSet, the ResourceGroupName and StorageAccountName can get from input directly

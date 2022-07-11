@@ -82,7 +82,6 @@ namespace Microsoft.Azure.Commands.Management.Storage
             }
             if (!string.IsNullOrEmpty(PolicyId))
             {
-
                 Track2.ObjectReplicationPolicyResource policy = this.StorageClientTrack2
                     .GetObjectReplicationPolicyResource(this.ResourceGroupName, this.StorageAccountName, this.PolicyId)
                     .Get();
@@ -102,7 +101,6 @@ namespace Microsoft.Azure.Commands.Management.Storage
                 {
                     pspolicies.Add(new PSObjectReplicationPolicy(policy, this.ResourceGroupName, this.StorageAccountName));
                 }
-               
                 WriteObject(pspolicies.ToArray(), true);
             }
         }

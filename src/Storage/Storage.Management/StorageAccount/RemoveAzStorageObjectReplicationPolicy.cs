@@ -104,7 +104,6 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         // For AccountNameParameterSet, the ResourceGroupName and StorageAccountName can get from input directly
                         break;
                 }
-
                 this.StorageClientTrack2.GetObjectReplicationPolicyResource(this.ResourceGroupName, this.StorageAccountName, this.PolicyId)
                     .Delete(global::Azure.WaitUntil.Completed);
 

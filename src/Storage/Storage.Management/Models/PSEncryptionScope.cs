@@ -22,7 +22,6 @@ using System.Collections.Generic;
 using Track2 = Azure.ResourceManager.Storage;
 using Track2Models = Azure.ResourceManager.Storage.Models;
 
-
 namespace Microsoft.Azure.Commands.Management.Storage.Models
 {
     // wrapper of EncryptionScope

@@ -72,7 +72,6 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             {
                 data.Rules.Add(rule.ParseObjectReplicationPolicyRule());
             }
-
             return data;
         }
     }
@@ -143,7 +142,6 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             if (filter != null)
             {
                 this.PrefixMatch = filter.PrefixMatch is null ? null : new List<string>(filter.PrefixMatch).ToArray();
-
                 if (filter.MinCreationTime != null)
                 {
                     if (filter.MinCreationTime.ToUpper()[filter.MinCreationTime.Length - 1] != 'Z')
@@ -154,7 +152,6 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
                 }
             }
         }
- 
 
         public Track2Models.ObjectReplicationPolicyFilter ParseObjectReplicationPolicyFilter()
         {
