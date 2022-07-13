@@ -13,13 +13,12 @@
 // ----------------------------------------------------------------------------------
 
 using Microsoft.Azure.Commands.ResourceManager.Common.ArgumentCompleters;
-using Microsoft.Azure.Management.Storage;
-using Microsoft.Azure.Management.Storage.Models;
 using System.Management.Automation;
+using Track2Models = Azure.ResourceManager.Storage.Models;
 
 namespace Microsoft.Azure.Commands.Management.Storage
 {
-    [Cmdlet("Get", ResourceManager.Common.AzureRMConstants.AzureRMPrefix + "StorageAccountKey"), OutputType(typeof(StorageAccountKey))]
+    [Cmdlet("Get", ResourceManager.Common.AzureRMConstants.AzureRMPrefix + "StorageAccountKey"), OutputType(typeof(Track2Models.StorageAccountKey))]
     public class GetAzureStorageAccountKeyCommand : StorageAccountBaseCmdlet
     {
         [Parameter(
@@ -48,16 +47,14 @@ namespace Microsoft.Azure.Commands.Management.Storage
         {
             base.ExecuteCmdlet();
 
-            ListKeyExpand? listkeyExpend = null;
+            Track2Models.ListKeyExpand? expand = null;
             if (ListKerbKey.IsPresent)
             {
-                listkeyExpend = ListKeyExpand.Kerb;
+                expand = Track2Models.ListKeyExpand.Kerb;
             }
 
-            var storageKeys = this.StorageClient.StorageAccounts.ListKeys(
-                 this.ResourceGroupName,
-                 this.Name,
-                 listkeyExpend).Keys;
+            var storageKeys = this.StorageClientTrack2.GetStorageAccount(this.ResourceGroupName, this.Name)
+                .GetKeys(expand).Value.Keys;
 
             WriteObject(storageKeys, true);
         }

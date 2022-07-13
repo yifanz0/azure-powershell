@@ -13,13 +13,12 @@
 // ----------------------------------------------------------------------------------
 
 using Microsoft.Azure.Commands.ResourceManager.Common.ArgumentCompleters;
-using Microsoft.Azure.Management.Storage;
-using Microsoft.Azure.Management.Storage.Models;
 using System.Management.Automation;
+using Track2Models = Azure.ResourceManager.Storage.Models;
 
 namespace Microsoft.Azure.Commands.Management.Storage
 {
-    [Cmdlet("New", ResourceManager.Common.AzureRMConstants.AzureRMPrefix + "StorageAccountKey"), OutputType(typeof(StorageAccountKey))]
+    [Cmdlet("New", ResourceManager.Common.AzureRMConstants.AzureRMPrefix + "StorageAccountKey"), OutputType(typeof(Track2Models.StorageAccountKey))]
     public class NewAzureStorageAccountKeyCommand : StorageAccountBaseCmdlet
     {
         private const string Key1 = "key1";
@@ -60,10 +59,9 @@ namespace Microsoft.Azure.Commands.Management.Storage
         {
             base.ExecuteCmdlet();
 
-            var keys = this.StorageClient.StorageAccounts.RegenerateKey(
-                this.ResourceGroupName,
-                this.Name,
-                this.KeyName);
+            Track2Models.StorageAccountRegenerateKeyContent content = new Track2Models.StorageAccountRegenerateKeyContent(this.KeyName);
+            var keys = this.StorageClientTrack2.GetStorageAccount(this.ResourceGroupName, this.Name)
+                .RegenerateKey(content).Value;
 
             WriteObject(keys);
         }

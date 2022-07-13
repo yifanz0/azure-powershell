@@ -15,8 +15,6 @@
 using Microsoft.Azure.Commands.Management.Storage.Models;
 using Microsoft.Azure.Commands.ResourceManager.Common.ArgumentCompleters;
 using Microsoft.Azure.Management.Internal.Resources.Utilities.Models;
-using Microsoft.Azure.Management.Storage;
-using Microsoft.Azure.Management.Storage.Models;
 using System.Management.Automation;
 
 namespace Microsoft.Azure.Commands.Management.Storage
@@ -100,9 +98,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         break;
                 }
 
-                this.StorageClient.StorageAccounts.RevokeUserDelegationKeys(
-                    this.ResourceGroupName,
-                    this.StorageAccountName);
+                this.StorageClientTrack2.GetStorageAccount(this.ResourceGroupName, this.StorageAccountName).RevokeUserDelegationKeys();
 
                 if (PassThru.IsPresent)
                 {

@@ -12,18 +12,10 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using System.Collections;
-using System.Collections.Generic;
 using System.Management.Automation;
-using Microsoft.Azure.Commands.ResourceManager.Common.Tags;
-using Microsoft.Azure.Management.Storage;
-using Microsoft.Azure.Management.Storage.Models;
-using StorageModels = Microsoft.Azure.Management.Storage.Models;
 using Microsoft.Azure.Commands.Management.Storage.Models;
 using Microsoft.Azure.Commands.ResourceManager.Common.ArgumentCompleters;
-using System;
-using System.Text;
-using Microsoft.Rest.Azure;
+using Track2 = Azure.ResourceManager.Storage;
 
 namespace Microsoft.Azure.Commands.Management.Storage
 {
@@ -110,31 +102,9 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     {
                         requestType = "HnsOnHydrationRequest";
                     }
+                     
+                    this.StorageClientTrack2.GetStorageAccount(this.ResourceGroupName, this.Name).HierarchicalNamespaceMigration(global::Azure.WaitUntil.Completed, requestType);
 
-                    try
-                    {
-                        this.StorageClient.StorageAccounts.HierarchicalNamespaceMigration(
-                            this.ResourceGroupName,
-                            this.Name,
-                            requestType);
-                    }
-                    catch (ErrorResponseException e)
-                    {
-                        if (e.Body != null && e.Body.Error != null && e.Body.Error.Message != null)
-                        {
-                            // sdk will not add the detail error message to exception message for custmized error, so create a new exception with detail error in exception message
-                            ErrorResponseException ex = new ErrorResponseException(e.Body.Error.Message, e);
-                            ex.Request = e.Request;
-                            ex.Response = e.Response;
-                            ex.Source = e.Source;
-                            ex.Body = e.Body;
-                            throw ex;
-                        }
-                        else
-                        {
-                            throw e;
-                        }
-                    }
 
                     if (this.RequestType.ToLower() == HierarchicalNamespaceUpgradeAction.Validation.ToLower())
                     {
@@ -142,8 +112,8 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     }
                     else
                     {
-                        var storageAccount = this.StorageClient.StorageAccounts.GetProperties(this.ResourceGroupName, this.Name);
-
+                        Track2.StorageAccountResource storageAccount = this.StorageClientTrack2
+                            .GetStorageAccount(this.ResourceGroupName, this.Name).Get();
                         WriteStorageAccount(storageAccount);
                     }
                 }

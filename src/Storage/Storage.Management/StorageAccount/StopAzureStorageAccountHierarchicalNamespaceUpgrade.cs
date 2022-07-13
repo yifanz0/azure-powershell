@@ -12,13 +12,8 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using System.Collections;
-using System.Collections.Generic;
 using System.Management.Automation;
 using Microsoft.Azure.Commands.ResourceManager.Common.Tags;
-using Microsoft.Azure.Management.Storage;
-using Microsoft.Azure.Management.Storage.Models;
-using StorageModels = Microsoft.Azure.Management.Storage.Models;
 using Microsoft.Azure.Commands.Management.Storage.Models;
 using Microsoft.Azure.Commands.ResourceManager.Common.ArgumentCompleters;
 using System;
@@ -96,30 +91,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
 
                 if (this.force || ShouldContinue(string.Format("Stop HierarchicalNamespace Upgrade of Storage Account '{0}'.", this.Name), ""))
                 {
-
-                    try
-                    {
-                        this.StorageClient.StorageAccounts.AbortHierarchicalNamespaceMigration(
-                            this.ResourceGroupName,
-                            this.Name);
-                    }
-                    catch (ErrorResponseException e)
-                    {
-                        if (e.Body != null && e.Body.Error != null && e.Body.Error.Message != null)
-                        {
-                            // sdk will not add the detail error message to exception message for custmized error, so create a new exception with detail error in exception message
-                            ErrorResponseException newex = new ErrorResponseException(e.Body.Error.Message, e);
-                            newex.Request = e.Request;
-                            newex.Response = e.Response;
-                            newex.Source = e.Source;
-                            newex.Body = e.Body;
-                            throw newex;
-                        }
-                        else
-                        {
-                            throw e;
-                        }
-                    }
+                    this.StorageClientTrack2.GetStorageAccount(this.ResourceGroupName, this.Name).AbortHierarchicalNamespaceMigration(global::Azure.WaitUntil.Completed);
 
                     if (this.PassThru)
                     {

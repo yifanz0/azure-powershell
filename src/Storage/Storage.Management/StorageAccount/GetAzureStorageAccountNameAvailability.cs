@@ -12,13 +12,12 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using Microsoft.Azure.Management.Storage;
-using Microsoft.Azure.Management.Storage.Models;
 using System.Management.Automation;
+using Track2Models = Azure.ResourceManager.Storage.Models;
 
 namespace Microsoft.Azure.Commands.Management.Storage.StorageAccount
 {
-    [Cmdlet("Get", ResourceManager.Common.AzureRMConstants.AzureRMPrefix + "StorageAccountNameAvailability"), OutputType(typeof(CheckNameAvailabilityResult))]
+    [Cmdlet("Get", ResourceManager.Common.AzureRMConstants.AzureRMPrefix + "StorageAccountNameAvailability"), OutputType(typeof(Track2Models.CheckNameAvailabilityResult))]
     public class GetAzureStorageAccountNameAvailability : StorageAccountBaseCmdlet
     {
         [Parameter(
@@ -34,7 +33,9 @@ namespace Microsoft.Azure.Commands.Management.Storage.StorageAccount
         {
             base.ExecuteCmdlet();
 
-            WriteObject(this.StorageClient.StorageAccounts.CheckNameAvailability(Name));
+            Track2Models.StorageAccountNameAvailabilityContent content = new Track2Models.StorageAccountNameAvailabilityContent(this.Name);
+            var result = this.StorageClientTrack2.CheckNameAvailability(content);
+            WriteObject(result);
         }
     }
 }

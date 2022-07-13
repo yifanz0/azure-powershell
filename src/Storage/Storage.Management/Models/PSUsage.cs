@@ -12,7 +12,7 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using Microsoft.Azure.Management.Storage.Models;
+using Track2Models = Azure.ResourceManager.Storage.Models;
 
 namespace Microsoft.Azure.Commands.Management.Storage.Models
 {
@@ -22,7 +22,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
         public string Name { get; set; }
 
-        public UsageUnit? Unit { get; set; }
+        public Track2Models.UsageUnit? Unit { get; set; }
 
         public int? CurrentValue { get; set; }
 

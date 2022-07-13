@@ -20,6 +20,7 @@ using Microsoft.WindowsAzure.Commands.Storage.Adapters;
 using Microsoft.WindowsAzure.Commands.Utilities.Common;
 using Microsoft.Azure.Storage;
 using System.Management.Automation;
+using Track2 = Azure.ResourceManager.Storage;
 
 namespace Microsoft.Azure.Commands.Management.Storage
 {
@@ -55,7 +56,8 @@ namespace Microsoft.Azure.Commands.Management.Storage
             }
             else
             {
-                account = (new ARMStorageProvider(StorageClient)).GetCloudStorageAccount(Name, ResourceGroupName);
+                Track2.StorageAccountResource accountResource = this.StorageClientTrack2.GetStorageAccount(this.ResourceGroupName, this.Name).Get();
+                account = PSStorageAccount.GetCloudStorageAccount(accountResource);
             }
 
             // Clear the current storage account for both SM and RM
