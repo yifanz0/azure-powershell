@@ -18,6 +18,10 @@
         - Additional information about change #1
 -->
 ## Upcoming Release
+* Supported sticky bit in DataLakeGen2 permissions
+    - `New-AzDataLakeGen2Item`
+    - `Set-AzDataLakeGen2ItemAclObject`
+    - `Update-AzDataLakeGen2Item`
 * Show OAuth token in debug log in debug build only
     -  `New-AzStorageContext`
 
