@@ -153,11 +153,11 @@ namespace Microsoft.Azure.Commands.Management.Storage
                 }
                 Track2.StorageAccountResource storageAccount = this.StorageClientTrack2
                     .GetStorageAccount(this.ResourceGroupName, this.Name).Get();
-                Track2Models.NetworkRuleSet storageACL = storageAccount.Data.NetworkRuleSet;
+                Track2Models.StorageAccountNetworkRuleSet storageACL = storageAccount.Data.NetworkRuleSet;
 
                 if (storageACL == null)
                 {
-                    storageACL = new Track2Models.NetworkRuleSet(Track2Models.DefaultAction.Allow);
+                    storageACL = new Track2Models.StorageAccountNetworkRuleSet(Track2Models.StorageNetworkDefaultAction.Allow);
                 }
 
                 PSNetworkRuleSet psNetworkRule = PSNetworkRuleSet.ParsePSNetworkRule(storageACL);

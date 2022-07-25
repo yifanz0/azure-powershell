@@ -14,12 +14,7 @@
 
 using Microsoft.Azure.Commands.Management.Storage.Models;
 using Microsoft.Azure.Management.Internal.Resources.Utilities.Models;
-using Microsoft.Azure.Management.Storage;
-using Microsoft.Azure.Management.Storage.Models;
-using Microsoft.WindowsAzure.Commands.Common.CustomAttributes;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Management.Automation;
 
 namespace Microsoft.Azure.Commands.Management.Storage
@@ -135,7 +130,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
             Mandatory = true,
             ParameterSetName = AccountObjectSnapshotParameterSet)]
         [ValidateNotNullOrEmpty]
-        public DateTime? SnapshotTime { get; set; }
+        public DateTimeOffset? SnapshotTime { get; set; }
 
         [Parameter(HelpMessage = "Force to remove the Share and all content in it")]
         public SwitchParameter Force { get; set; }
@@ -217,12 +212,10 @@ namespace Microsoft.Azure.Commands.Management.Storage
                 }
                 if (Force.IsPresent || ShouldContinue(String.Format("Remove Share and all files in it: {0}", this.Name), ""))
                 {
-                    this.StorageClient.FileShares.Delete(
-                       this.ResourceGroupName,
-                       this.StorageAccountName,
-                       this.Name,
-                       xMsSnapshot: this.SnapshotTime is null ? null : this.SnapshotTime.Value.ToUniversalTime().ToString("o"),
-                       include: include.ToLower());
+                    string include = this.include.ToLower();
+                    string snapshot = this.SnapshotTime is null ? null : this.SnapshotTime.Value.DateTime.ToString("o")+"Z";
+                    this.StorageClientTrack2.GetFileShareResource(this.ResourceGroupName, this.StorageAccountName, this.Name)
+                        .Delete(global::Azure.WaitUntil.Completed, snapshot, include);
 
                     if (PassThru.IsPresent)
                     {

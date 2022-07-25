@@ -103,7 +103,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         requestType = "HnsOnHydrationRequest";
                     }
                      
-                    this.StorageClientTrack2.GetStorageAccount(this.ResourceGroupName, this.Name).HierarchicalNamespaceMigration(global::Azure.WaitUntil.Completed, requestType);
+                    this.StorageClientTrack2.GetStorageAccount(this.ResourceGroupName, this.Name).EnableHierarchicalNamespace(global::Azure.WaitUntil.Completed, requestType);
 
 
                     if (this.RequestType.ToLower() == HierarchicalNamespaceUpgradeAction.Validation.ToLower())

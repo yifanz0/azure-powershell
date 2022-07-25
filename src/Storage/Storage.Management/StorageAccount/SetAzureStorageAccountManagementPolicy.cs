@@ -169,8 +169,8 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     this.StorageAccountName = accountResource.ResourceName;
                 }
 
-                ManagementPolicyResource managementPolicyResource;
-                Track2.ManagementPolicyData data;
+                StorageAccountManagementPolicyResource managementPolicyResource;
+                Track2.StorageAccountManagementPolicyData data;
 
                 switch (this.ParameterSetName)
                 {
@@ -178,7 +178,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     case AccountNamePolicyRuleParameterSet:
                     case AccountResourceIdPolicyRuleParameterSet:
 
-                        data = new Track2.ManagementPolicyData
+                        data = new Track2.StorageAccountManagementPolicyData
                         {
                             Rules = PSManagementPolicyRule.ParseManagementPolicyRules(this.Rule)
                         };
@@ -191,7 +191,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     case AccountNamePolicyObjectParameterSet:
                     case AccountResourceIdPolicyObjectParameterSet:
 
-                        data = new Track2.ManagementPolicyData()
+                        data = new Track2.StorageAccountManagementPolicyData()
                         {
                             Rules = PSManagementPolicyRule.ParseManagementPolicyRules(this.Policy.Rules)
                         };

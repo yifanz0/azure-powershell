@@ -107,7 +107,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
                 }
                 Track2.BlobServiceData data = new Track2.BlobServiceData();
 
-                data.RestorePolicy = new Track2Models.RestorePolicyProperties(false)
+                data.RestorePolicy = new Track2Models.RestorePolicy(false)
                 {
                     Days = null,
                 };

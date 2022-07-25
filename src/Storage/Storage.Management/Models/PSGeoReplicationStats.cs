@@ -20,7 +20,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
     public class PSGeoReplicationStats
     {
         //Parse GeoReplicationStats in SDK to wrapped property PSGeoReplicationStats
-        public static PSGeoReplicationStats ParsePSGeoReplicationStats(Track2Models.GeoReplicationStats geoReplicationStats)
+        public static PSGeoReplicationStats ParsePSGeoReplicationStats(Track2Models.GeoReplicationStatistics geoReplicationStats)
         {
             if (geoReplicationStats == null)
             {

@@ -13,8 +13,6 @@
 // ----------------------------------------------------------------------------------
 
 using Microsoft.Azure.Commands.Common.Authentication.Abstractions;
-using Microsoft.Azure.Management.Storage;
-using Microsoft.Azure.Management.Storage.Models;
 using Microsoft.WindowsAzure.Commands.Common.Storage;
 using Microsoft.WindowsAzure.Commands.Storage.Adapters;
 using System;
@@ -27,6 +25,8 @@ using Azure.ResourceManager.Models;
 using Microsoft.WindowsAzure.Commands.Utilities.Common;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Auth;
+using Azure.ResourceManager.Storage.Models;
+using Azure.ResourceManager.Resources.Models;
 
 namespace Microsoft.Azure.Commands.Management.Storage.Models
 {
@@ -42,7 +42,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             this.Encryption = storageAccountResource.Data.Encryption;
             this.Kind = storageAccountResource.Data.Kind.ToString();
             this.AccessTier = storageAccountResource.Data.AccessTier;
-            this.CreationTime = storageAccountResource.Data.CreationOn;
+            this.CreationTime = storageAccountResource.Data.CreatedOn;
             this.CustomDomain = storageAccountResource.Data.CustomDomain is null ? null : new PSCustomDomain(storageAccountResource.Data.CustomDomain);
             this.Identity = storageAccountResource.Data.Identity != null ? new PSIdentity(storageAccountResource.Data.Identity) : null;
             this.LastGeoFailoverTime = storageAccountResource.Data.LastGeoFailoverOn;
@@ -59,7 +59,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             this.NetworkRuleSet = PSNetworkRuleSet.ParsePSNetworkRule(storageAccountResource.Data.NetworkRuleSet);
 
             this.EnableHierarchicalNamespace = storageAccountResource.Data.IsHnsEnabled;
-            this.FailoverInProgress = storageAccountResource.Data.FailoverInProgress;
+            this.FailoverInProgress = storageAccountResource.Data.IsFailoverInProgress;
             this.LargeFileSharesState = storageAccountResource.Data.LargeFileSharesState.ToString();
             this.AzureFilesIdentityBasedAuth =
                 storageAccountResource.Data.AzureFilesIdentityBasedAuthentication is null ? null : new PSAzureFilesIdentityBasedAuthentication(storageAccountResource.Data.AzureFilesIdentityBasedAuthentication);
@@ -68,7 +68,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             this.MinimumTlsVersion = storageAccountResource.Data.MinimumTlsVersion is null ? null : storageAccountResource.Data.MinimumTlsVersion.ToString();
             this.RoutingPreference = PSRoutingPreference.ParsePSRoutingPreference(storageAccountResource.Data.RoutingPreference);
             this.BlobRestoreStatus = storageAccountResource.Data.BlobRestoreStatus is null ? null : new PSBlobRestoreStatus(storageAccountResource.Data.BlobRestoreStatus);
-            this.EnableNfsV3 = storageAccountResource.Data.EnableNfsV3;
+            this.EnableNfsV3 = storageAccountResource.Data.IsNfsV3Enabled;
             this.ExtendedLocation = storageAccountResource.Data.ExtendedLocation is null ? null : new PSExtendedLocation(storageAccountResource.Data.ExtendedLocation);
             this.AllowSharedKeyAccess = storageAccountResource.Data.AllowSharedKeyAccess;
             this.KeyCreationTime = storageAccountResource.Data.KeyCreationTime is null ? null : new PSKeyCreationTime(storageAccountResource.Data.KeyCreationTime);
@@ -101,10 +101,10 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
         [Ps1Xml(Label = "Kind", Target = ViewControl.Table, Position = 4)]
         public string Kind { get; set; }
-        public Track2Models.Encryption Encryption { get; set; }
+        public Track2Models.StorageAccountEncryption Encryption { get; set; }
 
         [Ps1Xml(Label = "AccessTier", Target = ViewControl.Table, Position = 5)]
-        public Track2Models.AccessTier? AccessTier { get; set; }
+        public Track2Models.StorageAccountAccessTier? AccessTier { get; set; }
 
         [Ps1Xml(Label = "CreationTime", Target = ViewControl.Table, Position = 6)]
         public DateTimeOffset? CreationTime { get; set; }
@@ -115,21 +115,21 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
         public DateTimeOffset? LastGeoFailoverTime { get; set; }
 
-        public Track2Models.Endpoints PrimaryEndpoints { get; set; }
+        public Track2Models.StorageAccountEndpoints PrimaryEndpoints { get; set; }
 
         [Ps1Xml(Label = "PrimaryLocation", Target = ViewControl.Table, Position = 2)]
         public string PrimaryLocation { get; set; }
 
         [Ps1Xml(Label = "ProvisioningState", Target = ViewControl.Table, Position = 7)]
-        public Track2Models.ProvisioningState? ProvisioningState { get; set; }
+        public Track2Models.StorageProvisioningState? ProvisioningState { get; set; }
 
-        public Track2Models.Endpoints SecondaryEndpoints { get; set; }
+        public Track2Models.StorageAccountEndpoints SecondaryEndpoints { get; set; }
 
         public string SecondaryLocation { get; set; }
 
-        public Track2Models.AccountStatus? StatusOfPrimary { get; set; }
+        public Track2Models.StorageAccountStatus? StatusOfPrimary { get; set; }
 
-        public Track2Models.AccountStatus? StatusOfSecondary { get; set; }
+        public Track2Models.StorageAccountStatus? StatusOfSecondary { get; set; }
 
         public IDictionary<string, string> Tags { get; set; }
 
@@ -182,10 +182,10 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
         public static CloudStorageAccount GetCloudStorageAccount(Track2.StorageAccountResource storageAccountResource)
         {
-            Uri blobEndpoint = storageAccountResource.Data.PrimaryEndpoints.Blob != null ? new Uri(storageAccountResource.Data.PrimaryEndpoints.Blob) : null;
-            Uri queueEndpoint = storageAccountResource.Data.PrimaryEndpoints.Queue != null ? new Uri(storageAccountResource.Data.PrimaryEndpoints.Queue) : null;
-            Uri tableEndpoint = storageAccountResource.Data.PrimaryEndpoints.Table != null ? new Uri(storageAccountResource.Data.PrimaryEndpoints.Table) : null;
-            Uri fileEndpoint = storageAccountResource.Data.PrimaryEndpoints.File != null ? new Uri(storageAccountResource.Data.PrimaryEndpoints.File) : null;
+            Uri blobEndpoint = storageAccountResource.Data.PrimaryEndpoints.BlobUri ?? null;
+            Uri queueEndpoint = storageAccountResource.Data.PrimaryEndpoints.QueueUri ?? null;
+            Uri tableEndpoint = storageAccountResource.Data.PrimaryEndpoints.TableUri ?? null;
+            Uri fileEndpoint = storageAccountResource.Data.PrimaryEndpoints.FileUri ?? null;
             string key = storageAccountResource.GetKeys().Value.Keys[0].Value;
             StorageCredentials storageCredentials = new Azure.Storage.Auth.StorageCredentials(storageAccountResource.Data.Name, key);
             CloudStorageAccount cloudStorageAccount = new CloudStorageAccount(
@@ -251,17 +251,17 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         public string Name { get; set; }
         public bool? UseSubDomain { get; set; }
 
-        public PSCustomDomain(Track2Models.CustomDomain input)
+        public PSCustomDomain(Track2Models.StorageCustomDomain input)
         {
             this.Name = input.Name;
-            this.UseSubDomain = input.UseSubDomainName;
+            this.UseSubDomain = input.IsUseSubDomainNameEnabled;
         }
 
-        public Track2Models.CustomDomain ParseCustomDomain()
+        public Track2Models.StorageCustomDomain ParseCustomDomain()
         {
-            Track2Models.CustomDomain customDomain =
-                new Track2Models.CustomDomain(this.Name);
-            customDomain.UseSubDomainName = this.UseSubDomain;
+            Track2Models.StorageCustomDomain customDomain =
+                new Track2Models.StorageCustomDomain(this.Name);
+            customDomain.IsUseSubDomainNameEnabled = this.UseSubDomain;
             return customDomain;
         }
     }
@@ -332,8 +332,8 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         public string ResourceType { get; set; }
         public string Kind { get; set; }
         public IList<string> Locations { get; set; }
-        public IList<SKUCapability> Capabilities { get; set; }
-        public IList<Restriction> Restrictions { get; set; }
+        public IList<StorageSkuCapability> Capabilities { get; set; }
+        public IList<StorageSkuRestriction> Restrictions { get; set; }
 
         public PSSku(Track2Models.StorageSku sku)
         {
@@ -358,10 +358,10 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         public PSExtendedLocation()
         { }
 
-        public PSExtendedLocation(Track2Models.ExtendedLocation extendedLocation)
+        public PSExtendedLocation(ExtendedLocation extendedLocation)
         {
             this.Name = extendedLocation.Name;
-            this.Type = extendedLocation.ExtendedLocationType != null ? extendedLocation.ExtendedLocationType.ToString() : null;
+            this.Type = extendedLocation.ExtendedLocationType?.ToString();
         }
 
         public string Name { get; set; }
@@ -373,7 +373,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         public PSKeyCreationTime()
         { }
 
-        public PSKeyCreationTime(Track2Models.KeyCreationTime keyCreationTime)
+        public PSKeyCreationTime(Track2Models.StorageAccountKeyCreationTime keyCreationTime)
         {
             if (keyCreationTime != null)
             {
@@ -397,7 +397,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         {
             if (immutableStorageAccount != null)
             {
-                this.Enabled = immutableStorageAccount.Enabled;
+                this.Enabled = immutableStorageAccount.IsEnabled;
                 this.ImmutabilityPolicy = immutableStorageAccount.ImmutabilityPolicy is null ? null : new PSAccountImmutabilityPolicyProperties(immutableStorageAccount.ImmutabilityPolicy);
             }
         }
@@ -413,7 +413,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         public PSAccountImmutabilityPolicyProperties()
         { }
 
-        public PSAccountImmutabilityPolicyProperties(Track2Models.AccountImmutabilityPolicyProperties accountImmutabilityPolicyProperties)
+        public PSAccountImmutabilityPolicyProperties(Track2Models.AccountImmutabilityPolicy accountImmutabilityPolicyProperties)
         {
             if (accountImmutabilityPolicyProperties != null)
             {

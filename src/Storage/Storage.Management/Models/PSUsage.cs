@@ -22,7 +22,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
         public string Name { get; set; }
 
-        public Track2Models.UsageUnit? Unit { get; set; }
+        public Track2Models.StorageUsageUnit? Unit { get; set; }
 
         public int? CurrentValue { get; set; }
 

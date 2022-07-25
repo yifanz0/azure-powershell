@@ -19,6 +19,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Management.Automation;
+using Track2 = Azure.ResourceManager.Storage;
+using Track2Models = Azure.ResourceManager.Storage.Models;
 
 namespace Microsoft.Azure.Commands.Management.Storage
 {
@@ -194,25 +196,59 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     }
                 }
 
-                var container =
-                    this.StorageClient.BlobContainers.Create(
-                            this.ResourceGroupName,
-                            this.StorageAccountName,
-                            this.Name,
-                            new BlobContainer(
-                                defaultEncryptionScope: this.DefaultEncryptionScope,
-                                denyEncryptionScopeOverride: this.preventEncryptionScopeOverride,
-                                publicAccess: (PublicAccess?)this.publicAccess,
-                                metadata: MetadataDictionary,
-                                immutableStorageWithVersioning: this.EnableImmutableStorageWithVersioning.IsPresent ? new ImmutableStorageWithVersioning(true) : null,
-                                enableNfsV3RootSquash: enableNfsV3RootSquash,
-                                enableNfsV3AllSquash: enableNfsV3AllSquash));
+                Track2.BlobContainerData data = new Track2.BlobContainerData();
 
-                container =
-                    this.StorageClient.BlobContainers.Get(
-                            this.ResourceGroupName,
-                            this.StorageAccountName,
-                            this.Name);
+                data.EnableNfsV3AllSquash = enableNfsV3AllSquash;
+                data.EnableNfsV3RootSquash = enableNfsV3RootSquash;
+                data.PublicAccess = (Track2Models.StoragePublicAccessType?)this.publicAccess;
+                data.DefaultEncryptionScope = this.DefaultEncryptionScope;
+                data.PreventEncryptionScopeOverride = this.preventEncryptionScopeOverride;
+
+                if (this.EnableImmutableStorageWithVersioning.IsPresent)
+                {
+                    Track2Models.ImmutableStorageWithVersioning immutableStorageWithVersioning = new Track2Models.ImmutableStorageWithVersioning();
+                    immutableStorageWithVersioning.IsEnabled = true;
+                    data.ImmutableStorageWithVersioning = immutableStorageWithVersioning;
+                } 
+
+                if (this.Metadata != null)
+                {
+                    foreach (DictionaryEntry entry in this.Metadata)
+                    {
+                        if (entry.Value is null)
+                        {
+                            data.Metadata.Add(entry.Key.ToString(), string.Empty);
+                        }
+                        else
+                        {
+                            data.Metadata.Add(entry.Key.ToString(), entry.Value.ToString());
+                        }
+                    }
+                }
+
+                var container = this.StorageClientTrack2.CreateBlobContainer(this.ResourceGroupName, this.StorageAccountName, this.Name, data);
+
+                container = this.StorageClientTrack2.GetBlobContainerResource(this.ResourceGroupName, this.StorageAccountName, this.Name).Get();
+
+                //var container =
+                //    this.StorageClient.BlobContainers.Create(
+                //            this.ResourceGroupName,
+                //            this.StorageAccountName,
+                //            this.Name,
+                //            new BlobContainer(
+                //                defaultEncryptionScope: this.DefaultEncryptionScope,
+                //                denyEncryptionScopeOverride: this.preventEncryptionScopeOverride,
+                //                publicAccess: (PublicAccess?)this.publicAccess,
+                //                metadata: MetadataDictionary,
+                //                immutableStorageWithVersioning: this.EnableImmutableStorageWithVersioning.IsPresent ? new ImmutableStorageWithVersioning(true) : null,
+                //                enableNfsV3RootSquash: enableNfsV3RootSquash,
+                //                enableNfsV3AllSquash: enableNfsV3AllSquash));
+
+                //container =
+                //    this.StorageClient.BlobContainers.Get(
+                //            this.ResourceGroupName,
+                //            this.StorageAccountName,
+                //            this.Name);
 
                 WriteObject(new PSContainer(container));
             }

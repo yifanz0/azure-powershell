@@ -47,10 +47,10 @@ namespace Microsoft.Azure.Commands.Management.Storage
         {
             base.ExecuteCmdlet();
 
-            Track2Models.ListKeyExpand? expand = null;
+            Track2Models.StorageListKeyExpand? expand = null;
             if (ListKerbKey.IsPresent)
             {
-                expand = Track2Models.ListKeyExpand.Kerb;
+                expand = Track2Models.StorageListKeyExpand.Kerb;
             }
 
             var storageKeys = this.StorageClientTrack2.GetStorageAccount(this.ResourceGroupName, this.Name)

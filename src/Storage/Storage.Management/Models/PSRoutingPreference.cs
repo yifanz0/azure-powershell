@@ -20,18 +20,19 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
     public class PSRoutingPreference
     {
         //Parse RoutingPreference  in SDK to wrapped property PSRoutingPreference
-        public static PSRoutingPreference ParsePSRoutingPreference(Track2Models.RoutingPreference routingPreference)
+        public static PSRoutingPreference ParsePSRoutingPreference(Track2Models.StorageRoutingPreference routingPreference)
         {
             if (routingPreference == null)
             {
                 return null;
             }
 
-            PSRoutingPreference pSRoutingPreference = new PSRoutingPreference();
-
-            pSRoutingPreference.RoutingChoice = routingPreference.RoutingChoice != null ? routingPreference.RoutingChoice.ToString() : null;
-            pSRoutingPreference.PublishMicrosoftEndpoints = routingPreference.PublishMicrosoftEndpoints;
-            pSRoutingPreference.PublishInternetEndpoints = routingPreference.PublishInternetEndpoints;
+            PSRoutingPreference pSRoutingPreference = new PSRoutingPreference
+            {
+                RoutingChoice = routingPreference.RoutingChoice?.ToString(),
+                PublishMicrosoftEndpoints = routingPreference.IsMicrosoftEndpointsPublished,
+                PublishInternetEndpoints = routingPreference.IsInternetEndpointsPublished
+            };
 
             return pSRoutingPreference;
         }

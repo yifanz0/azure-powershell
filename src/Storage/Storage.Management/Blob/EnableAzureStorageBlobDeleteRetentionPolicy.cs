@@ -115,7 +115,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
 
                 data.DeleteRetentionPolicy = new Track2Models.DeleteRetentionPolicy
                 {
-                    Enabled = true,
+                    IsEnabled = true,
                     Days = RetentionDays,
                 };
 

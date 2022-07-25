@@ -12,72 +12,46 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using Microsoft.Azure.Commands.Common.Authentication.Abstractions;
-using Microsoft.Azure.Management.Storage;
-using Microsoft.Azure.Management.Storage.Models;
 using Microsoft.WindowsAzure.Commands.Common.Attributes;
-using Microsoft.WindowsAzure.Commands.Common.Storage;
-using Microsoft.WindowsAzure.Commands.Storage.Adapters;
-using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.File;
 using System;
 using System.Collections.Generic;
-using StorageModels = Microsoft.Azure.Management.Storage.Models;
+using Track2 = Azure.ResourceManager.Storage;
 
 namespace Microsoft.Azure.Commands.Management.Storage.Models
 {
     public class PSShare //: CloudFileShare
     {
-        public PSShare(StorageModels.FileShare share)
+        public PSShare(Track2.FileShareResource share)
         {
             this.ResourceGroupName = ParseResourceGroupFromId(share.Id);
             this.StorageAccountName = ParseStorageAccountNameFromId(share.Id);
             this.Id = share.Id;
-            this.Name = share.Name;
-            this.Type = share.Type;
-            this.Metadata = share.Metadata;
-            this.Etag = share.Etag;
-            this.LastModifiedTime = share.LastModifiedTime;
-            this.QuotaGiB = share.ShareQuota;
-            this.EnabledProtocols = share.EnabledProtocols;
-            this.RootSquash = share.RootSquash;
-            this.Version = share.Version;
-            this.Deleted = share.Deleted;
-            this.DeletedTime = share.DeletedTime;
-            this.RemainingRetentionDays = share.RemainingRetentionDays;
-            this.EnabledProtocols = share.EnabledProtocols;
-            this.RootSquash = share.RootSquash;
-            this.ShareUsageBytes = share.ShareUsageBytes;
-            this.AccessTier = share.AccessTier;
-            this.AccessTierChangeTime = share.AccessTierChangeTime;
-            this.AccessTierStatus = share.AccessTierStatus;
-            this.SnapshotTime = share.SnapshotTime;
-        }
-
-        public PSShare(FileShareItem share)
-        {
-            this.ResourceGroupName = ParseResourceGroupFromId(share.Id);
-            this.StorageAccountName = ParseStorageAccountNameFromId(share.Id);
-            this.Id = share.Id;
-            this.Name = share.Name;
-            this.Type = share.Type;
-            this.Metadata = share.Metadata;
-            this.Etag = share.Etag;
-            this.LastModifiedTime = share.LastModifiedTime;
-            this.QuotaGiB = share.ShareQuota;
-            this.EnabledProtocols = share.EnabledProtocols;
-            this.RootSquash = share.RootSquash;
-            this.Version = share.Version;
-            this.Deleted = share.Deleted;
-            this.DeletedTime = share.DeletedTime;
-            this.RemainingRetentionDays = share.RemainingRetentionDays;
-            this.EnabledProtocols = share.EnabledProtocols;
-            this.RootSquash = share.RootSquash;
-            this.ShareUsageBytes = share.ShareUsageBytes;
-            this.AccessTier = share.AccessTier;
-            this.AccessTierChangeTime = share.AccessTierChangeTime;
-            this.AccessTierStatus = share.AccessTierStatus;
-            this.SnapshotTime = share.SnapshotTime;
+            this.Name = share.Data.Name;
+            this.Type = share.Data.ResourceType;
+            this.Metadata = share.Data.Metadata;
+            this.Etag = share.Data.ETag?.ToString();
+            this.LastModifiedTime = share.Data.LastModifiedOn;
+            this.QuotaGiB = share.Data.ShareQuota;
+            if (share.Data.EnabledProtocol != null)
+            {
+                this.EnabledProtocols = share.Data.EnabledProtocol.ToString();
+            }
+            if (share.Data.RootSquash != null)
+            {
+                this.RootSquash = share.Data.RootSquash.ToString();
+            }
+            this.Version = share.Data.Version;
+            this.Deleted = share.Data.IsDeleted;
+            this.DeletedTime = share.Data.DeletedOn;
+            this.RemainingRetentionDays = share.Data.RemainingRetentionDays;
+            this.ShareUsageBytes = share.Data.ShareUsageBytes;
+            if (share.Data.AccessTier != null)
+            {
+                this.AccessTier = share.Data.AccessTier.ToString();
+            }
+            this.AccessTierChangeTime = share.Data.AccessTierChangeOn;
+            this.AccessTierStatus = share.Data.AccessTierStatus;
+            this.SnapshotTime = share.Data.SnapshotOn;
         }
 
         [Ps1Xml(Label = "ResourceGroupName", Target = ViewControl.Table, Position = 0)]
@@ -100,7 +74,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
         public IDictionary<string, string> Metadata { get; set; }       
 
-        public DateTime? LastModifiedTime { get; set; }
+        public DateTimeOffset? LastModifiedTime { get; set; }
 
         [Ps1Xml(Label = "Version", Target = ViewControl.List, Position = 7)]
         public string Version { get; set; }
@@ -108,7 +82,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         public bool? Deleted { get; private set; }
 
         [Ps1Xml(Label = "DeletedTime", Target = ViewControl.List, ScriptBlock = "$_.DeletedTime.ToString(\"u\")", Position = 6)]
-        public DateTime? DeletedTime { get; private set; }
+        public DateTimeOffset? DeletedTime { get; private set; }
 
         public int? RemainingRetentionDays { get; private set; }
 
@@ -116,12 +90,12 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         public string RootSquash { get; set; }
 
         public string AccessTier { get; set; }
-        public DateTime? AccessTierChangeTime { get; }
+        public DateTimeOffset? AccessTierChangeTime { get; }
         public string AccessTierStatus { get; }
 
         public long? ShareUsageBytes { get; }
 
-        public DateTime? SnapshotTime { get; private set; }
+        public DateTimeOffset? SnapshotTime { get; private set; }
         public static string ParseResourceGroupFromId(string idFromServer)
         {
             if (!string.IsNullOrEmpty(idFromServer))

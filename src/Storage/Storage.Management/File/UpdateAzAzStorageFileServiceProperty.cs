@@ -12,11 +12,12 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
+using Track2 = Azure.ResourceManager.Storage;
+using Track2Models = Azure.ResourceManager.Storage.Models;
+
 namespace Microsoft.Azure.Commands.Management.Storage
 {
     using Microsoft.Azure.Commands.Management.Storage.Models;
-    using Microsoft.Azure.Management.Storage;
-    using Microsoft.Azure.Management.Storage.Models;
     using System;
     using System.Collections.Generic;
     using System.Management.Automation;
@@ -200,56 +201,56 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         // For AccountNameParameterSet, the ResourceGroupName and StorageAccountName can get from input directly
                         break;
                 }
-                DeleteRetentionPolicy deleteRetentionPolicy = null;
+
+                Track2.FileServiceData data = new Track2.FileServiceData();
+
                 if (this.enableShareDeleteRetentionPolicy != null)
                 {
-                    deleteRetentionPolicy = new DeleteRetentionPolicy();
-                    deleteRetentionPolicy.Enabled = this.enableShareDeleteRetentionPolicy.Value;
+                    data.ShareDeleteRetentionPolicy = new Track2Models.DeleteRetentionPolicy
+                    {
+                        IsEnabled = this.enableShareDeleteRetentionPolicy.Value
+                    };
                     if (this.enableShareDeleteRetentionPolicy.Value == true)
                     {
-                        deleteRetentionPolicy.Days = ShareRetentionDays;
+                        data.ShareDeleteRetentionPolicy.Days = ShareRetentionDays;
                     }
                 }
 
-                ProtocolSettings protocolSettings = null;
                 if(this.SmbProtocolVersion != null ||
                     this.SmbAuthenticationMethod != null ||
                     this.SmbKerberosTicketEncryption != null ||
                     this.SmbChannelEncryption != null ||
                     this.enableSmbMultichannel != null)
                 {
-                    protocolSettings = new ProtocolSettings();
-                    protocolSettings.Smb = new SmbSetting();
+                    data.ProtocolSmbSetting = new Track2Models.SmbSetting();
                     if (this.SmbProtocolVersion != null)
                     {
-                        protocolSettings.Smb.Versions = ConnectStringArray(this.SmbProtocolVersion);
+                        data.ProtocolSmbSetting.Versions = ConnectStringArray(this.SmbProtocolVersion);
                     }
                     if (this.SmbAuthenticationMethod != null)
                     {
-                        protocolSettings.Smb.AuthenticationMethods = ConnectStringArray(this.SmbAuthenticationMethod);
+                        data.ProtocolSmbSetting.AuthenticationMethods = ConnectStringArray(this.SmbAuthenticationMethod);
                     }
                     if (this.SmbKerberosTicketEncryption != null)
                     {
-                        protocolSettings.Smb.KerberosTicketEncryption = ConnectStringArray(this.SmbKerberosTicketEncryption);
+                        data.ProtocolSmbSetting.KerberosTicketEncryption = ConnectStringArray(this.SmbKerberosTicketEncryption);
                     }
                     if (this.SmbChannelEncryption != null)
                     {
-                        protocolSettings.Smb.ChannelEncryption = ConnectStringArray(this.SmbChannelEncryption);
+                        data.ProtocolSmbSetting.ChannelEncryption = ConnectStringArray(this.SmbChannelEncryption);
                     }
                     if(this.enableSmbMultichannel != null)
                     {
-                        protocolSettings.Smb.Multichannel = new Multichannel();
-                        protocolSettings.Smb.Multichannel.Enabled = this.enableSmbMultichannel;
+                        data.ProtocolSmbSetting.IsMultiChannelEnabled = this.enableSmbMultichannel;
                     }
                 }
 
-                FileServiceProperties serviceProperties = this.StorageClient.FileServices.SetServiceProperties(this.ResourceGroupName, this.StorageAccountName, 
-                    new FileServiceProperties(shareDeleteRetentionPolicy: deleteRetentionPolicy, protocolSettings: protocolSettings));
+                Track2.FileServiceResource properties = this.StorageClientTrack2.GetFileServiceResource(this.ResourceGroupName, this.StorageAccountName)
+                    .CreateOrUpdate(global::Azure.WaitUntil.Completed, data).Value;
 
                 // Get all File service properties from server for output
-                serviceProperties = this.StorageClient.FileServices.GetServiceProperties(this.ResourceGroupName, this.StorageAccountName);
-
-                WriteObject(new PSFileServiceProperties(serviceProperties));
+                properties = this.StorageClientTrack2.GetFileServiceResource(this.ResourceGroupName, this.StorageAccountName).Get();
+                WriteObject(new PSFileServiceProperties(properties));
             }
         }
     }

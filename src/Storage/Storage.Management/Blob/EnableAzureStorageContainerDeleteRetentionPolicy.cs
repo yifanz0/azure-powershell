@@ -109,7 +109,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
                 Track2.BlobServiceData data = new Track2.BlobServiceData();
                 data.ContainerDeleteRetentionPolicy = new Track2Models.DeleteRetentionPolicy
                 {
-                    Enabled = true,
+                    IsEnabled = true,
                     Days = this.RetentionDays,
                 };
 

@@ -61,7 +61,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             this.Id = policyResource.Id;
             this.Name = policyResource.Data.Name;
             this.Type = policyResource.Data.ResourceType;
-            this.Cors = policyResource.Data.CorsRulesValue is null ? null : new PSCorsRules(policyResource.Data.CorsRulesValue);
+            this.Cors = policyResource.Data.CorsRules is null ? null : new PSCorsRules(policyResource.Data.CorsRules);
             this.DefaultServiceVersion = policyResource.Data.DefaultServiceVersion;
             this.DeleteRetentionPolicy = policyResource.Data.DeleteRetentionPolicy is null ? null : new PSDeleteRetentionPolicy(policyResource.Data.DeleteRetentionPolicy);
             this.RestorePolicy = policyResource.Data.RestorePolicy is null ? null : new PSRestorePolicy(policyResource.Data.RestorePolicy);
@@ -109,17 +109,17 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         {
         }
 
-        public PSChangeFeed(Track2Models.ChangeFeed changeFeed)
+        public PSChangeFeed(Track2Models.BlobServiceChangeFeed changeFeed)
         {
-            this.Enabled = changeFeed.Enabled;
+            this.Enabled = changeFeed.IsEnabled;
             this.RetentionInDays = changeFeed.RetentionInDays;
         }
 
-        public Track2Models.ChangeFeed ParseChangeFeed()
+        public Track2Models.BlobServiceChangeFeed ParseChangeFeed()
         {
-            Track2Models.ChangeFeed changeFeed = new Track2Models.ChangeFeed
+            Track2Models.BlobServiceChangeFeed changeFeed = new Track2Models.BlobServiceChangeFeed
             {
-                Enabled = this.Enabled,
+                IsEnabled = this.Enabled,
                 RetentionInDays = this.RetentionInDays,
             };
             return changeFeed;
@@ -142,7 +142,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
         public PSDeleteRetentionPolicy(Track2Models.DeleteRetentionPolicy policy)
         {
-            this.Enabled = policy.Enabled;
+            this.Enabled = policy.IsEnabled;
             this.Days = policy.Days;
         }
 
@@ -150,7 +150,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         {
             Track2Models.DeleteRetentionPolicy ret = new Track2Models.DeleteRetentionPolicy
             {
-                Enabled = this.Enabled,
+                IsEnabled = this.Enabled,
                 Days = this.Days,
             };
             return ret;
@@ -170,18 +170,18 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         {
         }
 
-        public PSRestorePolicy(Track2Models.RestorePolicyProperties policy)
+        public PSRestorePolicy(Track2Models.RestorePolicy policy)
         {
-            this.Enabled = policy.Enabled;
+            this.Enabled = policy.IsEnabled;
             this.Days = policy.Days;
             this.MinRestoreTime = policy.MinRestoreOn;
         }
 
-        public Track2Models.RestorePolicyProperties ParseRestorePolicy()
+        public Track2Models.RestorePolicy ParseRestorePolicy()
         {
             bool enabled = this.Enabled is null ? false : this.Enabled.Value;
 
-            return new Track2Models.RestorePolicyProperties(enabled)
+            return new Track2Models.RestorePolicy(enabled)
             {
                 Days = this.Days,
             };
@@ -199,7 +199,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         {
         }
 
-        public PSCorsRules(IList<Track2Models.CorsRule> rules)
+        public PSCorsRules(IList<Track2Models.StorageCorsRule> rules)
         {
             if (rules is null)
             {
@@ -208,7 +208,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             else
             {
                 List<PSCorsRule> ruleList = new List<PSCorsRule>();
-                foreach(Track2Models.CorsRule rule in rules)
+                foreach(Track2Models.StorageCorsRule rule in rules)
                 {
                     ruleList.Add(new PSCorsRule(rule));
                 }
@@ -216,7 +216,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             }
         }
 
-        public IList<Track2Models.CorsRule> ParseCorsRules()
+        public IList<Track2Models.StorageCorsRule> ParseCorsRules()
         {
             if (this.CorsRulesProperty is null)
             {
@@ -224,7 +224,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             }
             else
             {
-                List<Track2Models.CorsRule> corsRules = new List<Track2Models.CorsRule>();
+                List<Track2Models.StorageCorsRule> corsRules = new List<Track2Models.StorageCorsRule>();
                 foreach(PSCorsRule rule in this.CorsRulesProperty)
                 {
                     corsRules.Add(rule.ParseCorsRule());
@@ -249,7 +249,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         {
         }
 
-        public PSCorsRule(Track2Models.CorsRule rule)
+        public PSCorsRule(Track2Models.StorageCorsRule rule)
         {
             this.AllowedOrigins = ListToArray(rule.AllowedOrigins);
 
@@ -259,7 +259,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             } else
             {
                 List<string> allowedMethodsList = new List<string>();
-                foreach (Track2Models.CorsRuleAllowedMethodsItem itm in rule.AllowedMethods)
+                foreach (Track2Models.CorsRuleAllowedMethod itm in rule.AllowedMethods)
                 {
                     allowedMethodsList.Add(itm.ToString());
                 }
@@ -271,9 +271,9 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             this.AllowedHeaders = ListToArray(rule.AllowedHeaders);
         }
 
-        public Track2Models.CorsRule ParseCorsRule()
+        public Track2Models.StorageCorsRule ParseCorsRule()
         {
-            List<Track2Models.CorsRuleAllowedMethodsItem> allowedMethods = new List<Track2Models.CorsRuleAllowedMethodsItem>();
+            List<Track2Models.CorsRuleAllowedMethod> allowedMethods = new List<Track2Models.CorsRuleAllowedMethod>();
             if (this.AllowedMethods is null)
             {
                 allowedMethods = null;   
@@ -281,11 +281,11 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             {
                 foreach(string itm in this.AllowedMethods)
                 {
-                    allowedMethods.Add(new Track2Models.CorsRuleAllowedMethodsItem(itm));
+                    allowedMethods.Add(new Track2Models.CorsRuleAllowedMethod(itm));
                 }
             }
 
-            return new Track2Models.CorsRule(
+            return new Track2Models.StorageCorsRule(
                 this.AllowedOrigins,
                 allowedMethods,
                 this.MaxAgeInSeconds,
@@ -325,7 +325,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         public PSLastAccessTimeTrackingPolicy(Track2Models.LastAccessTimeTrackingPolicy policy)
         {
             this.Name = policy.Name?.ToString();
-            this.Enable = policy.Enable;
+            this.Enable = policy.IsEnabled;
             this.TrackingGranularityInDays = policy.TrackingGranularityInDays;
             this.BlobType = policy.BlobType is null ? null : new List<string>(policy.BlobType).ToArray();
         }
@@ -334,7 +334,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         {
             Track2Models.LastAccessTimeTrackingPolicy policy = new Track2Models.LastAccessTimeTrackingPolicy(this.Enable)
             {
-                Name = new Track2Models.Name(this.Name),
+                Name = new Track2Models.LastAccessTimeTrackingPolicyName(this.Name),
                 TrackingGranularityInDays = this.TrackingGranularityInDays,
             };
 

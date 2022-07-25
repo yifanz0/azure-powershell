@@ -12,6 +12,8 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
+using Track2 = Azure.ResourceManager.Storage;
+
 namespace Microsoft.Azure.Commands.Management.Storage
 {
     using Microsoft.Azure.Commands.Management.Storage.Models;
@@ -98,9 +100,12 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     // For AccountNameParameterSet, the ResourceGroupName and StorageAccountName can get from input directly
                     break;
             }
-            FileServiceProperties serviceProperties = this.StorageClient.FileServices.GetServiceProperties(this.ResourceGroupName, this.StorageAccountName);
 
-            WriteObject(new PSFileServiceProperties(serviceProperties));
+            Track2.FileServiceResource properties = this.StorageClientTrack2
+                .GetFileServiceResource(this.ResourceGroupName, this.StorageAccountName)
+                .Get();
+
+            WriteObject(new PSFileServiceProperties(properties));
         }
     }
 }

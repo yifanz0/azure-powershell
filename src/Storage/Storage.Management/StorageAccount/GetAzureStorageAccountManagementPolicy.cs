@@ -94,7 +94,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     break;
             }
 
-            ManagementPolicyResource policy = this.StorageClientTrack2.GetManagementPolicyResource(
+            StorageAccountManagementPolicyResource policy = this.StorageClientTrack2.GetManagementPolicyResource(
                 this.ResourceGroupName, this.StorageAccountName, "default").Get();
 
             var result = new PSManagementPolicy(policy, this.ResourceGroupName, this.StorageAccountName);

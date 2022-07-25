@@ -12,6 +12,7 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
+using Azure;
 using Microsoft.Azure.Commands.Management.Storage.Models;
 using Microsoft.Azure.Management.Internal.Resources.Utilities.Models;
 using Microsoft.Azure.Management.Storage;
@@ -19,7 +20,10 @@ using Microsoft.Azure.Management.Storage.Models;
 using Microsoft.Rest.Azure;
 using Microsoft.WindowsAzure.Commands.Common.CustomAttributes;
 using System;
+using System.Collections.Generic;
 using System.Management.Automation;
+using Track2 = Azure.ResourceManager.Storage;
+using Track2Models = Azure.ResourceManager.Storage.Models;
 
 namespace Microsoft.Azure.Commands.Management.Storage
 {
@@ -114,7 +118,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
             Mandatory = false,
             ParameterSetName = AccountNameSingleParameterSet)]
         [ValidateNotNullOrEmpty]
-        public DateTime? SnapshotTime { get; set; }
+        public DateTimeOffset? SnapshotTime { get; set; }
 
         [Parameter(HelpMessage = "Specify this parameter to get the Share Usage in Bytes.",
             Mandatory = false,
@@ -171,18 +175,30 @@ namespace Microsoft.Azure.Commands.Management.Storage
 
             if (!string.IsNullOrEmpty(this.Name))
             {
-                string expend = null;
+                //string expend = null;
+                string expand = null; 
                 if(this.GetShareUsage)
                 {
-                    expend = ShareGetExpand.Stats;
+                    //expend = ShareGetExpand.Stats;
+                    expand = ShareGetExpand.Stats;
                 }
-                var Share = this.StorageClient.FileShares.Get(
-                           this.ResourceGroupName,
-                           this.StorageAccountName,
-                           this.Name,
-                           expend,
-                           xMsSnapshot: this.SnapshotTime is null? null : this.SnapshotTime.Value.ToUniversalTime().ToString("o"));
-                WriteObject(new PSShare(Share));
+                string snapshot = this.SnapshotTime is null ? null : this.SnapshotTime.Value.DateTime.ToString("o")+"Z";
+                
+                Track2.FileShareResource share = this.StorageClientTrack2.GetFileShareResource(this.ResourceGroupName, this.StorageAccountName, this.Name)
+                    .Get(
+                    expand: expand,
+                    xMsSnapshot: snapshot);
+
+
+                //var Share = this.StorageClient.FileShares.Get(
+                //           this.ResourceGroupName,
+                //           this.StorageAccountName,
+                //           this.Name,
+                //           expend,
+                //           xMsSnapshot: this.SnapshotTime is null ? null : this.SnapshotTime.Value.ToUniversalTime().ToString("o"));
+                //WriteObject(new PSShare(Share));
+
+                WriteObject(new PSShare(share));
             }
             else
             {
@@ -195,16 +211,33 @@ namespace Microsoft.Azure.Commands.Management.Storage
                 {
                     listSharesExpand = string.IsNullOrEmpty(listSharesExpand) ? ShareListExpand.Snapshots : listSharesExpand + "," + ShareListExpand.Snapshots;
                 }
-                IPage<FileShareItem> shares = this.StorageClient.FileShares.List(
-                           this.ResourceGroupName,
-                           this.StorageAccountName,
-                           expand: listSharesExpand);
-                WriteShareList(shares);
-                while (shares.NextPageLink != null)
+
+                Pageable<Track2.FileShareResource> shares = this.StorageClientTrack2
+                    .GetFileServiceResource(this.ResourceGroupName, this.StorageAccountName)
+                    .GetFileShares()
+                    .GetAll(expand: listSharesExpand);
+
+                if (shares != null)
                 {
-                    shares = this.StorageClient.FileShares.ListNext(shares.NextPageLink);
-                    WriteShareList(shares);
+                    List<PSShare> output = new List<PSShare>();
+                    foreach (Track2.FileShareResource share in shares)
+                    {
+                        output.Add(new PSShare(share));
+                    }
+                    WriteObject(output, true);
                 }
+
+
+                //IPage<FileShareItem> shares = this.StorageClient.FileShares.List(
+                //           this.ResourceGroupName,
+                //           this.StorageAccountName,
+                //           expand: listSharesExpand);
+                //WriteShareList(shares);
+                //while (shares.NextPageLink != null)
+                //{
+                //    shares = this.StorageClient.FileShares.ListNext(shares.NextPageLink);
+                //    WriteShareList(shares);
+                //}
             }
         }
     }

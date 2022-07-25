@@ -13,12 +13,14 @@
 // ----------------------------------------------------------------------------------
 
 using Microsoft.Azure.Commands.Management.Storage.Models;
-using Microsoft.Azure.Management.Storage;
-using Microsoft.Azure.Management.Storage.Models;
+//using Microsoft.Azure.Management.Storage;
+//using Microsoft.Azure.Management.Storage.Models;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Management.Automation;
+using Track2 = Azure.ResourceManager.Storage;
+using Track2Models = Azure.ResourceManager.Storage.Models;
 
 namespace Microsoft.Azure.Commands.Management.Storage
 {
@@ -140,7 +142,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
 
             if (ShouldProcess(this.Name, "Update container"))
             {
-                Dictionary<string, string> MetadataDictionary = CreateMetadataDictionary(Metadata, validate: true);
+                //Dictionary<string, string> MetadataDictionary = CreateMetadataDictionary(Metadata, validate: true);
 
                 bool? enableNfsV3RootSquash = null;
                 bool? enableNfsV3AllSquash = null;
@@ -163,15 +165,44 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     }
                 }
 
-                var container = this.StorageClient.BlobContainers.Update(
-                                    this.ResourceGroupName,
-                                    this.StorageAccountName,
-                                    this.Name,
-                                    new BlobContainer(
-                                        publicAccess: (PublicAccess?)this.publicAccess,
-                                        metadata: MetadataDictionary,
-                                        enableNfsV3RootSquash: enableNfsV3RootSquash,
-                                        enableNfsV3AllSquash: enableNfsV3AllSquash));
+                Track2.BlobContainerData data = new Track2.BlobContainerData();
+                data.EnableNfsV3AllSquash = enableNfsV3AllSquash;
+                data.EnableNfsV3RootSquash = enableNfsV3RootSquash;
+                data.PublicAccess = (Track2Models.StoragePublicAccessType?)this.publicAccess;
+                if (this.Metadata != null)
+                {
+                    if (this.Metadata.Count == 0)
+                    {
+                        data.Metadata.Clear();
+                    } else
+                    {
+                        foreach (DictionaryEntry entry in this.Metadata)
+                        {
+                            if (entry.Value is null)
+                            {
+                                data.Metadata.Add(entry.Key.ToString(), string.Empty);
+                            }
+                            else
+                            {
+                                data.Metadata.Add(entry.Key.ToString(), entry.Value.ToString());
+                            }
+                        }
+                    }
+                }
+
+
+                var container = this.StorageClientTrack2.GetBlobContainerResource(this.ResourceGroupName, this.StorageAccountName, this.Name)
+                    .Update(data);
+
+                //var container = this.StorageClient.BlobContainers.Update(
+                //                    this.ResourceGroupName,
+                //                    this.StorageAccountName,
+                //                    this.Name,
+                //                    new BlobContainer(
+                //                        publicAccess: (PublicAccess?)this.publicAccess,
+                //                        metadata: MetadataDictionary,
+                //                        enableNfsV3RootSquash: enableNfsV3RootSquash,
+                //                        enableNfsV3AllSquash: enableNfsV3AllSquash));
 
                 WriteObject(new PSContainer(container));
             }

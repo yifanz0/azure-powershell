@@ -13,13 +13,12 @@
 // ----------------------------------------------------------------------------------
 
 using Microsoft.Azure.Commands.Management.Storage.Models;
-using Microsoft.Azure.Management.Storage;
-using Microsoft.Azure.Management.Storage.Models;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Management.Automation;
-using Microsoft.Azure.Management.Internal.Resources.Utilities.Models;
+using Track2 = Azure.ResourceManager.Storage;
+using Track2Models = Azure.ResourceManager.Storage.Models;
 
 namespace Microsoft.Azure.Commands.Management.Storage
 {
@@ -158,18 +157,47 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     expand = ShareCreateExpand.Snapshots;
                 }
 
-                var share =
-                    this.StorageClient.FileShares.Create(
-                            this.ResourceGroupName,
-                            this.StorageAccountName,
-                            this.Name,
-                            new FileShare(
-                                metadata: MetadataDictionary,
-                                shareQuota: shareQuota,
-                                enabledProtocols: this.EnabledProtocol,
-                                rootSquash: this.RootSquash,
-                                accessTier: accessTier),
-                                expand: expand);
+                Track2.FileShareData data = new Track2.FileShareData();
+                
+                if (MetadataDictionary != null)
+                {
+                    foreach (KeyValuePair<string, string> kv in MetadataDictionary)
+                    {
+                        data.Metadata.Add(kv.Key, kv.Value);
+                    }
+                }
+
+                data.ShareQuota = this.shareQuota;
+                if (this.EnabledProtocol != null)
+                {
+                    data.EnabledProtocol = new Track2Models.FileShareEnabledProtocol(this.EnabledProtocol);
+                }
+                if (this.RootSquash != null)
+                {
+                    data.RootSquash = new Track2Models.RootSquashType(this.RootSquash);
+                }
+                if (this.accessTier != null)
+                {
+                    data.AccessTier = new Track2Models.FileShareAccessTier(this.accessTier);
+                }
+
+                Track2.FileShareResource share = this.StorageClientTrack2
+                    .GetFileServiceResource(this.ResourceGroupName, this.StorageAccountName)
+                    .GetFileShares()
+                    .CreateOrUpdate(global::Azure.WaitUntil.Completed, this.Name, data, expand).Value;
+
+                //var share =
+                //    this.StorageClient.FileShares.Create(
+                //            this.ResourceGroupName,
+                //            this.StorageAccountName,
+                //            this.Name,
+                //            new FileShare(
+                //                metadata: MetadataDictionary,
+                //                shareQuota: shareQuota,
+                //                enabledProtocols: this.EnabledProtocol,
+                //                rootSquash: this.RootSquash,
+                //                accessTier: accessTier),
+                //                expand: expand);
 
                 WriteObject(new PSShare(share));
             }

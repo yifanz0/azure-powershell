@@ -19,6 +19,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Management.Automation;
+using Track2 = Azure.ResourceManager.Storage;
+using Track2Models = Azure.ResourceManager.Storage.Models;
 
 namespace Microsoft.Azure.Commands.Management.Storage
 {
@@ -114,11 +116,16 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         break;
                 }
 
-                var legalHold = this.StorageClient.BlobContainers.ClearLegalHold(
-                        this.ResourceGroupName,
-                        this.StorageAccountName,
-                        this.Name,
-                        new List<string>(this.Tag));
+                Track2Models.LegalHold data = new Track2Models.LegalHold(new List<string>(this.Tag));
+
+                var legalHold = this.StorageClientTrack2.GetBlobContainerResource(this.ResourceGroupName, this.StorageAccountName, this.Name)
+                    .ClearLegalHold(data);
+
+                //var legalHold = this.StorageClient.BlobContainers.ClearLegalHold(
+                //        this.ResourceGroupName,
+                //        this.StorageAccountName,
+                //        this.Name,
+                //        new List<string>(this.Tag));
                 WriteObject(new PSLegalHold(legalHold));
             }
         }

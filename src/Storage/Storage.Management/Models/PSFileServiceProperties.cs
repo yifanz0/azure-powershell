@@ -17,6 +17,8 @@ using Microsoft.Azure.Management.Storage.Models;
 using Microsoft.WindowsAzure.Commands.Common.Attributes;
 using System;
 using System.Collections.Generic;
+using Track2 = Azure.ResourceManager.Storage;
+using Track2Models = Azure.ResourceManager.Storage.Models;
 
 namespace Microsoft.Azure.Commands.Management.Storage.Models
 {
@@ -41,33 +43,25 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         public PSFileServiceProperties()
         { }
 
-        public PSFileServiceProperties(FileServiceProperties policy)
+        public PSFileServiceProperties(Track2.FileServiceResource policy)
         {
             this.ResourceGroupName = (new ResourceIdentifier(policy.Id)).ResourceGroupName;
             this.StorageAccountName = PSBlobServiceProperties.GetStorageAccountNameFromResourceId(policy.Id);
             this.Id = policy.Id;
-            this.Name = policy.Name;
-            this.Type = policy.Type;
-            this.Cors = policy.Cors is null ? null : new PSCorsRules(policy.Cors);
-            this.ShareDeleteRetentionPolicy = policy.ShareDeleteRetentionPolicy is null ? null : new PSDeleteRetentionPolicy(policy.ShareDeleteRetentionPolicy);
-            this.ProtocolSettings = policy.ProtocolSettings is null ? null : new PSProtocolSettings(policy.ProtocolSettings);
-        }
-        public FileServiceProperties ParseFileServiceProperties()
-        {
-            return new FileServiceProperties
-            {
-                Cors = this.Cors is null ? null : this.Cors.ParseCorsRules(),
-                ShareDeleteRetentionPolicy = this.ShareDeleteRetentionPolicy is null ? null : this.ShareDeleteRetentionPolicy.ParseDeleteRetentionPolicy(),
-            };
+            this.Name = policy.Data.Name;
+            this.Type = policy.Data.ResourceType;
+            this.Cors = policy.Data.CorsRules is null ? null : new PSCorsRules(policy.Data.CorsRules);
+            this.ShareDeleteRetentionPolicy = policy.Data.ShareDeleteRetentionPolicy is null ? null : new PSDeleteRetentionPolicy(policy.Data.ShareDeleteRetentionPolicy);
+            this.ProtocolSettings = policy.Data.ProtocolSmbSetting is null ? null : new PSProtocolSettings(policy.Data.ProtocolSmbSetting);
         }
     }
     public class PSProtocolSettings
     {
         public PSSmbSetting Smb { get; set; }
 
-        public PSProtocolSettings(ProtocolSettings protocolSettings)
+        public PSProtocolSettings(Track2Models.SmbSetting smbSetting)
         {
-            this.Smb = protocolSettings.Smb is null ? null : new PSSmbSetting(protocolSettings.Smb);
+            this.Smb = smbSetting is null ? null : new PSSmbSetting(smbSetting);
         }
     }
 
@@ -79,13 +73,13 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         public string[] ChannelEncryption { get; set; }
         public PSMultichannel Multichannel { get; set; }
 
-        public PSSmbSetting(SmbSetting smbSetting)
+        public PSSmbSetting(Track2Models.SmbSetting smbSetting)
         {
-            this.Versions = smbSetting.Versions is null ? null : smbSetting.Versions.Split(new char[] { ';'});
-            this.AuthenticationMethods = smbSetting.AuthenticationMethods is null ? null : smbSetting.AuthenticationMethods.Split(new char[] { ';' });
-            this.KerberosTicketEncryption = smbSetting.KerberosTicketEncryption is null ? null : smbSetting.KerberosTicketEncryption.Split(new char[] { ';' });
-            this.ChannelEncryption = smbSetting.ChannelEncryption is null ? null : smbSetting.ChannelEncryption.Split(new char[] { ';' });
-            this.Multichannel = smbSetting.Multichannel is null ? null : new PSMultichannel(smbSetting.Multichannel);
+            this.Versions = smbSetting.Versions?.Split(new char[] { ';' });
+            this.AuthenticationMethods = smbSetting.AuthenticationMethods?.Split(new char[] { ';' });
+            this.KerberosTicketEncryption = smbSetting.KerberosTicketEncryption?.Split(new char[] { ';' });
+            this.ChannelEncryption = smbSetting.ChannelEncryption?.Split(new char[] { ';' });
+            this.Multichannel = smbSetting.IsMultiChannelEnabled is null ? null : new PSMultichannel(smbSetting.IsMultiChannelEnabled);
         }
     }
 
@@ -96,6 +90,11 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         public PSMultichannel(Multichannel multichannel)
         {
             this.Enabled = multichannel.Enabled;
+        }
+
+        public PSMultichannel(bool? isMultiChannelEnabled)
+        {
+            this.Enabled = isMultiChannelEnabled;
         }
     }
 }

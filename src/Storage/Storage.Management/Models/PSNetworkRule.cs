@@ -171,9 +171,9 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         }
 
         //Parse NetworkRule property DefaultAction in SDK to wrapped property PSNetworkRuleDefaultActionEnum
-        public static PSNetWorkRuleDefaultActionEnum ParsePSNetworkRuleDefaultAction(Track2Models.DefaultAction defaultAction)
+        public static PSNetWorkRuleDefaultActionEnum ParsePSNetworkRuleDefaultAction(Track2Models.StorageNetworkDefaultAction defaultAction)
         {
-            if (defaultAction == Track2Models.DefaultAction.Allow)
+            if (defaultAction == Track2Models.StorageNetworkDefaultAction.Allow)
             {
                 return PSNetWorkRuleDefaultActionEnum.Allow;
             }
@@ -184,20 +184,20 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         }
 
         //Parse wrapped property PSNetworkRuleDefaultActionEnum to NetworkRule property DefaultAction in SDK
-        public static Track2Models.DefaultAction ParseStorageNetworkRuleDefaultAction(PSNetWorkRuleDefaultActionEnum defaultAction)
+        public static Track2Models.StorageNetworkDefaultAction ParseStorageNetworkRuleDefaultAction(PSNetWorkRuleDefaultActionEnum defaultAction)
         {
             if (defaultAction == PSNetWorkRuleDefaultActionEnum.Allow)
             {
-                return Track2Models.DefaultAction.Allow;
+                return Track2Models.StorageNetworkDefaultAction.Allow;
             }
             else
             {
-                return Track2Models.DefaultAction.Deny;
+                return Track2Models.StorageNetworkDefaultAction.Deny;
             }
         }
 
         //Parse single NetworkRule IpRule in SDK to wrapped property PSIpRule
-        public static PSIpRule ParsePSNetworkRuleIPRule(Track2Models.IPRule ipRule)
+        public static PSIpRule ParsePSNetworkRuleIPRule(Track2Models.StorageAccountIPRule ipRule)
         {
             PSIpRule returnRule = new PSIpRule
             {
@@ -208,15 +208,15 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         }
 
         //Parse wrapped property PSIpRule to single NetworkRule IpRule in SDK
-        public static Track2Models.IPRule ParseStorageNetworkRuleIPRule(PSIpRule ipRule)
+        public static Track2Models.StorageAccountIPRule ParseStorageNetworkRuleIPRule(PSIpRule ipRule)
         {
-            Track2Models.IPRule returnRule = new Track2Models.IPRule(ipRule.IPAddressOrRange);
+            Track2Models.StorageAccountIPRule returnRule = new Track2Models.StorageAccountIPRule(ipRule.IPAddressOrRange);
             returnRule.Action = ParseStorageNetworkRuleAction(ipRule.Action);
             return returnRule;
         }
 
         //Parse single NetworkRule PSResourceAccessRule in SDK to wrapped property PSPSResourceAccessRule
-        public static PSResourceAccessRule ParsePSResourceAccessRule(Track2Models.ResourceAccessRule rule)
+        public static PSResourceAccessRule ParsePSResourceAccessRule(Track2Models.StorageAccountResourceAccessRule rule)
         {
             PSResourceAccessRule returnRule = new PSResourceAccessRule
             {
@@ -227,19 +227,19 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         }
 
         //Parse wrapped property PSPSResourceAccessRule to single NetworkRule PSResourceAccessRule in SDK
-        public static Track2Models.ResourceAccessRule ParseStorageResourceAccessRule(PSResourceAccessRule rule)
+        public static Track2Models.StorageAccountResourceAccessRule ParseStorageResourceAccessRule(PSResourceAccessRule rule)
         {
-            Track2Models.ResourceAccessRule returnRule =
-                new Track2Models.ResourceAccessRule
+            Track2Models.StorageAccountResourceAccessRule returnRule =
+                new Track2Models.StorageAccountResourceAccessRule
                 {
                     TenantId = rule.TenantId,
-                    ResourceId = rule.ResourceId
+                    ResourceId = new global::Azure.Core.ResourceIdentifier(rule.ResourceId)
                 };
             return returnRule;
         }
 
         //Parse single NetworkRule VirtualNetworkRule in SDK to wrapped property PSVirtualNetworkRule
-        public static PSVirtualNetworkRule ParsePSNetworkRuleVirtualNetworkRule(Track2Models.VirtualNetworkRule virtualNetworkRule)
+        public static PSVirtualNetworkRule ParsePSNetworkRuleVirtualNetworkRule(Track2Models.StorageAccountVirtualNetworkRule virtualNetworkRule)
         {
             PSVirtualNetworkRule returnRule = new PSVirtualNetworkRule();
             returnRule.Action = ParsePSNetworkRuleAction(virtualNetworkRule.Action?.ToString());
@@ -250,10 +250,10 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         }
 
         //Parse wrapped property PSVirtualNetworkRule to single NetworkRule VirtualNetworkRule in SDK
-        public static Track2Models.VirtualNetworkRule ParseStorageNetworkRuleVirtualNetworkRule(PSVirtualNetworkRule virtualNetworkRule)
+        public static Track2Models.StorageAccountVirtualNetworkRule ParseStorageNetworkRuleVirtualNetworkRule(PSVirtualNetworkRule virtualNetworkRule)
         {
-            Track2Models.VirtualNetworkRule returnRule =
-                new Track2Models.VirtualNetworkRule(virtualNetworkRule.VirtualNetworkResourceId);
+            Track2Models.StorageAccountVirtualNetworkRule returnRule =
+                new Track2Models.StorageAccountVirtualNetworkRule(new global::Azure.Core.ResourceIdentifier(virtualNetworkRule.VirtualNetworkResourceId));
             var action = ParseStorageNetworkRuleAction(virtualNetworkRule.Action);
             returnRule.Action = action != null ? action : null;
 
@@ -261,7 +261,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         }
 
         //Parse Storage NetworkRule object in SDK to wrapped PSNetworkRuleSet
-        public static PSNetworkRuleSet ParsePSNetworkRule(Track2Models.NetworkRuleSet rules)
+        public static PSNetworkRuleSet ParsePSNetworkRule(Track2Models.StorageAccountNetworkRuleSet rules)
         {
             if (rules == null)
             {
@@ -305,14 +305,14 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         }
 
         //Parse wrapped PSNetworkRuleSet to storage NetworkRule object in SDK
-        public static Track2Models.NetworkRuleSet ParseStorageNetworkRule(PSNetworkRuleSet rules)
+        public static Track2Models.StorageAccountNetworkRuleSet ParseStorageNetworkRule(PSNetworkRuleSet rules)
         {
             if (rules == null)
             {
                 return null;
             }
-            Track2Models.NetworkRuleSet returnRules =
-                new Track2Models.NetworkRuleSet(ParseStorageNetworkRuleDefaultAction(rules.DefaultAction))
+            Track2Models.StorageAccountNetworkRuleSet returnRules =
+                new Track2Models.StorageAccountNetworkRuleSet(ParseStorageNetworkRuleDefaultAction(rules.DefaultAction))
                 {
                     Bypass = ParseStorageNetworkRuleBypass(rules.Bypass)
                 };

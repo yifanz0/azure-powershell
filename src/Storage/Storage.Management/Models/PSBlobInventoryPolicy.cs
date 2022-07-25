@@ -38,13 +38,13 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             this.Type = policy.Data.ResourceType;
             this.LastModifiedTime = policy.Data.LastModifiedOn;
             this.SystemData = policy.Data.SystemData is null ? null : new PSSystemData(policy.Data.SystemData);
-            this.Enabled = policy.Data.Policy.Enabled;
+            this.Enabled = policy.Data.PolicySchema.IsEnabled;
             // TODO: Destination is currently not supported yet. Will add later. 
 
-            if (policy.Data.Policy.Rules != null)
+            if (policy.Data.PolicySchema.Rules != null)
             {
                 List<PSBlobInventoryPolicyRule> psRules = new List<PSBlobInventoryPolicyRule>();
-                foreach (Track2Models.BlobInventoryPolicyRule rule in policy.Data.Policy.Rules)
+                foreach (Track2Models.BlobInventoryPolicyRule rule in policy.Data.PolicySchema.Rules)
                 {
                     psRules.Add(new PSBlobInventoryPolicyRule(rule));
                 }
@@ -63,12 +63,12 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
             Track2Models.BlobInventoryPolicySchema policySchema = new Track2Models.BlobInventoryPolicySchema(
                 this.Enabled,
-                Track2Models.InventoryRuleType.Inventory,
+                Track2Models.BlobInventoryRuleType.Inventory,
                 invRules);
 
             Track2.BlobInventoryPolicyData data = new Track2.BlobInventoryPolicyData
             {
-                Policy = policySchema,
+                PolicySchema = policySchema,
             };
             return data;
         }
@@ -116,7 +116,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         public PSBlobInventoryPolicyRule() { }
         public PSBlobInventoryPolicyRule(Track2Models.BlobInventoryPolicyRule rule)
         {
-            this.Enabled = rule.Enabled;
+            this.Enabled = rule.IsEnabled;
             this.Name = rule.Name;
             this.Destination = rule.Destination;
             this.Definition = rule.Definition is null ? null : new PSBlobInventoryPolicyDefinition(rule.Definition);
@@ -163,9 +163,9 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         public Track2Models.BlobInventoryPolicyDefinition parseBlobInventoryPolicyDefinition()
         {
             Track2Models.BlobInventoryPolicyDefinition policyDefinition = new Track2Models.BlobInventoryPolicyDefinition(
-                new Track2Models.Format(this.Format),
-                new Track2Models.Schedule(this.Schedule),
-                new Track2Models.ObjectType(this.ObjectType),
+                new Track2Models.BlobInventoryPolicyFormat(this.Format),
+                new Track2Models.BlobInventoryPolicySchedule(this.Schedule),
+                new Track2Models.BlobInventoryPolicyObjectType(this.ObjectType),
                 this.SchemaFields is null ? null : new List<string>(this.SchemaFields)
                 );
 
@@ -223,7 +223,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
         public PSBlobInventoryPolicyFilter(Track2Models.BlobInventoryPolicyFilter filters)
         {
-            this.PrefixMatch = PSManagementPolicyRuleFilter.StringListToArray(filters.PrefixMatch);
+            this.PrefixMatch = PSManagementPolicyRuleFilter.StringListToArray(filters.IncludePrefix);
             this.BlobTypes = PSManagementPolicyRuleFilter.StringListToArray(filters.BlobTypes);
             this.IncludeBlobVersions = filters.IncludeBlobVersions;
             this.IncludeSnapshots = filters.IncludeSnapshots;
@@ -241,7 +241,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             {
                 foreach (string prefixMatch in this.PrefixMatch)
                 {
-                    policyFilter.PrefixMatch.Add(prefixMatch);
+                    policyFilter.IncludePrefix.Add(prefixMatch);
                 }
             }
             if (this.BlobTypes != null)

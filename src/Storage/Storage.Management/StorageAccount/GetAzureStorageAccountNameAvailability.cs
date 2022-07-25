@@ -17,7 +17,7 @@ using Track2Models = Azure.ResourceManager.Storage.Models;
 
 namespace Microsoft.Azure.Commands.Management.Storage.StorageAccount
 {
-    [Cmdlet("Get", ResourceManager.Common.AzureRMConstants.AzureRMPrefix + "StorageAccountNameAvailability"), OutputType(typeof(Track2Models.CheckNameAvailabilityResult))]
+    [Cmdlet("Get", ResourceManager.Common.AzureRMConstants.AzureRMPrefix + "StorageAccountNameAvailability"), OutputType(typeof(Track2Models.StorageAccountNameAvailabilityResult))]
     public class GetAzureStorageAccountNameAvailability : StorageAccountBaseCmdlet
     {
         [Parameter(

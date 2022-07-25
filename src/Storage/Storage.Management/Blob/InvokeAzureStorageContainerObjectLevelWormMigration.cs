@@ -112,14 +112,20 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     default:
                         break;
                 }
-                this.StorageClient.BlobContainers.ObjectLevelWorm(
-                      this.ResourceGroupName,
-                      this.StorageAccountName,
-                      this.Name);
-                var container = this.StorageClient.BlobContainers.Get(
-                           this.ResourceGroupName,
-                           this.StorageAccountName,
-                           this.Name);
+                //this.StorageClient.BlobContainers.ObjectLevelWorm(
+                //      this.ResourceGroupName,
+                //      this.StorageAccountName,
+                //      this.Name);
+
+                this.StorageClientTrack2.GetBlobContainerResource(this.ResourceGroupName, this.StorageAccountName, this.Name)
+                    .EnableObjectLevelWorm(global::Azure.WaitUntil.Completed);
+
+                var container = this.StorageClientTrack2.GetBlobContainerResource(this.ResourceGroupName, this.StorageAccountName, this.Name).Get();
+
+                //var container = this.StorageClient.BlobContainers.Get(
+                //           this.ResourceGroupName,
+                //           this.StorageAccountName,
+                //           this.Name);
                 WriteObject(new PSContainer(container));
             }
         }

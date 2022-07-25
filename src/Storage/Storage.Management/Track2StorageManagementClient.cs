@@ -55,7 +55,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
         /// <summary>
         /// Check if a storage account name is available
         /// </summary>
-        public CheckNameAvailabilityResult CheckNameAvailability(StorageAccountNameAvailabilityContent content) =>
+        public StorageAccountNameAvailabilityResult CheckNameAvailability(StorageAccountNameAvailabilityContent content) =>
             GetSubscription(_subscription).CheckStorageAccountNameAvailability(content);
 
         /// <summary>
@@ -108,8 +108,8 @@ namespace Microsoft.Azure.Commands.Management.Storage
         /// <summary>
         /// Get management policy resource
         /// </summary>
-        public Track2.ManagementPolicyResource GetManagementPolicyResource(string resourceGroupName, string storageAccountName, string policyName) =>
-            _armClient.GetManagementPolicyResource(Track2.ManagementPolicyResource.CreateResourceIdentifier(_subscription, resourceGroupName, storageAccountName, policyName));
+        public Track2.StorageAccountManagementPolicyResource GetManagementPolicyResource(string resourceGroupName, string storageAccountName, string policyName) =>
+            _armClient.GetStorageAccountManagementPolicyResource(Track2.StorageAccountManagementPolicyResource.CreateResourceIdentifier(_subscription, resourceGroupName, storageAccountName, policyName));
 
         /// <summary>
         /// Get BlobServiceResource with subscription, resource group name, and storage account name

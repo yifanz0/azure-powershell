@@ -164,9 +164,9 @@ namespace Microsoft.Azure.Commands.Management.Storage
                 }
                 if (enableChangeFeed != null)
                 {
-                    data.ChangeFeed = new Track2Models.ChangeFeed
+                    data.ChangeFeed = new Track2Models.BlobServiceChangeFeed
                     {
-                        Enabled = this.enableChangeFeed
+                        IsEnabled= this.enableChangeFeed
                     };
                     if (this.changeFeedRetentionInDays != null)
                     {

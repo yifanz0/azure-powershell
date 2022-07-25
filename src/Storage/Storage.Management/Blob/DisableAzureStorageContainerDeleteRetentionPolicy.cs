@@ -106,7 +106,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
 
                 data.ContainerDeleteRetentionPolicy = new Track2Models.DeleteRetentionPolicy
                 {
-                    Enabled = false,
+                    IsEnabled = false,
                     Days = null,
                 };
 

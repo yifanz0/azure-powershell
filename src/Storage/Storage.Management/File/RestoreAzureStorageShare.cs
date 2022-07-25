@@ -14,12 +14,9 @@
 
 using Microsoft.Azure.Commands.Management.Storage.Models;
 using Microsoft.Azure.Management.Internal.Resources.Utilities.Models;
-using Microsoft.Azure.Management.Storage;
-using Microsoft.Azure.Management.Storage.Models;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Management.Automation;
+using Track2Models = Azure.ResourceManager.Storage.Models;
 
 namespace Microsoft.Azure.Commands.Management.Storage
 {
@@ -124,19 +121,13 @@ namespace Microsoft.Azure.Commands.Management.Storage
 
             if (ShouldProcess(this.Name, "Restore Share"))
             {
-                this.StorageClient.FileShares.Restore(
-                                    this.ResourceGroupName,
-                                    this.StorageAccountName,
-                                    this.Name,
-                                    this.Name,
-                                    this.DeletedShareVersion);
+                Track2Models.DeletedShare deletedShare = new Track2Models.DeletedShare(this.Name, this.DeletedShareVersion);
 
+                this.StorageClientTrack2.GetFileShareResource(this.ResourceGroupName, this.StorageAccountName, this.Name)
+                    .Restore(deletedShare);
 
-                var Share = this.StorageClient.FileShares.Get(
-                           this.ResourceGroupName,
-                           this.StorageAccountName,
-                           this.Name);
-                WriteObject(new PSShare(Share));
+                var share = this.StorageClientTrack2.GetFileShareResource(this.ResourceGroupName, this.StorageAccountName, this.Name).Get();
+                WriteObject(new PSShare(share));
             }
         }
     }

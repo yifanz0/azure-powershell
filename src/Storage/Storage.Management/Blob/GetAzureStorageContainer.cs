@@ -12,6 +12,9 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
+using Track2 = Azure.ResourceManager.Storage;
+using Track2Models = Azure.ResourceManager.Storage.Models;
+
 using Microsoft.Azure.Commands.Management.Storage.Models;
 using Microsoft.Azure.Management.Storage;
 using Microsoft.Azure.Management.Storage.Models;
@@ -19,6 +22,7 @@ using Microsoft.Rest.Azure;
 using System;
 using System.Collections.Generic;
 using System.Management.Automation;
+using Azure;
 
 namespace Microsoft.Azure.Commands.Management.Storage
 {
@@ -92,24 +96,46 @@ namespace Microsoft.Azure.Commands.Management.Storage
                 {
                     WriteWarning("Can't get single deleted container, so -IncludeDeleted will be omit when get single container with -Name.");
                 }
-                var container = this.StorageClient.BlobContainers.Get(
-                           this.ResourceGroupName,
-                           this.StorageAccountName,
-                           this.Name);
-                WriteObject(new PSContainer(container));
+
+                Track2.BlobContainerResource blobContainerResource = this.StorageClientTrack2
+                    .GetBlobContainerResource(this.ResourceGroupName, this.StorageAccountName, this.Name).Get().Value;
+
+                //var container = this.StorageClient.BlobContainers.Get(
+                //           this.ResourceGroupName,
+                //           this.StorageAccountName,
+                //           this.Name);
+                //WriteObject(new PSContainer(container));
+                WriteObject(new PSContainer(blobContainerResource));
             }
             else
             {
-                IPage<ListContainerItem> containerlistResult = this.StorageClient.BlobContainers.List(
-                               this.ResourceGroupName,
-                               this.StorageAccountName, 
-                               include: IncludeDeleted.IsPresent ? ListContainersInclude.Deleted : null);
-                WriteContainerList(containerlistResult);
-                while (containerlistResult.NextPageLink != null)
+
+                Pageable<Track2.BlobContainerResource> containerList = this.StorageClientTrack2.GetBlobServiceResource(this.ResourceGroupName, this.StorageAccountName)
+                    .GetBlobContainers()
+                    .GetAll(include: IncludeDeleted.IsPresent ? ListContainersInclude.Deleted : null);
+
+                if (containerList != null)
                 {
-                    containerlistResult = this.StorageClient.BlobContainers.ListNext(containerlistResult.NextPageLink);
-                    WriteContainerList(containerlistResult);
+                    List<PSContainer> output = new List<PSContainer>();
+                    foreach (Track2.BlobContainerResource container in containerList)
+                    {
+                        output.Add(new PSContainer(container));
+                    }
+                    WriteObject(output, true);
                 }
+                
+
+
+                //IPage<ListContainerItem> containerlistResult = this.StorageClient.BlobContainers.List(
+                //               this.ResourceGroupName,
+                //               this.StorageAccountName, 
+                //               include: IncludeDeleted.IsPresent ? ListContainersInclude.Deleted : null);
+                //WriteContainerList(containerlistResult);
+                //while (containerlistResult.NextPageLink != null)
+                //{
+                //    containerlistResult = this.StorageClient.BlobContainers.ListNext(containerlistResult.NextPageLink);
+                //    WriteContainerList(containerlistResult);
+                //}
             }
         }
     }

@@ -19,6 +19,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Management.Automation;
+using Azure.ResourceManager.Storage;
+using Azure.ResourceManager.Storage.Models;
 
 namespace Microsoft.Azure.Commands.Management.Storage
 {
@@ -111,12 +113,22 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     break;
             }
 
-            ImmutabilityPolicy policy= 
-            this.StorageClient.BlobContainers.GetImmutabilityPolicy(
-                        this.ResourceGroupName,
-                        this.StorageAccountName,
-                        this.ContainerName,
-                        Etag);
+            //ImmutabilityPolicy policy= 
+            //this.StorageClient.BlobContainers.GetImmutabilityPolicy(
+            //            this.ResourceGroupName,
+            //            this.StorageAccountName,
+            //            this.ContainerName,
+            //            Etag);
+
+            //ImmutabilityPolicyResource policy = this.StorageClientTrack2.GetImmutabilityPolicy(
+            //    this.ResourceGroupName,
+            //    this.StorageAccountName,
+            //    this.ContainerName,
+            //    this.Etag);
+
+            ImmutabilityPolicyResource policy = this.StorageClientTrack2.GetImmutabilityPolicyResource(
+                this.ResourceGroupName, this.StorageAccountName, this.ContainerName).Get(new global::Azure.ETag(this.Etag)).Value;
+
 
             WriteObject(new PSImmutabilityPolicy(policy));
         }

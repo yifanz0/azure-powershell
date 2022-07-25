@@ -191,7 +191,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
                 Track2.EncryptionScopeData data = new Track2.EncryptionScopeData();
                 if (this.KeyvaultEncryption.IsPresent)
                 {
-                    data.Source = Track2Models.EncryptionScopeSource.MicrosoftKeyVault;
+                    data.Source = Track2Models.EncryptionScopeSource.KeyVault;
                     data.KeyVaultProperties = new Track2Models.EncryptionScopeKeyVaultProperties
                     {
                         KeyUri = new Uri(this.KeyUri)
@@ -199,7 +199,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
                 }
                 if (this.StorageEncryption.IsPresent)
                 {
-                    data.Source = Track2Models.EncryptionScopeSource.MicrosoftStorage;
+                    data.Source = Track2Models.EncryptionScopeSource.Storage;
                 }
 
                 if (this.State != null)

@@ -117,10 +117,12 @@ namespace Microsoft.Azure.Commands.Management.Storage
                 }
                 if (Force.IsPresent || ShouldContinue(String.Format("Remove container and all blobs in it: {0}", this.Name), ""))
                 {
-                    this.StorageClient.BlobContainers.Delete(
-                       this.ResourceGroupName,
-                       this.StorageAccountName,
-                       this.Name);
+                    //this.StorageClient.BlobContainers.Delete(
+                    //   this.ResourceGroupName,
+                    //   this.StorageAccountName,
+                    //   this.Name);
+
+                    this.StorageClientTrack2.GetBlobContainerResource(this.ResourceGroupName, this.StorageAccountName, this.Name).Delete(global::Azure.WaitUntil.Completed);
 
                     if (PassThru.IsPresent)
                     {

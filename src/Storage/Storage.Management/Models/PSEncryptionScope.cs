@@ -35,7 +35,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             this.Name = scope.Data.Name;
             this.Type = scope.Data.ResourceType;
             this.LastModifiedTime = scope.Data.LastModifiedOn;
-            this.CreationTime = scope.Data.CreationOn;
+            this.CreationTime = scope.Data.CreatedOn;
             this.Source = scope.Data.Source.ToString();
             this.State = scope.Data.State.ToString();
             this.KeyVaultProperties = scope.Data.KeyVaultProperties is null ? null : new PSEncryptionScopeKeyVaultProperties(scope.Data.KeyVaultProperties);

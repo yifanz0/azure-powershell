@@ -187,41 +187,43 @@ namespace Microsoft.Azure.Commands.Management.Storage
         }
 
 
-        protected static Track2Models.AccessTier ParseAccessTier(string accessTier)
+        protected static Track2Models.StorageAccountAccessTier ParseAccessTier(string accessTier)
         {
-            Track2Models.AccessTier returnAccessTier;
-            if (!Enum.TryParse<Track2Models.AccessTier>(accessTier, true, out returnAccessTier))
+            Track2Models.StorageAccountAccessTier returnAccessTier;
+            if (!Enum.TryParse<Track2Models.StorageAccountAccessTier>(accessTier, true, out returnAccessTier))
             {
                 throw new ArgumentOutOfRangeException("AccessTier");
             }
             return returnAccessTier;
         }
 
-        protected static Track2Models.Encryption ParseEncryption(bool storageEncryption = false, bool keyVaultEncryption = false, string keyName = null, string keyVersion = null, string keyVaultUri = null)
+        protected static Track2Models.StorageAccountEncryption ParseEncryption(bool storageEncryption = false, bool keyVaultEncryption = false, string keyName = null, string keyVersion = null, string keyVaultUri = null)
         {
-            Track2Models.Encryption accountEncryption = new Track2Models.Encryption();
+            Track2Models.StorageAccountEncryption accountEncryption = new Track2Models.StorageAccountEncryption();
 
             if (storageEncryption)
             {
-                accountEncryption.KeySource = Track2Models.KeySource.MicrosoftStorage;
+                accountEncryption.KeySource = Track2Models.StorageAccountKeySource.Storage;
             }
             if (keyVaultEncryption)
             {
-                accountEncryption.KeySource = Track2Models.KeySource.MicrosoftKeyvault;
-                accountEncryption.KeyVaultProperties = new Track2Models.KeyVaultProperties();
-                accountEncryption.KeyVaultProperties.KeyName = keyName;
-                accountEncryption.KeyVaultProperties.KeyVersion = keyVersion;
-                accountEncryption.KeyVaultProperties.KeyVaultUri = new Uri(keyVaultUri);
+                accountEncryption.KeySource = Track2Models.StorageAccountKeySource.KeyVault;
+                accountEncryption.KeyVaultProperties = new Track2Models.StorageAccountKeyVaultProperties
+                {
+                    KeyName = keyName,
+                    KeyVersion = keyVersion,
+                    KeyVaultUri = new Uri(keyVaultUri)
+                };
             }
             return accountEncryption;
         }
 
         public static CloudStorageAccount GetCloudStorageAccount(Track2.StorageAccountResource storageAccountResource)
         {
-            Uri blobEndpoint = storageAccountResource.Data.PrimaryEndpoints.Blob != null ? new Uri(storageAccountResource.Data.PrimaryEndpoints.Blob) : null;
-            Uri queueEndpoint = storageAccountResource.Data.PrimaryEndpoints.Queue != null ? new Uri(storageAccountResource.Data.PrimaryEndpoints.Queue) : null;
-            Uri tableEndpoint = storageAccountResource.Data.PrimaryEndpoints.Table != null ? new Uri(storageAccountResource.Data.PrimaryEndpoints.Table) : null;
-            Uri fileEndpoint = storageAccountResource.Data.PrimaryEndpoints.File != null ? new Uri(storageAccountResource.Data.PrimaryEndpoints.File) : null;
+            Uri blobEndpoint = storageAccountResource.Data.PrimaryEndpoints.BlobUri ?? null;
+            Uri queueEndpoint = storageAccountResource.Data.PrimaryEndpoints.QueueUri ?? null;
+            Uri tableEndpoint = storageAccountResource.Data.PrimaryEndpoints.TableUri ?? null;
+            Uri fileEndpoint = storageAccountResource.Data.PrimaryEndpoints.FileUri ?? null;
             string key = null;
             if (storageAccountResource.GetKeys()?.Value?.Keys != null && storageAccountResource.GetKeys().Value.Keys.Count > 0)
             {

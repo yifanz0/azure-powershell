@@ -134,11 +134,11 @@ namespace Microsoft.Azure.Commands.Management.Storage
             {
                 Track2.StorageAccountResource storageAccount = this.StorageClientTrack2
                     .GetStorageAccount(this.ResourceGroupName, this.Name).Get();
-                Track2Models.NetworkRuleSet storageACL = storageAccount.Data.NetworkRuleSet;
+                Track2Models.StorageAccountNetworkRuleSet storageACL = storageAccount.Data.NetworkRuleSet;
 
                 if (storageACL == null)
                 {
-                    storageACL = new Track2Models.NetworkRuleSet(Track2Models.DefaultAction.Allow);
+                    storageACL = new Track2Models.StorageAccountNetworkRuleSet(Track2Models.StorageNetworkDefaultAction.Allow);
                 }
                 bool ruleChanged = false;
 
@@ -148,9 +148,9 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         foreach (string s in VirtualNetworkResourceId)
                         {
                             bool ruleExist = false;
-                            foreach (Track2Models.VirtualNetworkRule originRule in storageACL.VirtualNetworkRules)
+                            foreach (Track2Models.StorageAccountVirtualNetworkRule originRule in storageACL.VirtualNetworkRules)
                             {
-                                if (originRule.VirtualNetworkResourceId.Equals(s, System.StringComparison.InvariantCultureIgnoreCase))
+                                if (originRule.VirtualNetworkResourceId.ToString().Equals(s, System.StringComparison.InvariantCultureIgnoreCase))
                                 {
                                     ruleExist = true;
                                     WriteDebug(string.Format("Skip add VirtualNetworkRule as it already exist: {0}", s));
@@ -159,7 +159,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
                             }
                             if (!ruleExist)
                             {
-                                Track2Models.VirtualNetworkRule rule = new Track2Models.VirtualNetworkRule(s);
+                                Track2Models.StorageAccountVirtualNetworkRule rule = new Track2Models.StorageAccountVirtualNetworkRule(new global::Azure.Core.ResourceIdentifier(s));
                                 storageACL.VirtualNetworkRules.Add(rule);
                                 ruleChanged = true;
                             }
@@ -169,7 +169,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         foreach (string s in IPAddressOrRange)
                         {
                             bool ruleExist = false;
-                            foreach (Track2Models.IPRule originRule in storageACL.IPRules)
+                            foreach (Track2Models.StorageAccountIPRule originRule in storageACL.IPRules)
                             {
                                 if (originRule.IPAddressOrRange.Equals(s, System.StringComparison.InvariantCultureIgnoreCase))
                                 {
@@ -180,7 +180,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
                             }
                             if (!ruleExist)
                             {
-                                Track2Models.IPRule rule = new Track2Models.IPRule(s);
+                                Track2Models.StorageAccountIPRule rule = new Track2Models.StorageAccountIPRule(s);
                                 storageACL.IPRules.Add(rule);
                                 ruleChanged = true;
                             }
@@ -188,10 +188,10 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         break;
                     case ResourceAccessRuleStringParameterSet:
                         bool ResourceAccessruleExist = false;
-                        foreach (Track2Models.ResourceAccessRule originRule in storageACL.ResourceAccessRules)
+                        foreach (Track2Models.StorageAccountResourceAccessRule originRule in storageACL.ResourceAccessRules)
                         {
                             if (originRule.TenantId.Equals(this.TenantId)
-                            && originRule.ResourceId.Equals(this.ResourceId, System.StringComparison.InvariantCultureIgnoreCase))
+                            && originRule.ResourceId.ToString().Equals(this.ResourceId.ToString(), System.StringComparison.InvariantCultureIgnoreCase))
                             {
                                 ResourceAccessruleExist = true;
                                 WriteDebug(string.Format("Skip add ResourceAccessRule as it already exist, TenantId: {0}, ResourceId: {1}", this.TenantId, this.ResourceId));
@@ -200,9 +200,9 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         }
                         if (!ResourceAccessruleExist)
                         {
-                            Track2Models.ResourceAccessRule rule = new Track2Models.ResourceAccessRule{
+                            Track2Models.StorageAccountResourceAccessRule rule = new Track2Models.StorageAccountResourceAccessRule{
                                 TenantId = this.TenantId,
-                                ResourceId = this.ResourceId,
+                                ResourceId = new global::Azure.Core.ResourceIdentifier(this.ResourceId),
                             };
                             storageACL.ResourceAccessRules.Add(rule);
                             ruleChanged = true;
@@ -212,9 +212,9 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         foreach (PSVirtualNetworkRule rule in VirtualNetworkRule)
                         {
                             bool ruleExist = false;
-                            foreach (Track2Models.VirtualNetworkRule originRule in storageACL.VirtualNetworkRules)
+                            foreach (Track2Models.StorageAccountVirtualNetworkRule originRule in storageACL.VirtualNetworkRules)
                             {
-                                if (originRule.VirtualNetworkResourceId.Equals(rule.VirtualNetworkResourceId, System.StringComparison.InvariantCultureIgnoreCase))
+                                if (originRule.VirtualNetworkResourceId.ToString().Equals(rule.VirtualNetworkResourceId.ToString(), System.StringComparison.InvariantCultureIgnoreCase))
                                 {
                                     ruleExist = true;
                                     WriteDebug(string.Format("Skip add IPAddressOrRange as it already exist: {0}", rule.VirtualNetworkResourceId));
@@ -232,10 +232,10 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         foreach (PSResourceAccessRule rule in ResourceAccessRule)
                         {
                             bool ruleExist = false;
-                            foreach (Track2Models.ResourceAccessRule originRule in storageACL.ResourceAccessRules)
+                            foreach (Track2Models.StorageAccountResourceAccessRule originRule in storageACL.ResourceAccessRules)
                             {
                                 if (originRule.TenantId.Equals(rule.TenantId)
-                                && originRule.ResourceId.Equals(rule.ResourceId, System.StringComparison.InvariantCultureIgnoreCase))
+                                && originRule.ResourceId.ToString().Equals(rule.ResourceId.ToString(), System.StringComparison.InvariantCultureIgnoreCase))
                                 {
                                     ruleExist = true;
                                     WriteDebug(string.Format("Skip add ResourceAccessRule as it already exist, TenantId: {0}, ResourceId: {1}", rule.TenantId, rule.ResourceId));
@@ -254,7 +254,7 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         foreach (PSIpRule rule in IPRule)
                         {
                             bool ruleExist = false;
-                            foreach (Track2Models.IPRule originRule in storageACL.IPRules)
+                            foreach (Track2Models.StorageAccountIPRule originRule in storageACL.IPRules)
                             {
                                 if (originRule.IPAddressOrRange.Equals(rule.IPAddressOrRange, System.StringComparison.InvariantCultureIgnoreCase))
                                 {

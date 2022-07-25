@@ -18,7 +18,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 {
     public class PSAzureFilesIdentityBasedAuthentication
     {
-        public PSAzureFilesIdentityBasedAuthentication(Track2Models.AzureFilesIdentityBasedAuthentication auth)
+        public PSAzureFilesIdentityBasedAuthentication(Track2Models.FilesIdentityBasedAuthentication auth)
         {
             if (auth != null)
             {
@@ -35,14 +35,14 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
     public class PSActiveDirectoryProperties
     {
-        public PSActiveDirectoryProperties(Track2Models.ActiveDirectoryProperties properties)
+        public PSActiveDirectoryProperties(Track2Models.StorageActiveDirectoryProperties properties)
         {
             if (properties != null)
             {
                 this.DomainName = properties.DomainName;
                 this.NetBiosDomainName = properties.NetBiosDomainName;
                 this.ForestName = properties.ForestName;
-                this.DomainGuid = properties.DomainGuid;
+                this.DomainGuid = properties.DomainGuid.ToString();
                 this.DomainSid = properties.DomainSid;
                 this.AzureStorageSid = properties.AzureStorageSid;
                 this.SamAccountName = properties.SamAccountName;

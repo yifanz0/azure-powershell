@@ -14,8 +14,7 @@
 
 using Microsoft.Azure.Commands.Management.Storage.Models;
 using Microsoft.Azure.Commands.ResourceManager.Common;
-using Microsoft.Azure.Management.Storage;
-using Microsoft.Azure.Management.Storage.Models;
+//using Microsoft.Azure.Management.Storage;
 using Microsoft.WindowsAzure.Commands.Utilities.Common;
 using System;
 using System.Collections;
@@ -24,9 +23,7 @@ using System.Collections.Generic;
 namespace Microsoft.Azure.Commands.Management.Storage
 {
     public abstract class StorageFileBaseCmdlet : AzureRMCmdlet
-    {
-        private StorageManagementClientWrapper storageClientWrapper;
-        
+    {   
         protected const string AccountNameAlias = "AccountName";
         protected const string NameAlias = "Name";
 
@@ -130,25 +127,6 @@ namespace Microsoft.Azure.Commands.Management.Storage
             return returnValue;
         }
 
-        public IStorageManagementClient StorageClient
-        {
-            get
-            {
-                if (storageClientWrapper == null)
-                {
-                    storageClientWrapper = new StorageManagementClientWrapper(DefaultProfile.DefaultContext)
-                    {
-                        VerboseLogger = WriteVerboseWithTimestamp,
-                        ErrorLogger = WriteErrorWithTimestamp
-                    };
-                }
-
-                return storageClientWrapper.StorageManagementClient;
-            }
-
-            set { storageClientWrapper = new StorageManagementClientWrapper(value); }
-        }
-
         private Track2StorageManagementClient _track2StorageManagementClient;
         public Track2StorageManagementClient StorageClientTrack2
         {
@@ -167,16 +145,6 @@ namespace Microsoft.Azure.Commands.Management.Storage
             get
             {
                 return DefaultProfile.DefaultContext.Subscription.Id.ToString();
-            }
-        }
-
-        protected void WriteShareList(IEnumerable<FileShareItem> shares)
-        {
-            if (shares != null)
-            {
-                List<PSShare> output = new List<PSShare>();
-                shares.ForEach(share => output.Add(new PSShare(share)));
-                WriteObject(output, true);
             }
         }
 

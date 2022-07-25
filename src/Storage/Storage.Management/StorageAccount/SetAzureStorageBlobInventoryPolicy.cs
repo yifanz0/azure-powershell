@@ -194,20 +194,20 @@ namespace Microsoft.Azure.Commands.Management.Storage
                     case AccountNamePolicyRuleParameterSet:
                     case AccountResourceIdPolicyRuleParameterSet:
                         Track2.BlobInventoryPolicyData data = new Track2.BlobInventoryPolicyData();
-                        data.Policy = new Track2Models.BlobInventoryPolicySchema(
+                        data.PolicySchema = new Track2Models.BlobInventoryPolicySchema(
                             !(this.Disabled.IsPresent),
-                            Track2Models.InventoryRuleType.Inventory,
+                            Track2Models.BlobInventoryRuleType.Inventory,
                             PSBlobInventoryPolicy.ParseBlobInventoryPolicyRules(this.Rule));
                         blobInventoryPolicyResource = this.StorageClientTrack2
                             .GetBlobInventoryPolicyResource(this.ResourceGroupName, this.StorageAccountName, DefaultPolicyName)
-                            .Update(WaitUntil.Completed, data).Value;
+                            .CreateOrUpdate(WaitUntil.Completed, data).Value;
                         break;
                     case AccountObjectPolicyObjectParameterSet:
                     case AccountNamePolicyObjectParameterSet:
                     case AccountResourceIdPolicyObjectParameterSet:
                         blobInventoryPolicyResource = this.StorageClientTrack2
                             .GetBlobInventoryPolicyResource(this.ResourceGroupName, this.StorageAccountName, DefaultPolicyName)
-                            .Update(WaitUntil.Completed, this.Policy.ParseBlobInventoryPolicy()).Value;
+                            .CreateOrUpdate(WaitUntil.Completed, this.Policy.ParseBlobInventoryPolicy()).Value;
                         break;
                     default:
                         throw new PSArgumentException(string.Format(CultureInfo.InvariantCulture, "Invalid ParameterSet: {0}", this.ParameterSetName));

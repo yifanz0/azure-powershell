@@ -15,12 +15,15 @@
 using Microsoft.Azure.Commands.Management.Storage.Models;
 using Microsoft.Azure.Commands.ResourceManager.Common.ArgumentCompleters;
 using Microsoft.Azure.Management.Internal.Resources.Utilities.Models;
-using Microsoft.Azure.Management.Storage;
-using Microsoft.Azure.Management.Storage.Models;
+//using Microsoft.Azure.Management.Storage;
+//using Microsoft.Azure.Management.Storage.Models;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Management.Automation;
+using Track2 = Azure.ResourceManager.Storage;
+using Track2Models = Azure.ResourceManager.Storage.Models;
 
 namespace Microsoft.Azure.Commands.Management.Storage
 {
@@ -178,17 +181,37 @@ namespace Microsoft.Azure.Commands.Management.Storage
             {
                 Dictionary<string, string> MetadataDictionary = CreateMetadataDictionary(Metadata, validate: true);
 
-                var Share = this.StorageClient.FileShares.Update(
-                                    this.ResourceGroupName,
-                                    this.StorageAccountName,
-                                    this.Name,
-                                    new FileShare(
-                                        metadata: MetadataDictionary,
-                                        shareQuota: shareQuota,
-                                        rootSquash: this.RootSquash,
-                                        accessTier: accessTier));
+                Track2.FileShareData data = new Track2.FileShareData();
+                if (MetadataDictionary != null)
+                {
+                    if (MetadataDictionary.Count == 0)
+                    {
+                        data.Metadata.Clear();
+                    } else
+                    {
+                        foreach (KeyValuePair<string, string> kvp in MetadataDictionary)
+                        {
+                            data.Metadata.Add(kvp.Key, kvp.Value);
+                        }
+                    }
+                }
 
-                WriteObject(new PSShare(Share));
+                data.ShareQuota = this.shareQuota;
+
+                if (this.RootSquash != null)
+                {
+                    data.RootSquash = new Track2Models.RootSquashType(this.RootSquash);
+                }
+                if (this.accessTier != null)
+                {
+                    data.AccessTier = new Track2Models.FileShareAccessTier(this.AccessTier);
+                }
+
+                Track2.FileShareResource share = this.StorageClientTrack2
+                    .GetFileShareResource(this.ResourceGroupName, this.StorageAccountName, this.Name)
+                    .Update(data);
+
+                WriteObject(new PSShare(share));
             }
         }
     }

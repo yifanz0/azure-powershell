@@ -12,7 +12,6 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
-using Azure.ResourceManager.Storage.Models;
 using Microsoft.WindowsAzure.Commands.Common.Attributes;
 using System;
 using System.Collections.Generic;
@@ -29,13 +28,13 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         public PSManagementPolicy()
         { }
 
-        public PSManagementPolicy(Track2.ManagementPolicyResource policyResource, string resourceGroupName, string storageAccountName)
+        public PSManagementPolicy(Track2.StorageAccountManagementPolicyResource policyResource, string resourceGroupName, string storageAccountName)
         {
             this.ResourceGroupName = resourceGroupName;
             this.StorageAccountName = storageAccountName;
             this.Id = policyResource.Id;
             this.Name = policyResource.Data.Name;
-            this.Type = Track2.ManagementPolicyResource.ResourceType.ToString();
+            this.Type = Track2.StorageAccountManagementPolicyResource.ResourceType.ToString();
             this.LastModifiedTime = policyResource.Data.LastModifiedOn;
             this.Rules = PSManagementPolicyRule.GetPSManagementPolicyRules(policyResource.Data.Rules);
         }
@@ -70,7 +69,7 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
 
         public PSManagementPolicyRule(Track2Models.ManagementPolicyRule rule)
         {
-            this.Enabled = rule.Enabled;
+            this.Enabled = rule.IsEnabled;
             this.Name = rule.Name;
             this.Definition = rule.Definition is null ? null : new PSManagementPolicyDefinition(rule.Definition);
         }
@@ -79,10 +78,10 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
         {
             Track2Models.ManagementPolicyRule rule = new Track2Models.ManagementPolicyRule(
                 this.Name,
-                RuleType.Lifecycle,
+                Track2Models.ManagementPolicyRuleType.Lifecycle,
                 this.Definition?.ParseManagementPolicyDefination()
                 );
-            rule.Enabled = this.Enabled;
+            rule.IsEnabled = this.Enabled;
             return rule;
         }
 
@@ -323,15 +322,15 @@ namespace Microsoft.Azure.Commands.Management.Storage.Models
             Track2Models.ManagementPolicyVersion policyVersion = new Track2Models.ManagementPolicyVersion();
             if (this.Delete != null)
             {
-                policyVersion.Delete = new DateAfterCreation(this.Delete.DaysAfterCreationGreaterThan);
+                policyVersion.Delete = new Track2Models.DateAfterCreation(this.Delete.DaysAfterCreationGreaterThan);
             }
             if (this.TierToCool != null)
             {
-                policyVersion.TierToCool = new DateAfterCreation(this.TierToCool.DaysAfterCreationGreaterThan);
+                policyVersion.TierToCool = new Track2Models.DateAfterCreation(this.TierToCool.DaysAfterCreationGreaterThan);
             }
             if (this.TierToArchive != null)
             {
-                policyVersion.TierToArchive = new DateAfterCreation(this.TierToArchive.DaysAfterCreationGreaterThan);
+                policyVersion.TierToArchive = new Track2Models.DateAfterCreation(this.TierToArchive.DaysAfterCreationGreaterThan);
             }
 
             return policyVersion;

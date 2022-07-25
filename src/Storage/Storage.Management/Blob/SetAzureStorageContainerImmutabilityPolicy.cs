@@ -12,6 +12,7 @@
 // limitations under the License.
 // ----------------------------------------------------------------------------------
 
+using Azure.ResourceManager.Storage;
 using Microsoft.Azure.Commands.Management.Storage.Models;
 using Microsoft.Azure.Management.Storage;
 using Microsoft.Azure.Management.Storage.Models;
@@ -19,6 +20,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Management.Automation;
+using Azure;
 
 namespace Microsoft.Azure.Commands.Management.Storage
 {
@@ -272,28 +274,63 @@ namespace Microsoft.Azure.Commands.Management.Storage
                         break;
                 }
 
-                ImmutabilityPolicy policy;
+                //ImmutabilityPolicy policy;
+
+                ImmutabilityPolicyResource policy;
+
                 if (!ExtendPolicy.IsPresent)
                 {
-                    policy = this.StorageClient.BlobContainers.CreateOrUpdateImmutabilityPolicy(
-                                this.ResourceGroupName,
-                                this.StorageAccountName,
-                                this.ContainerName,
-                                new ImmutabilityPolicy(
-                                    immutabilityPeriodSinceCreationInDays: immutabilityPeriod,
-                                    allowProtectedAppendWrites: this.allowProtectedAppendWrite,
-                                    allowProtectedAppendWritesAll: this.allowProtectedAppendWriteAll),
-                                this.Etag);
+
+                    //policy = this.StorageClient.BlobContainers.CreateOrUpdateImmutabilityPolicy(
+                    //            this.ResourceGroupName,
+                    //            this.StorageAccountName,
+                    //            this.ContainerName,
+                    //            new ImmutabilityPolicy(
+                    //                immutabilityPeriodSinceCreationInDays: immutabilityPeriod,
+                    //                allowProtectedAppendWrites: this.allowProtectedAppendWrite,
+                    //                allowProtectedAppendWritesAll: this.allowProtectedAppendWriteAll),
+                    //            this.Etag);
+
+                    ImmutabilityPolicyData data = new ImmutabilityPolicyData
+                    {
+                        ImmutabilityPeriodSinceCreationInDays = this.immutabilityPeriod,
+                        AllowProtectedAppendWrites = this.allowProtectedAppendWrite,
+                        AllowProtectedAppendWritesAll = this.allowProtectedAppendWriteAll,
+                    };
+
+
+                    policy = this.StorageClientTrack2.GetImmutabilityPolicyResource(this.ResourceGroupName, this.StorageAccountName, this.ContainerName)
+                        .CreateOrUpdate(WaitUntil.Completed, data, new ETag(this.Etag)).Value;
+
+
+
+
                 }
                 else
                 {
-                    policy = this.StorageClient.BlobContainers.ExtendImmutabilityPolicy(
-                                this.ResourceGroupName,
-                                this.StorageAccountName,
-                                this.ContainerName,
-                                this.Etag,
-                                new ImmutabilityPolicy(
-                                    immutabilityPeriodSinceCreationInDays: immutabilityPeriod));
+                    //policy = this.StorageClient.BlobContainers.ExtendImmutabilityPolicy(
+                    //            this.ResourceGroupName,
+                    //            this.StorageAccountName,
+                    //            this.ContainerName,
+                    //            this.Etag,
+                    //            new ImmutabilityPolicy(
+                    //                immutabilityPeriodSinceCreationInDays: immutabilityPeriod));
+
+                    ImmutabilityPolicyData data = new ImmutabilityPolicyData
+                    {
+                        ImmutabilityPeriodSinceCreationInDays = this.ImmutabilityPeriod,
+                    };
+
+                    //policy = this.StorageClientTrack2.ExtendImmutabilityPolicy(
+                    //    this.ResourceGroupName,
+                    //    this.StorageAccountName,
+                    //    this.ContainerName,
+                    //    data,
+                    //    this.Etag);
+
+                    policy = this.StorageClientTrack2.GetImmutabilityPolicyResource(this.ResourceGroupName, this.StorageAccountName, this.ContainerName)
+                        .ExtendImmutabilityPolicy(new ETag(this.Etag), data);
+
                 }
                 WriteObject(new PSImmutabilityPolicy(policy));
             }
