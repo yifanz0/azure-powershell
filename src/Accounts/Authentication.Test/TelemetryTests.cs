@@ -113,6 +113,7 @@ namespace Common.Authentication.Test
 
         [Fact(Skip = "Intermittent failures. Investigation needed.")]
         [Trait(Category.AcceptanceType, Category.CheckIn)]
+        [Obsolete]
         public void DataCollectionHandlesSerializationErrors()
         {
             TestExecutionHelpers.SetUpSessionAndProfile();
@@ -151,6 +152,7 @@ namespace Common.Authentication.Test
 
         [Fact]
         [Trait(Category.AcceptanceType, Category.CheckIn)]
+        [Obsolete]
         public void DataCollectionHandlesIOErrors()
         {
             TestExecutionHelpers.SetUpSessionAndProfile();
@@ -174,6 +176,7 @@ namespace Common.Authentication.Test
 
         [Fact]
         [Trait(Category.AcceptanceType, Category.CheckIn)]
+        [Obsolete]
         public void DataCollectionHandlesFileExistenceErrors()
         {
             TestExecutionHelpers.SetUpSessionAndProfile();
@@ -196,6 +199,7 @@ namespace Common.Authentication.Test
         }
         [Fact]
         [Trait(Category.AcceptanceType, Category.CheckIn)]
+        [Obsolete]
         public void DataCollectionHandlesDirectoryExistenceErrors()
         {
             TestExecutionHelpers.SetUpSessionAndProfile();
@@ -220,6 +224,7 @@ namespace Common.Authentication.Test
 
         [Fact]
         [Trait(Category.AcceptanceType, Category.CheckIn)]
+        [Obsolete]
         public void DataCollectionHandlesWriteErrors()
         {
             TestExecutionHelpers.SetUpSessionAndProfile();

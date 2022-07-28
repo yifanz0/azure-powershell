@@ -44,7 +44,9 @@ namespace Microsoft.Azure.Commands.Profile
             var profile = _dataCollectionProfile;
             profile.EnableAzureDataCollection = enable;
             var session = AzureSession.Instance;
+#pragma warning disable CS0618 // Type or member is obsolete
             DataCollectionController.WritePSDataCollectionProfile(session, profile);
+#pragma warning restore CS0618 // Type or member is obsolete
             AzureSession.Instance.RegisterComponent(DataCollectionController.RegistryKey, () => DataCollectionController.Create(profile), true);
         }
     }
