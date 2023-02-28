@@ -11,7 +11,7 @@
   DotNetFrameworkVersion = '4.7.2'
   RequiredAssemblies = './bin/Az.ElasticSan.private.dll'
   FormatsToProcess = './Az.ElasticSan.format.ps1xml'
-  FunctionsToExport = 'Add-AzElasticSanVolumeGroupNetworkRule', 'Get-AzElasticSan', 'Get-AzElasticSanSkuList', 'Get-AzElasticSanVolume', 'Get-AzElasticSanVolumeGroup', 'New-AzElasticSan', 'New-AzElasticSanVirtualNetworkRuleObject', 'New-AzElasticSanVolume', 'New-AzElasticSanVolumeGroup', 'Remove-AzElasticSan', 'Remove-AzElasticSanVolume', 'Remove-AzElasticSanVolumeGroup', 'Remove-AzElasticSanVolumeGroupNetworkRule', 'Update-AzElasticSan', 'Update-AzElasticSanVolume', 'Update-AzElasticSanVolumeGroup', '*'
+  FunctionsToExport = 'Add-AzElasticSanVolumeGroupNetworkRule', 'Get-AzElasticSan', 'Get-AzElasticSanSkuList', 'Get-AzElasticSanSnapshot', 'Get-AzElasticSanVolume', 'Get-AzElasticSanVolumeGroup', 'New-AzElasticSan', 'New-AzElasticSanSnapshot', 'New-AzElasticSanVirtualNetworkRuleObject', 'New-AzElasticSanVolume', 'New-AzElasticSanVolumeGroup', 'Remove-AzElasticSan', 'Remove-AzElasticSanSnapshot', 'Remove-AzElasticSanVolume', 'Remove-AzElasticSanVolumeGroup', 'Remove-AzElasticSanVolumeGroupNetworkRule', 'Update-AzElasticSan', 'Update-AzElasticSanSnapshot', 'Update-AzElasticSanVolume', 'Update-AzElasticSanVolumeGroup', '*'
   AliasesToExport = '*'
   PrivateData = @{
     PSData = @{

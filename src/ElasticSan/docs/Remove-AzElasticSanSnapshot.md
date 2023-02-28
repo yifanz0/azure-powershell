@@ -1,76 +1,56 @@
 ---
 external help file:
 Module Name: Az.ElasticSan
-online version: https://learn.microsoft.com/powershell/module/az.elasticsan/update-azelasticsanvolume
+online version: https://learn.microsoft.com/powershell/module/az.elasticsan/remove-azelasticsansnapshot
 schema: 2.0.0
 ---
 
-# Update-AzElasticSanVolume
+# Remove-AzElasticSanSnapshot
 
 ## SYNOPSIS
-Update an Volume.
+Delete a Volume Snapshot.
 
 ## SYNTAX
 
-### UpdateExpanded (Default)
+### Delete (Default)
 ```
-Update-AzElasticSanVolume -ElasticSanName <String> -Name <String> -ResourceGroupName <String>
- -VolumeGroupName <String> [-SubscriptionId <String>] [-SizeGiB <Int64>] [-Tag <Hashtable>]
- [-DefaultProfile <PSObject>] [-AsJob] [-NoWait] [-Confirm] [-WhatIf] [<CommonParameters>]
-```
-
-### Update
-```
-Update-AzElasticSanVolume -ElasticSanName <String> -Name <String> -ResourceGroupName <String>
- -VolumeGroupName <String> -Parameter <IVolumeUpdate> [-SubscriptionId <String>] [-DefaultProfile <PSObject>]
- [-AsJob] [-NoWait] [-Confirm] [-WhatIf] [<CommonParameters>]
+Remove-AzElasticSanSnapshot -ElasticSanName <String> -Name <String> -ResourceGroupName <String>
+ -VolumeGroupName <String> [-SubscriptionId <String>] [-DefaultProfile <PSObject>] [-AsJob] [-NoWait]
+ [-PassThru] [-Confirm] [-WhatIf] [<CommonParameters>]
 ```
 
-### UpdateViaIdentity
+### DeleteViaIdentity
 ```
-Update-AzElasticSanVolume -InputObject <IElasticSanIdentity> -Parameter <IVolumeUpdate>
- [-DefaultProfile <PSObject>] [-AsJob] [-NoWait] [-Confirm] [-WhatIf] [<CommonParameters>]
-```
-
-### UpdateViaIdentityExpanded
-```
-Update-AzElasticSanVolume -InputObject <IElasticSanIdentity> [-SizeGiB <Int64>] [-Tag <Hashtable>]
- [-DefaultProfile <PSObject>] [-AsJob] [-NoWait] [-Confirm] [-WhatIf] [<CommonParameters>]
+Remove-AzElasticSanSnapshot -InputObject <IElasticSanIdentity> [-DefaultProfile <PSObject>] [-AsJob] [-NoWait]
+ [-PassThru] [-Confirm] [-WhatIf] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Update an Volume.
+Delete a Volume Snapshot.
 
 ## EXAMPLES
 
-### Example 1: Update an Elastic SAN volume
+### Example 1: {{ Add title here }}
 ```powershell
-$volume = Update-AzElasticSanVolume -ResourceGroupName myresourcegroup -ElasticSanName myelasticsan -VolumeGroupName myvolumegroup -Name myvolume -Tag @{tag3 = "value3"} -SizeGib 120
+{{ Add code here }}
 ```
 
 ```output
-CreationDataCreateSource       : 
-CreationDataSourceUri          : 
-Id                             : /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myresourcegroup/providers/Microsoft.ElasticSan/elasticSans/myelasticsan/volumegroups/myvolumegroup/volumes/myvolume
-Name                           : myvolume
-SizeGiB                        : 120
-StorageTargetIqn               : iqn.2022-09.net.windows.core.blob.ElasticSan.es-3ibot5m2r3y0:myvolume
-StorageTargetPortalHostname    : es-3ibot5m2r3y0.z1.blob.storage.azure.net
-StorageTargetPortalPort        : 3260
-StorageTargetProvisioningState : Succeeded
-StorageTargetStatus            : Running
-SystemDataCreatedAt            : 9/19/2022 2:39:28 AM
-SystemDataCreatedBy            : yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
-SystemDataCreatedByType        : Application
-SystemDataLastModifiedAt       : 9/19/2022 2:39:28 AM
-SystemDataLastModifiedBy       : yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
-SystemDataLastModifiedByType   : Application
-Tag                            : Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.Api20211120Preview.ResourceTags
-Type                           : Microsoft.ElasticSan/ElasticSans
-VolumeId                       : abababab-abab-abab-abab-abababababab
+{{ Add output here }}
 ```
 
-This command updates the SizeGib and Tag properties of a volume.
+{{ Add description here }}
+
+### Example 2: {{ Add title here }}
+```powershell
+{{ Add code here }}
+```
+
+```output
+{{ Add output here }}
+```
+
+{{ Add description here }}
 
 ## PARAMETERS
 
@@ -109,7 +89,7 @@ The name of the ElasticSan.
 
 ```yaml
 Type: System.String
-Parameter Sets: Update, UpdateExpanded
+Parameter Sets: Delete
 Aliases:
 
 Required: True
@@ -125,7 +105,7 @@ To construct, see NOTES section for INPUTOBJECT properties and create a hash tab
 
 ```yaml
 Type: Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.IElasticSanIdentity
-Parameter Sets: UpdateViaIdentity, UpdateViaIdentityExpanded
+Parameter Sets: DeleteViaIdentity
 Aliases:
 
 Required: True
@@ -136,12 +116,12 @@ Accept wildcard characters: False
 ```
 
 ### -Name
-The name of the Volume.
+The name of the volume snapshot within the given volume group.
 
 ```yaml
 Type: System.String
-Parameter Sets: Update, UpdateExpanded
-Aliases: VolumeName
+Parameter Sets: Delete
+Aliases: SnapshotName
 
 Required: True
 Position: Named
@@ -165,19 +145,18 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Parameter
-Response for Volume request.
-To construct, see NOTES section for PARAMETER properties and create a hash table.
+### -PassThru
+Returns true when the command succeeds
 
 ```yaml
-Type: Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.Api202301.IVolumeUpdate
-Parameter Sets: Update, UpdateViaIdentity
+Type: System.Management.Automation.SwitchParameter
+Parameter Sets: (All)
 Aliases:
 
-Required: True
+Required: False
 Position: Named
 Default value: None
-Accept pipeline input: True (ByValue)
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
@@ -187,25 +166,10 @@ The name is case insensitive.
 
 ```yaml
 Type: System.String
-Parameter Sets: Update, UpdateExpanded
+Parameter Sets: Delete
 Aliases:
 
 Required: True
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -SizeGiB
-Volume size.
-
-```yaml
-Type: System.Int64
-Parameter Sets: UpdateExpanded, UpdateViaIdentityExpanded
-Aliases:
-
-Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -217,7 +181,7 @@ The ID of the target subscription.
 
 ```yaml
 Type: System.String
-Parameter Sets: Update, UpdateExpanded
+Parameter Sets: Delete
 Aliases:
 
 Required: False
@@ -227,27 +191,12 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Tag
-Resource tags.
-
-```yaml
-Type: System.Collections.Hashtable
-Parameter Sets: UpdateExpanded, UpdateViaIdentityExpanded
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -VolumeGroupName
 The name of the VolumeGroup.
 
 ```yaml
 Type: System.String
-Parameter Sets: Update, UpdateExpanded
+Parameter Sets: Delete
 Aliases:
 
 Required: True
@@ -293,13 +242,11 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-### Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.Api202301.IVolumeUpdate
-
 ### Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.IElasticSanIdentity
 
 ## OUTPUTS
 
-### Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.Api202301.IVolume
+### System.Boolean
 
 ## NOTES
 
@@ -318,11 +265,6 @@ To create the parameters described below, construct a hash table containing the 
   - `[SubscriptionId <String>]`: The ID of the target subscription.
   - `[VolumeGroupName <String>]`: The name of the VolumeGroup.
   - `[VolumeName <String>]`: The name of the Volume.
-
-`PARAMETER <IVolumeUpdate>`: Response for Volume request.
-  - `[SizeGiB <Int64?>]`: Volume size.
-  - `[Tag <IVolumeUpdateTags>]`: Resource tags.
-    - `[(Any) <String>]`: This indicates any property can be added to this object.
 
 ## RELATED LINKS
 

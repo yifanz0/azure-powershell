@@ -35,7 +35,7 @@ branch: ce6d86734f244e44e4ae39952f62c324d8fe6817
 require:
   - $(this-folder)/../readme.azure.noprofile.md
 input-file:
-  - $(repo)/specification/elasticsan/resource-manager/Microsoft.ElasticSan/preview/2021-11-20-preview/elasticsan.json
+  - D:\code\azure-rest-api-specs\specification\elasticsan\resource-manager\Microsoft.ElasticSan\preview\2021-11-20-preview/elasticsan.json
 
 # Normally, title is the service name
 title: ElasticSan

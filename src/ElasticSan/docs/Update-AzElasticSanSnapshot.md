@@ -1,80 +1,69 @@
 ---
 external help file:
 Module Name: Az.ElasticSan
-online version: https://learn.microsoft.com/powershell/module/az.elasticsan/update-azelasticsan
+online version: https://learn.microsoft.com/powershell/module/az.elasticsan/update-azelasticsansnapshot
 schema: 2.0.0
 ---
 
-# Update-AzElasticSan
+# Update-AzElasticSanSnapshot
 
 ## SYNOPSIS
-Update a Elastic San.
+Update a Volume Snapshot.
 
 ## SYNTAX
 
 ### UpdateExpanded (Default)
 ```
-Update-AzElasticSan -Name <String> -ResourceGroupName <String> [-SubscriptionId <String>]
- [-BaseSizeTiB <Int64>] [-ExtendedCapacitySizeTiB <Int64>] [-Tag <Hashtable>] [-DefaultProfile <PSObject>]
- [-AsJob] [-NoWait] [-Confirm] [-WhatIf] [<CommonParameters>]
+Update-AzElasticSanSnapshot -ElasticSanName <String> -Name <String> -ResourceGroupName <String>
+ -VolumeGroupName <String> [-SubscriptionId <String>] [-Tag <Hashtable>] [-DefaultProfile <PSObject>] [-AsJob]
+ [-NoWait] [-Confirm] [-WhatIf] [<CommonParameters>]
 ```
 
 ### Update
 ```
-Update-AzElasticSan -Name <String> -ResourceGroupName <String> -Parameter <IElasticSanUpdate>
- [-SubscriptionId <String>] [-DefaultProfile <PSObject>] [-AsJob] [-NoWait] [-Confirm] [-WhatIf]
- [<CommonParameters>]
+Update-AzElasticSanSnapshot -ElasticSanName <String> -Name <String> -ResourceGroupName <String>
+ -VolumeGroupName <String> -Parameter <ISnapshotUpdate> [-SubscriptionId <String>]
+ [-DefaultProfile <PSObject>] [-AsJob] [-NoWait] [-Confirm] [-WhatIf] [<CommonParameters>]
 ```
 
 ### UpdateViaIdentity
 ```
-Update-AzElasticSan -InputObject <IElasticSanIdentity> -Parameter <IElasticSanUpdate>
+Update-AzElasticSanSnapshot -InputObject <IElasticSanIdentity> -Parameter <ISnapshotUpdate>
  [-DefaultProfile <PSObject>] [-AsJob] [-NoWait] [-Confirm] [-WhatIf] [<CommonParameters>]
 ```
 
 ### UpdateViaIdentityExpanded
 ```
-Update-AzElasticSan -InputObject <IElasticSanIdentity> [-BaseSizeTiB <Int64>]
- [-ExtendedCapacitySizeTiB <Int64>] [-Tag <Hashtable>] [-DefaultProfile <PSObject>] [-AsJob] [-NoWait]
- [-Confirm] [-WhatIf] [<CommonParameters>]
+Update-AzElasticSanSnapshot -InputObject <IElasticSanIdentity> [-Tag <Hashtable>] [-DefaultProfile <PSObject>]
+ [-AsJob] [-NoWait] [-Confirm] [-WhatIf] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Update a Elastic San.
+Update a Volume Snapshot.
 
 ## EXAMPLES
 
-### Example 1: Update an Elastic SAN
+### Example 1: {{ Add title here }}
 ```powershell
-$elasticSan = Update-AzElasticSan -ResourceGroupName myresourcegroup -Name myelasticsan -BaseSizeTib 64 -ExtendedCapacitySizeTib 128 -Tag @{"tag3" = "value3"}
+{{ Add code here }}
 ```
 
 ```output
-AvailabilityZone             : 
-BaseSizeTiB                  : 64
-ExtendedCapacitySizeTiB      : 128
-Id                           : /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myresourcegroup/providers/Microsoft.ElasticSan/elasticSans/myelasticsan
-Location                     : eastus
-Name                         : myelasticsan
-ProvisioningState            : Succeeded
-SkuName                      : Premium_LRS
-SkuTier                      : 
-SystemDataCreatedAt          : 8/16/2022 4:59:54 AM
-SystemDataCreatedBy          : yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
-SystemDataCreatedByType      : Application
-SystemDataLastModifiedAt     : 8/16/2022 4:59:54 AM
-SystemDataLastModifiedBy     : yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
-SystemDataLastModifiedByType : Application
-Tag                          : Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.Api20211120Preview.ResourceTags
-TotalIops                    : 320000
-TotalMBps                    : 5120
-TotalSizeTiB                 : 192
-TotalVolumeSizeGiB           : 0
-Type                         : Microsoft.ElasticSan/ElasticSans
-VolumeGroupCount             : 0
+{{ Add output here }}
 ```
 
-This command updates the BaseSizeTib, ExtendedCapacitySizeTib, and Tag properties of an Elastic SAN.
+{{ Add description here }}
+
+### Example 2: {{ Add title here }}
+```powershell
+{{ Add code here }}
+```
+
+```output
+{{ Add output here }}
+```
+
+{{ Add description here }}
 
 ## PARAMETERS
 
@@ -84,21 +73,6 @@ Run the command as a job
 ```yaml
 Type: System.Management.Automation.SwitchParameter
 Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -BaseSizeTiB
-Base size of the Elastic San appliance in TiB.
-
-```yaml
-Type: System.Int64
-Parameter Sets: UpdateExpanded, UpdateViaIdentityExpanded
 Aliases:
 
 Required: False
@@ -123,15 +97,15 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ExtendedCapacitySizeTiB
-Extended size of the Elastic San appliance in TiB.
+### -ElasticSanName
+The name of the ElasticSan.
 
 ```yaml
-Type: System.Int64
-Parameter Sets: UpdateExpanded, UpdateViaIdentityExpanded
+Type: System.String
+Parameter Sets: Update, UpdateExpanded
 Aliases:
 
-Required: False
+Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -155,12 +129,12 @@ Accept wildcard characters: False
 ```
 
 ### -Name
-The name of the ElasticSan.
+The name of the volume snapshot within the given volume group.
 
 ```yaml
 Type: System.String
 Parameter Sets: Update, UpdateExpanded
-Aliases: ElasticSanName
+Aliases: SnapshotName
 
 Required: True
 Position: Named
@@ -185,11 +159,11 @@ Accept wildcard characters: False
 ```
 
 ### -Parameter
-Response for ElasticSan update request.
+Snapshot request.
 To construct, see NOTES section for PARAMETER properties and create a hash table.
 
 ```yaml
-Type: Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.Api202301.IElasticSanUpdate
+Type: Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.Api202301.ISnapshotUpdate
 Parameter Sets: Update, UpdateViaIdentity
 Aliases:
 
@@ -232,7 +206,7 @@ Accept wildcard characters: False
 ```
 
 ### -Tag
-Update tags
+Resource tags.
 
 ```yaml
 Type: System.Collections.Hashtable
@@ -240,6 +214,21 @@ Parameter Sets: UpdateExpanded, UpdateViaIdentityExpanded
 Aliases:
 
 Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -VolumeGroupName
+The name of the VolumeGroup.
+
+```yaml
+Type: System.String
+Parameter Sets: Update, UpdateExpanded
+Aliases:
+
+Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -282,13 +271,13 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-### Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.Api202301.IElasticSanUpdate
+### Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.Api202301.ISnapshotUpdate
 
 ### Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.IElasticSanIdentity
 
 ## OUTPUTS
 
-### Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.Api202301.IElasticSan
+### Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.Api202301.ISnapshot
 
 ## NOTES
 
@@ -308,10 +297,8 @@ To create the parameters described below, construct a hash table containing the 
   - `[VolumeGroupName <String>]`: The name of the VolumeGroup.
   - `[VolumeName <String>]`: The name of the Volume.
 
-`PARAMETER <IElasticSanUpdate>`: Response for ElasticSan update request.
-  - `[BaseSizeTiB <Int64?>]`: Base size of the Elastic San appliance in TiB.
-  - `[ExtendedCapacitySizeTiB <Int64?>]`: Extended size of the Elastic San appliance in TiB.
-  - `[Tag <IElasticSanUpdateTags>]`: Update tags
+`PARAMETER <ISnapshotUpdate>`: Snapshot request.
+  - `[Tag <ISnapshotUpdateTags>]`: Resource tags.
     - `[(Any) <String>]`: This indicates any property can be added to this object.
 
 ## RELATED LINKS

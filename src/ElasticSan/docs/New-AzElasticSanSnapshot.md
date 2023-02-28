@@ -1,78 +1,69 @@
 ---
 external help file:
 Module Name: Az.ElasticSan
-online version: https://learn.microsoft.com/powershell/module/az.elasticsan/new-azelasticsanvolume
+online version: https://learn.microsoft.com/powershell/module/az.elasticsan/new-azelasticsansnapshot
 schema: 2.0.0
 ---
 
-# New-AzElasticSanVolume
+# New-AzElasticSanSnapshot
 
 ## SYNOPSIS
-Create a Volume.
+Create a Volume Snapshot.
 
 ## SYNTAX
 
 ### CreateExpanded (Default)
 ```
-New-AzElasticSanVolume -ElasticSanName <String> -Name <String> -ResourceGroupName <String>
- -VolumeGroupName <String> [-SubscriptionId <String>] [-CreationDataCreateSource <VolumeCreateOption>]
- [-CreationDataSourceUri <String>] [-SizeGiB <Int64>] [-Tag <Hashtable>] [-DefaultProfile <PSObject>] [-AsJob]
- [-NoWait] [-Confirm] [-WhatIf] [<CommonParameters>]
+New-AzElasticSanSnapshot -ElasticSanName <String> -Name <String> -ResourceGroupName <String>
+ -VolumeGroupName <String> [-SubscriptionId <String>] [-CreationDataSourceUri <String>] [-Tag <Hashtable>]
+ [-DefaultProfile <PSObject>] [-AsJob] [-NoWait] [-Confirm] [-WhatIf] [<CommonParameters>]
 ```
 
 ### Create
 ```
-New-AzElasticSanVolume -ElasticSanName <String> -Name <String> -ResourceGroupName <String>
- -VolumeGroupName <String> -Parameter <IVolume> [-SubscriptionId <String>] [-DefaultProfile <PSObject>]
+New-AzElasticSanSnapshot -ElasticSanName <String> -Name <String> -ResourceGroupName <String>
+ -VolumeGroupName <String> -Parameter <ISnapshot> [-SubscriptionId <String>] [-DefaultProfile <PSObject>]
  [-AsJob] [-NoWait] [-Confirm] [-WhatIf] [<CommonParameters>]
 ```
 
 ### CreateViaIdentity
 ```
-New-AzElasticSanVolume -InputObject <IElasticSanIdentity> -Parameter <IVolume> [-DefaultProfile <PSObject>]
- [-AsJob] [-NoWait] [-Confirm] [-WhatIf] [<CommonParameters>]
+New-AzElasticSanSnapshot -InputObject <IElasticSanIdentity> -Parameter <ISnapshot>
+ [-DefaultProfile <PSObject>] [-AsJob] [-NoWait] [-Confirm] [-WhatIf] [<CommonParameters>]
 ```
 
 ### CreateViaIdentityExpanded
 ```
-New-AzElasticSanVolume -InputObject <IElasticSanIdentity> [-CreationDataCreateSource <VolumeCreateOption>]
- [-CreationDataSourceUri <String>] [-SizeGiB <Int64>] [-Tag <Hashtable>] [-DefaultProfile <PSObject>] [-AsJob]
- [-NoWait] [-Confirm] [-WhatIf] [<CommonParameters>]
+New-AzElasticSanSnapshot -InputObject <IElasticSanIdentity> [-CreationDataSourceUri <String>]
+ [-Tag <Hashtable>] [-DefaultProfile <PSObject>] [-AsJob] [-NoWait] [-Confirm] [-WhatIf] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Create a Volume.
+Create a Volume Snapshot.
 
 ## EXAMPLES
 
-### Example 1: Create a volume
+### Example 1: {{ Add title here }}
 ```powershell
-New-AzElasticSanVolume -ResourceGroupName myresourcegroup -ElasticSanName myelasticsan -VolumeGroupName myvolumegroup -Name myvolumegroup -SizeGib 100  -CreationDataSourceUri 'https://abc.com' -Tag @{tag1="value1";tag2="value2"}
+{{ Add code here }}
 ```
 
 ```output
-CreationDataCreateSource       : 
-CreationDataSourceUri          : https://abc.com
-Id                             : /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myresourcegroup/providers/Microsoft.ElasticSan/elasticSans/myelasticsan/volumegroups/myvolumegroup/volumes/myvolume
-Name                           : myvolume
-SizeGiB                        : 100
-StorageTargetIqn               : iqn.2022-09.net.windows.core.blob.ElasticSan.es-3ibot5m2r3y0:myvolume
-StorageTargetPortalHostname    : es-3ibot5m2r3y0.z1.blob.storage.azure.net
-StorageTargetPortalPort        : 3260
-StorageTargetProvisioningState : Succeeded
-StorageTargetStatus            : Running
-SystemDataCreatedAt            : 9/19/2022 2:39:28 AM
-SystemDataCreatedBy            : yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
-SystemDataCreatedByType        : Application
-SystemDataLastModifiedAt       : 9/19/2022 2:39:28 AM
-SystemDataLastModifiedBy       : yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
-SystemDataLastModifiedByType   : Application
-Tag                            : Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.Api20211120Preview.ResourceTags
-Type                           : Microsoft.ElasticSan/ElasticSans
-VolumeId                       : abababab-abab-abab-abab-abababababab
+{{ Add output here }}
 ```
 
-This command creates a volume.
+{{ Add description here }}
+
+### Example 2: {{ Add title here }}
+```powershell
+{{ Add code here }}
+```
+
+```output
+{{ Add output here }}
+```
+
+{{ Add description here }}
 
 ## PARAMETERS
 
@@ -82,21 +73,6 @@ Run the command as a job
 ```yaml
 Type: System.Management.Automation.SwitchParameter
 Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -CreationDataCreateSource
-This enumerates the possible sources of a volume creation.
-
-```yaml
-Type: Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Support.VolumeCreateOption
-Parameter Sets: CreateExpanded, CreateViaIdentityExpanded
 Aliases:
 
 Required: False
@@ -169,12 +145,12 @@ Accept wildcard characters: False
 ```
 
 ### -Name
-The name of the Volume.
+The name of the volume snapshot within the given volume group.
 
 ```yaml
 Type: System.String
 Parameter Sets: Create, CreateExpanded
-Aliases: VolumeName
+Aliases: SnapshotName
 
 Required: True
 Position: Named
@@ -199,11 +175,11 @@ Accept wildcard characters: False
 ```
 
 ### -Parameter
-Response for Volume request.
+Response for Volume Snapshot request.
 To construct, see NOTES section for PARAMETER properties and create a hash table.
 
 ```yaml
-Type: Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.Api202301.IVolume
+Type: Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.Api202301.ISnapshot
 Parameter Sets: Create, CreateViaIdentity
 Aliases:
 
@@ -224,21 +200,6 @@ Parameter Sets: Create, CreateExpanded
 Aliases:
 
 Required: True
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -SizeGiB
-Volume size.
-
-```yaml
-Type: System.Int64
-Parameter Sets: CreateExpanded, CreateViaIdentityExpanded
-Aliases:
-
-Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -326,13 +287,13 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-### Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.Api202301.IVolume
+### Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.Api202301.ISnapshot
 
 ### Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.IElasticSanIdentity
 
 ## OUTPUTS
 
-### Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.Api202301.IVolume
+### Microsoft.Azure.PowerShell.Cmdlets.ElasticSan.Models.Api202301.ISnapshot
 
 ## NOTES
 
@@ -352,13 +313,10 @@ To create the parameters described below, construct a hash table containing the 
   - `[VolumeGroupName <String>]`: The name of the VolumeGroup.
   - `[VolumeName <String>]`: The name of the Volume.
 
-`PARAMETER <IVolume>`: Response for Volume request.
+`PARAMETER <ISnapshot>`: Response for Volume Snapshot request.
   - `[Tag <IResourceTags>]`: Azure resource tags.
     - `[(Any) <String>]`: This indicates any property can be added to this object.
-  - `[CreationDataCreateSource <VolumeCreateOption?>]`: This enumerates the possible sources of a volume creation.
   - `[CreationDataSourceUri <String>]`: If createOption is Copy, this is the ARM id of the source snapshot or disk. If createOption is Restore, this is the ARM-like id of the source disk restore point.
-  - `[SizeGiB <Int64?>]`: Volume size.
-  - `[StorageTargetStatus <OperationalStatus?>]`: Operational status of the iSCSI Target.
   - `[SystemDataCreatedAt <DateTime?>]`: The timestamp of resource creation (UTC).
   - `[SystemDataCreatedBy <String>]`: The identity that created the resource.
   - `[SystemDataCreatedByType <CreatedByType?>]`: The type of identity that created the resource.
