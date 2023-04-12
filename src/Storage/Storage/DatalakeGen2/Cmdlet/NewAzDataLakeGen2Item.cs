@@ -387,7 +387,21 @@ namespace Microsoft.WindowsAzure.Commands.Storage.Blob.Cmdlet
             {
                 if (Char.ToLower(permission[i]) == 't')
                 {
-                    blobPermission += permission[i];
+                    if (permission[i] == 'T')
+                    {
+                        blobPermission += permission[i];
+                    } 
+                    else
+                    {
+                        if (umask[i] == '-')
+                        {
+                            blobPermission += 't';
+                        } 
+                        else
+                        {
+                            blobPermission += 'T';
+                        }
+                    }
                 }
                 else
                 {
